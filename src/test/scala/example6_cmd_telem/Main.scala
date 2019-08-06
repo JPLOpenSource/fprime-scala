@@ -37,7 +37,7 @@ class A extends Component {
   var i: Int = 0
   var f: Float = 0
 
-  override def processCommand(cmd: Command): Unit = {
+  override def executeCommand(cmd: Command): Unit = {
     cmd match {
       case IncreaseIntWith(x) =>
         i += x
@@ -57,7 +57,7 @@ class A extends Component {
 
   def when = {
     case cmd: Command =>
-      processCommand(cmd)
+      executeCommand(cmd)
     case _ => ()
   }
 }
@@ -90,7 +90,7 @@ class C extends Component {
   var i: Int = 0
   var f: Float = 0
 
-  override def processCommand(cmd: Command): Unit = {
+  override def executeCommand(cmd: Command): Unit = {
     cmd match {
       case IncreaseIntWith(x) =>
         i += x
@@ -110,7 +110,7 @@ class C extends Component {
 
   def when = {
     case cmd: Command =>
-      processCommand(cmd)
+      executeCommand(cmd)
     case _ => ()
   }
 }

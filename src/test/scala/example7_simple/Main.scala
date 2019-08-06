@@ -25,7 +25,7 @@ class A extends Component {
 
   var value: Float = 0.0f
 
-  override def processCommand(cmd: Command): Unit = {
+  override def executeCommand(cmd: Command): Unit = {
     cmd match {
       case SetValue(x) =>
         value = x

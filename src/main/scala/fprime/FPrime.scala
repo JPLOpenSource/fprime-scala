@@ -141,7 +141,7 @@ class GuardedSyncInput[S, T](implicit mutex: Mutex) extends SyncInput[S, T] {
 
 class SyncOutput[S, T] {
   /**
-   * A synchronous port is connected to exactly one synchronous input port.
+   * A synchronous output port is connected to exactly one synchronous input port.
    */
 
   private var otherEnd: SyncInput[S, T] = null
@@ -512,7 +512,7 @@ class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveC
 
   override def invoke(cmd: Command): Unit = {
     if (cmd.isUrgent) {
-      thisComponent.processTheCommand(cmd)
+      thisComponent.processCommand(cmd)
     } else {
       actorRef ! cmd
     }
@@ -620,9 +620,9 @@ trait PassiveComponent {
   protected implicit var parameters: Map[ParameterName, Int] = Map()
 
   /**
-   * 
+   * Sets the parameters of component based on a <code>Parameters</code> command from ground.
    *
-   * @param parameters
+   * @param parameters the <code>Parmeters</code> command.
    */
 
   private def setParameters(parameters: Parameters): Unit = {
@@ -632,44 +632,171 @@ trait PassiveComponent {
     }
   }
 
+  /**
+   * Set a single parameter.
+   *
+   * @param name  name of the parameter.
+   * @param value value the parameter is assigned.
+   */
+
   private def setParameter(name: ParameterName, value: Int): Unit = {
     parameters += (name -> value)
   }
+
+  /**
+   * Get the value of a parameter.
+   *
+   * @param name name of the parameter.
+   * @return value of the parameter.
+   */
 
   protected def getParameter(name: ParameterName): Option[Int] = {
     parameters.get(name)
   }
 
-  private[fprime] def processTheCommand(cmd: Command): Unit = {
+  /**
+   * This method is called to execute a command when an active component receives a such
+   * through a <code>CommandInput</code> port. It is either called when the command
+   * asynchronously is picked off the component's actor queue, or called directly in case the
+   * command is urgent. The method calls the <code>processCommand</code> method which the user
+   * has to define.
+   *
+   * @param cmd command to be executed.
+   */
+
+  private[fprime] def processCommand(cmd: Command): Unit = {
     cmd match {
       case parameters: Parameters => setParameters(parameters)
-      case _ => processCommand(cmd)
+      case _ => executeCommand(cmd)
 
     }
   }
 
-  protected def processCommand(cmd: Command): Unit = {
+  /**
+   * Executes a command. The method has to be overridden and defined by the user as part of
+   * the component definition.
+   *
+   * @param cmd command to be executed.
+   */
+
+  protected def executeCommand(cmd: Command): Unit = {
     println(s"*** no command handling implemented for component $componentName. $cmd is not processed!")
   }
 }
 
+/**
+ * A queued component is a passive component (like a class), which has an additional
+ * queue of messages built in. A queued component can have normal synchronized ports,
+ * as can passive components, but it can also have asynchronous queued input ports, which
+ * when invoked asynchronously , will place the incoming message in the queue.
+ *
+ * @tparam T type of messages inserted in queue.
+ */
+
+trait QueuedComponent[T] extends PassiveComponent {
+  /**
+   * The queue of messages.
+   */
+
+  implicit val queue = scala.collection.mutable.Queue[T]()
+
+  /**
+   * Inserting a message in the queue. Thread safe.
+   *
+   * @param x message being inserted into queue.
+   */
+
+  def put(x: T): Unit = {
+    mutex.synchronized {
+      queue += x
+    }
+  }
+
+  /**
+   * Getting the next element of the queue (FIFO). Thread safe.
+   *
+   * @return the next element <code>v</code> in the queue as <code>Some(v)</code>
+   *         if the queue is not empty, and <code>None</code> if the queue is
+   *         empty.
+   */
+
+  def get(): Option[T] = {
+    mutex.synchronized {
+      if (queue.isEmpty) None else Some(queue.dequeue())
+    }
+  }
+}
+
+/**
+ * An active component behaves like a thread to which messages can be sent over ports
+ * asynchronously. However, an active component can also have syncrhonous ports (like
+ * methods to be called).
+ */
+
 trait Component extends PassiveComponent {
-  def when: Actor.Receive
+  /**
+   * It meant to define the behavior of the component for each new message
+   * submitted to the component. It must be overridden and defined by the user.
+   * Incoming messages are of type <code>Any</code> and the method returns no
+   * value of importance.
+   *
+   * @return no return value beyond <code>()</code> of type <code>Unit</code>.
+   */
 
-  implicit var actorRef: ActorRef = system.actorOf(Props(new TheActor))
+  protected def when: PartialFunction[Any, Unit]
 
-  var timeOut: Option[Int] = None
+  /**
+   * A reference to the actor serving this active component. Each active component
+   * runs an actor.
+   */
 
-  def setTimer(time: Int): Unit = {
+  protected implicit var actorRef: ActorRef = system.actorOf(Props(new TheActor))
+
+  /**
+   * Variable indicating whether a timer has been set with the <code>setTimer</code>
+   * method.
+   */
+
+  private var timeOut: Option[Int] = None
+
+  /**
+   * Sets the timer to a specific number of seconds.
+   *
+   * @param time time in seconds.
+   */
+
+  protected def setTimer(time: Int): Unit = {
     timeOut = Some(time * 1000)
   }
 
-  def selfTrigger(msg: Any): Unit = {
+  /**
+   * Used for a component to send itself a message. This can be used to
+   * allow the component to enter a state where no external event is expected,
+   * and where the component sends itself a message to progress.
+   *
+   * @param msg the message the component sends itself.
+   */
+
+  protected def selfTrigger(msg: Any): Unit = {
     actorRef ! msg
   }
 
-  class TheActor extends Actor {
-    def resetTimer(): Unit = {
+  /**
+   * The actor that represents the individual behavior of this active component.
+   * Scala's Akka actors are used for this purpose.
+   */
+
+  private class TheActor extends Actor {
+
+    /**
+     * This method is called after each event processed by the actor. It initiates an actor timer if the
+     * <code>timeOut</code> variable has been set with the <code>setTimer</code>
+     * method. The actor timer will time out after the period indicated in the <code>timeOut</code> variable,
+     * by sending a <code>ReceiveTimeout</code> message to the actor, unless it is neutralized beforehand,
+     * e.g. when an expected different message is received.
+     */
+
+    private def resetTimer(): Unit = {
       timeOut match {
         case None =>
         case Some(time) =>
@@ -679,9 +806,18 @@ trait Component extends PassiveComponent {
       }
     }
 
-    override def receive: Receive = {
+    /**
+     * This method processes messages sent to the actor. If it is a command,
+     * it calls the user defined method <code>executeCommand</code> on it. Otherwise
+     * it calls the user defined <code>when</code> method on it. This method should not
+     * be overridden by the user.
+     *
+     * @return the method does not return any value of interest.
+     */
+
+    override def receive: PartialFunction[Any, Unit] = {
       case cmd: Command =>
-        processCommand(cmd)
+        executeCommand(cmd)
         resetTimer()
       case ReceiveTimeout =>
         context.setReceiveTimeout(Duration.Undefined)
@@ -695,18 +831,3 @@ trait Component extends PassiveComponent {
 
 }
 
-trait QueuedComponent[T] extends PassiveComponent {
-  implicit val queue = scala.collection.mutable.Queue[T]()
-
-  def put(x: T): Unit = {
-    mutex.synchronized {
-      queue += x
-    }
-  }
-
-  def get(): Option[T] = {
-    mutex.synchronized {
-      if (queue.isEmpty) None else Some(queue.dequeue())
-    }
-  }
-}
