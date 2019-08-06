@@ -61,7 +61,7 @@ object Main {
       (1 -> b.int_in),
       (2 -> c.int_in))
 
-    sender.int_out.connectListener(monitor.int_in)
+    sender.int_out.connectListeners(monitor.int_in)
 
     ground.int_out.connect(sender.int_in)
 

@@ -253,11 +253,17 @@ class Input[T](implicit actorRef: ActorRef, implicit val thisComponent: PassiveC
 }
 
 /**
- * A queued input port can only be part of a passive component.
+ * A queued input port can only be part of a <code>QueuedComponent</code>. Messages sent to a
+ * queued input port get stored in a queue. However, the queue is here not accessed by an
+ * internal actor thread (there is no such). Instead it can be read by other components.
  *
- * @param queue
- * @param mutex
- * @param component
+ * @param queue     the queue into which messages are stored. Defined as implicit and assumed to
+ *                  be in scope in the queued component the port is part of.
+ * @param mutex     mutex the mutex upon which a lock is taken. Defined as implicit and assumed to
+ *                  be in scope in the queued component the port is part of.
+ * @param component the queued component this port is part of, seen as a passive component.
+ *                  Defined as implicit and assumed to be in scope in the queued component
+ *                  the port is part of.
  * @tparam T type of message passed to port.
  */
 
@@ -267,8 +273,9 @@ class QueuedInput[T](
                       implicit val component: PassiveComponent) extends iInput[T] {
   /**
    * Calling the invoke method corresponds to sending a message to the component containing
-   * the input port as part of its interface. The message will be sent to the Akka actor
-   * representing the component's thread.
+   * the input port as part of its interface. The message will be stored in the queue, to
+   * be accessed by other components. The method is thread safe (a mutex protects the queue
+   * operation).
    *
    * @param a the message being sent
    */
@@ -289,16 +296,38 @@ class QueuedInput[T](
   def getComponentName: String = component.componentName
 }
 
+/**
+ * Asynchronous output port.
+ *
+ * @param componentName name of the component the port is part of. Defined as implicit
+ *                      and assumed to be in scope in the active component the port is part of.
+ * @tparam T type of messages sent on port.
+ */
+
 class Output[T](implicit componentName: String) {
-  var otherEnds: List[iInput[T]] = List()
+  /**
+   * The list of input ports this output port is connected to. The fact that
+   * it is a list allows for broadcasting.
+   */
+
+  private var otherEnds: List[iInput[T]] = List()
+
+  /**
+   * Connects this asynchronous output port to one or more asynchronous input ports.
+   *
+   * @param in the asynchronous input ports to connect to, provided as varargs.
+   */
 
   def connect(in: iInput[T]*): Unit = {
     otherEnds ++= in.toList
   }
 
-  def connectListeners(in: iInput[T]*): Unit = {
-    connect(in: _*)
-  }
+  /**
+   * Calling the invoke method causes the argument message to be sent to the input
+   * ports registered as receivers.
+   *
+   * @param a the message being sent.
+   */
 
   def invoke(a: T): Unit = {
     assert(!otherEnds.isEmpty, "Output port has not been connected to input port when sending $a")
@@ -308,11 +337,27 @@ class Output[T](implicit componentName: String) {
     }
   }
 
-  def debug(source: String, target: String, msg: T): Unit = {
-    val otherComponent =
-      println(s"$source ---> $target : [$msg]")
+  /**
+   * Used for debugging. Prints source, target, and message sent upon call of
+   * the <code>invoke</code> method.
+   *
+   * @param source name of component sending message.
+   * @param target name of component receiving message.
+   * @param msg the message sent.
+   */
+
+  private def debug(source: String, target: String, msg: T): Unit = {
+    println(s"$source ---> $target : [$msg]")
   }
 }
+
+/**
+ * An array output port supports an array of individual output ports.
+ * Each individual output port can be invoked using a port index.
+ *
+ * @param size
+ * @tparam T
+ */
 
 class ArrayOutput[T](size: Int) {
   var portArray: Array[iInput[T]] = new Array(size)
@@ -328,7 +373,7 @@ class ArrayOutput[T](size: Int) {
     }
   }
 
-  def connectListener(in: iInput[T]*): Unit = {
+  def connectListeners(in: iInput[T]*): Unit = {
     listeners ++= in.toList
   }
 
