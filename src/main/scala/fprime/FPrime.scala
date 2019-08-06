@@ -352,20 +352,23 @@ class Output[T](implicit componentName: String) {
 }
 
 /**
- * An array output port supports an array of individual output ports.
- * Each individual output port can be invoked using a port index.
+ * An array output port supports an array of individual asynchronous output ports.
+ * Each individual output port can be invoked using its port index.
  *
- * @param size
- * @tparam T
+ * @param size the size of the port array.
+ * @tparam T the type of of message sent on the individual output ports. They must
+ *       all be of the same type.
  */
 
 class ArrayOutput[T](size: Int) {
-  var portArray: Array[iInput[T]] = new Array(size)
-  var listeners: List[iInput[T]] = List()
+  private var portArray: Array[iInput[T]] = new Array(size)
+  private var listeners: List[iInput[T]] = List()
 
-  def allArrayEntriesDefined(): Boolean = {
-    portArray.indices forall (portArray(_) != null)
-  }
+  /**
+   * Connects this array output port to its indexed input ports, one for each index.
+   *
+   * @param bindings the (index, asynchronous input port) pairs to connect to, provided as varargs.
+   */
 
   def connect(bindings: (Int, iInput[T])*): Unit = {
     for ((index, inPort) <- bindings) {
@@ -373,12 +376,29 @@ class ArrayOutput[T](size: Int) {
     }
   }
 
+  /**
+   * It is with this method possible to connect to additional input ports besides those
+   * indexed in the array. This can be used to e.g. add listeners to the communication
+   * sent via the indexed ports.
+   *
+   * @param in the additional asynchronous input ports to connect to, provided as varargs.
+   */
+
   def connectListeners(in: iInput[T]*): Unit = {
     listeners ++= in.toList
   }
 
+  /**
+   * Calling the invoke method causes the argument message to be sent to the input
+   * port at the given index. Each such message also gets broadcasted to ports
+   * registered with the <code>connectListeners</code> method.
+   *
+   * @param index the index of the input port to send to.
+   * @param a the message being sent.
+   */
+
   def invoke(index: Int, a: T): Unit = {
-    assert(allArrayEntriesDefined(), "Output array port has not been fully connected")
+    assert(portArray.indices forall (portArray(_) != null), "Output array port has not been fully connected")
     portArray(index).invoke(a)
     for (otherEnd <- listeners) {
       otherEnd.invoke(a)
@@ -386,9 +406,9 @@ class ArrayOutput[T](size: Int) {
   }
 }
 
-/** ***********************************
- * Commands, Event and Telemetry Ports
- * ************************************/
+// ===========================================
+// === Command, Event, and Telemetry Ports ===
+// ===========================================
 
 // === The data ===
 
