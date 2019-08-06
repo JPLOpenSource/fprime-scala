@@ -343,7 +343,7 @@ class Output[T](implicit componentName: String) {
    *
    * @param source name of component sending message.
    * @param target name of component receiving message.
-   * @param msg the message sent.
+   * @param msg    the message sent.
    */
 
   private def debug(source: String, target: String, msg: T): Unit = {
@@ -357,7 +357,7 @@ class Output[T](implicit componentName: String) {
  *
  * @param size the size of the port array.
  * @tparam T the type of of message sent on the individual output ports. They must
- *       all be of the same type.
+ *           all be of the same type.
  */
 
 class ArrayOutput[T](size: Int) {
@@ -394,7 +394,7 @@ class ArrayOutput[T](size: Int) {
    * registered with the <code>connectListeners</code> method.
    *
    * @param index the index of the input port to send to.
-   * @param a the message being sent.
+   * @param a     the message being sent.
    */
 
   def invoke(index: Int, a: T): Unit = {
@@ -410,12 +410,33 @@ class ArrayOutput[T](size: Int) {
 // === Command, Event, and Telemetry Ports ===
 // ===========================================
 
-// === The data ===
+// === Data types for communication with ground:
+// === commands, events, and telemetry
 
-// To FSW
+// Data sent from ground to FSW
+
+/**
+ * Commands from ground controls the spacecraft/rover. Commands can be
+ * defined as case classes and case objects subclassing this trait.
+ */
 
 trait Command extends Serializable { // subclass this
-  var isUrgent: Boolean = false
+
+  /**
+   * True if the command is urgent. An urgent command sent to an asynchronous
+   * input port gets processed right away: it does not enter the input queue
+   * first.
+   */
+
+  private[fprime] var isUrgent: Boolean = false
+
+  /**
+   * This method can be called in a chaining manner. Suppose that <code>cmd</code> is
+   * a command. Then <code>cmd.urgent</code> is the same command as <code>cmd</code>
+   * except with the <code>isUrgent</code> flag set to true.
+   *
+   * @return the command updated with the <code>isUrgent</code> flag set to true.
+   */
 
   def urgent: Command = {
     isUrgent = true
@@ -423,25 +444,72 @@ trait Command extends Serializable { // subclass this
   }
 }
 
+/**
+ * A special command is the <code>Parameters</code> case class, which instructs setting
+ * indicated parameter names to denote indicated integer values.
+ *
+ * @param data the mapping of parameter names to the parameter values they shall denote.
+ */
+
 case class Parameters(data: Map[ParameterName, Int]) extends Command
 
-// From FSW
+// Data sent from FSW to ground
+
+/**
+ * Observations are data sent from the spacecraft/rover to ground. Any observation type must
+ * subclass this trait.
+ */
 
 trait Observation extends Serializable // subclass this
 
+/**
+ * Telemetry is a special kind of observation, which provides information about the value
+ * of a collection of variables having floating point values. This can e.g. be speed,
+ * orientation, temperature, etc.
+ *
+ * @param data The telemetry observations in the form of a mapping from telemetry names to values.
+ */
+
 case class Telemetry(data: Map[TelemetryName, Float]) extends Observation
+
+/**
+ * Events are observations indicating discrete events occuring, such as e.g. a command being
+ * dispatched, and a command succeeding. Events can be defined as case classes and case
+ * objects subclassing this trait.
+ */
 
 trait Event extends Observation // subclass this
 
-// === The ports ===
+// === The commanding and observation ports
 
-// -----------
-// --- FSW ---
-// -----------
+// FSW input
 
-// Input
+/**
+ * The <code>CommandInput</code> is a special <code>Input</code> port which accepts commands from
+ * ground. The port is special by handling a command right away in case the command has been
+ * declared as urgent (a command <code>cmd</code> is declared urgent by calling the <code>urgent</code>
+ * method on it as follows: <code>cmd.urgent</code>).
+ *
+ * @param actorRef  reference to Akka actor thread running internally in active component.
+ *                  Any input is sent to that actor thread. Defined as implicit and assumed to
+ *                  be in scope in the active component the port is part of.
+ * @param component the component this port is part of, seen as a passive component. Note that
+ *                  an active component subclasses passive component. Defined as implicit and assumed to
+ *                  be in scope in the active component the port is part of.
+ */
 
 class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveComponent) extends Input[Command] {
+  /**
+   * Calling the invoke method corresponds to sending a command to the component containing
+   * the input port as part of its interface. The command will be sent to the Akka actor
+   * representing the component's thread, unless the command is urgent, in which case it will
+   * be processed right away (it is not going into the component's actor queue). All commands
+   * will be processed by the user defined <code>processCommand</code>, which the user has to
+   * override/define in the component containing the port.
+   *
+   * @param cmd the command being sent.
+   */
+
   override def invoke(cmd: Command): Unit = {
     if (cmd.isUrgent) {
       thisComponent.processTheCommand(cmd)
@@ -451,12 +519,26 @@ class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveC
   }
 }
 
-// Output
+// FSW output
+
+/**
+ * An <code>ObsOutput</code> port is a special <code>Output</code> port to which observations
+ * can be sent, including events and telemetry. Events can be submitted with the standard
+ * <code>invoke</code> method. Telemetry can be submitted with the special <code>logTelem</code>
+ * method.
+ *
+ * @param componentName name of the component the port is part of. Defined as implicit
+ *                      and assumed to be in scope in the active component the port is part of.
+ */
 
 class ObsOutput(implicit componentName: String) extends Output[Observation] {
-  def log(obs: Observation): Unit = {
-    invoke(obs)
-  }
+  /**
+   * submits a telemetry observation reporting on the values of telemetry variables.
+   *
+   * @param data          the mapping from telemetry names to values to be reported.
+   * @param componentName name of the component the port is part of. Defined as implicit
+   *                      and assumed to be in scope in the active component the port is part of.
+   */
 
   def logTelem(data: (TelemetryName, Float)*)(implicit componentName: String): Unit = {
     val map = data.map {
@@ -466,46 +548,99 @@ class ObsOutput(implicit componentName: String) extends Output[Observation] {
   }
 }
 
-// --------------
-// --- Ground ---
-// --------------
+// Ground input
 
-// Input
+/**
+ * Special input port for ground for receiving observations from the spacecraft/rover.
+ *
+ * @param actorRef  reference to Akka actor thread running internally in active ground component.
+ *                  Any input is sent to that actor thread. Defined as implicit and assumed to
+ *                  be in scope in the active component the port is part of.
+ * @param component the ground component this port is part of, seen as a passive component. Note that
+ *                  an active component subclasses passive component. Defined as implicit and assumed to
+ *                  be in scope in the active component the port is part of.
+ */
 
 class ObsInput(implicit actorRef: ActorRef, implicit val component: PassiveComponent) extends Input[Observation]
 
-// Output
+// Ground output
+
+/**
+ * Special output port for ground for sending commmands.
+ *
+ * @param componentName name of the ground component the port is part of. Defined as implicit
+ *                      and assumed to be in scope in the active component the port is part of.
+ */
 
 class CommandOutput(implicit componentName: String) extends Output[Command]
 
-/** ****************
- * PassiveComponent
- * *****************/
+// ==================
+// === Components ===
+// ==================
 
-class Mutex
+/**
+ * Mutex used to achieve thread safe mutually exclusive access to
+ * variables of passive components.
+ */
+
+private[fprime] class Mutex
+
+/**
+ * A passive component is like a class. Sending a message to a passive component is like calling
+ * a method on the component, which returns with a value (potentially of type <code>Unit</code>
+ * if the "method" is just called for its side effect).
+ */
 
 trait PassiveComponent {
-  implicit val mutex = new Mutex
-  implicit val componentName = this.getClass.getSimpleName
-  implicit var parameters: Map[ParameterName, Int] = Map()
-  implicit val thisComponent: PassiveComponent = this
+  /**
+   * The mutex protecting the data of this component from parallel access from
+   * different components.
+   */
 
-  def setParameters(parameters: Parameters): Unit = {
+  protected[fprime] implicit val mutex = new Mutex
+
+  /**
+   * The name of this component.
+   */
+
+  protected[fprime] implicit val componentName = this.getClass.getSimpleName
+
+  /**
+   * A reference to this component.
+   */
+
+  protected[fprime] implicit val thisComponent: PassiveComponent = this
+
+  /**
+   * The parameters of this component, which can be assigned values with the
+   * <code>Parameters</code> command from ground. The parameters can be
+   * accessed from within the component to influence its behavior.
+   */
+
+  protected implicit var parameters: Map[ParameterName, Int] = Map()
+
+  /**
+   * 
+   *
+   * @param parameters
+   */
+
+  private def setParameters(parameters: Parameters): Unit = {
     val Parameters(map) = parameters
     for ((name, value) <- map) {
       setParameter(name, value)
     }
   }
 
-  def setParameter(name: ParameterName, value: Int): Unit = {
+  private def setParameter(name: ParameterName, value: Int): Unit = {
     parameters += (name -> value)
   }
 
-  def getParameter(name: ParameterName): Option[Int] = {
+  protected def getParameter(name: ParameterName): Option[Int] = {
     parameters.get(name)
   }
 
-  def processTheCommand(cmd: Command): Unit = {
+  private[fprime] def processTheCommand(cmd: Command): Unit = {
     cmd match {
       case parameters: Parameters => setParameters(parameters)
       case _ => processCommand(cmd)
@@ -513,14 +648,10 @@ trait PassiveComponent {
     }
   }
 
-  def processCommand(cmd: Command): Unit = {
+  protected def processCommand(cmd: Command): Unit = {
     println(s"*** no command handling implemented for component $componentName. $cmd is not processed!")
   }
 }
-
-/** ***************
- * ActiveComponent
- * ****************/
 
 trait Component extends PassiveComponent {
   def when: Actor.Receive
@@ -563,10 +694,6 @@ trait Component extends PassiveComponent {
   }
 
 }
-
-/** ***************
- * QueuedComponent
- * ****************/
 
 trait QueuedComponent[T] extends PassiveComponent {
   implicit val queue = scala.collection.mutable.Queue[T]()
