@@ -35,7 +35,3 @@ I am not sure I see the need for the conecpt of a QueuedComponent. Why make this
 ## Not only commands can be urgent
 
 Currently only commands can be urgent. However, one can imagine that any form of message can be urgent. 
-
-
-
-

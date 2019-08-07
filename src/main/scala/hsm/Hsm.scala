@@ -1,21 +1,50 @@
 package hsm
 
 /**
- * Internal DSL for Hierarchical State Machines (HSMs).
+ * Internal DSL for Hierarchical State Machines (HSMs). HSMs are extended state machines
+ * with the addition of super states, as well as enter and exit statements associated with
+ * states.
+ */
+
+/**
+ * The static variables of HSMs.
  */
 
 object HSM {
+  /**
+   * To be set to true when tracing is desired. Tracing causes
+   * printing the trace of state transitions occurring in the HSMs.
+   */
+
   var TRACE : Boolean = false
 
-  var trace : String = "" // TODO: use StringBuffer
+  /**
+   * The execution trace of an HSM. Updated if <code>TRACE</code> is true.
+   */
+
+  private var trace : String = "" // TODO: use StringBuffer
+
+  /**
+   * Adds astate transition to the trace.
+   *
+   * @param line the transition in text format.
+   */
 
   def addToTrace(line: String): Unit = {
     trace += line + "\n"
   }
 
+  /**
+   * Resets the <code>trace</code> variable.
+   */
+
   def resetTrace(): Unit = {
     trace = ""
   }
+
+  /**
+   * Prints the <code>trace</code> variable.
+   */
 
   def printTrace(): Unit = {
     println("===== trace: =====")
@@ -24,6 +53,15 @@ object HSM {
     println("------------------")
   }
 }
+
+/**
+ * A hiearchical state machine must be defined as a class subclassing this trait, which
+ * provides all the internal DSL methods for defining HSMs.
+ *
+ * @tparam Event type of events communicated to the state machine. They must all be of this type,
+ *               usually defined as case classes or case objects subclassing this type. However,
+ *               it can be instantiated with any type.
+ */
 
 trait HSM[Event] {
   val hsmName : String = this.getClass.getSimpleName
