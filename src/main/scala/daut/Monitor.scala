@@ -6,7 +6,7 @@ package daut
  * However, in general, the specification languages includes all of Scala. The monitors are able to
  * monitor events that carry data and relate such from different events across time, using any
  * of Scala's expressions, hence the 'D' in Daut. A special convenient capability is the support
- * of some temporal operators, which allows to avoid naming all intermediate states in an automaton,
+ * of a collection of temporal operators, which allows to avoid naming all intermediate states in an automaton,
  * resulting in more succinct monitors having the flavor of temporal logic. Furthermore, states in
  * a state machine can be parameterized with data. The DSL is a simplification of the TraceContract
  * internal Scala DSL by an order of magnitude less code.
@@ -20,14 +20,14 @@ package daut
  * This can schematically be illustrated as follows:
  *
  * <code>
- *   class MyMonitor extends Monitor[SomeType] {
- *     ...
- *   }
+ * class MyMonitor extends Monitor[SomeType] {
+ * ...
+ * }
  *
- *   val m = new MyMonitor()
+ * val m = new MyMonitor()
  *   m.verify(event1)
  *   m.verify(event2)
- *   ...
+ * ...
  *   m.verify(eventN)
  *   m.end()
  * </code>
@@ -218,7 +218,7 @@ class Monitor[E] {
    * to the list of invariants to check after each submission of an event. The first argument
    * is a message that will be printed in case the invariant is violated.
    *
-   * @param e message to be printed in case of an invariant violation.
+   * @param e   message to be printed in case of an invariant violation.
    * @param inv the invariant expression to be checked after each submitted event.
    */
 
@@ -232,14 +232,12 @@ class Monitor[E] {
    */
 
   protected trait state {
-    thisState =>
-
     /**
      * The transitions out of this state, represented as an (initially empty) partial
      * function from events to sets of states.
      */
 
-    private var transitions: Transitions = noTransitions
+    private[daut] var transitions: Transitions = noTransitions
 
     /**
      * This variable is true for final (acceptance) states: that is states where it is
@@ -250,123 +248,128 @@ class Monitor[E] {
     private[daut] var isFinal: Boolean = true
 
     /**
-     * Updates the <code>transitions</code> variable to denote the transition function provided.
-     * This corresponds to a state where the monitor is just waiting (watching) until an event
-     * is submitted that makes a transition fire. The containing state becomes final.
+     * Applies the state of an event. If the transition function associated with the state
+     * can fire, the resulting state set <code>ss</code> is returned as <code>Some(ss)</code>.
+     * If the transition function cannot fire <code>None</code> is returned.
      *
-     * @param ts the transition function.
+     * @param event the event the state is applied to.
+     * @return the optional set of states resulting from taking a transition.
      */
-
-    private[daut] def watch(ts: Transitions) {
-      transitions = ts
-    }
-
-    /**
-     * Updates the <code>transitions</code> variable to denote the transition function provided,
-     * modified to include this state in the resulting state set.
-     * This corresponds to a state where the monitor is always waiting  until an event
-     * is submitted that makes a transition fire. This corresponds to a state with a true
-     * self loop, no matter what other transition fires. The containing state becomes final.
-     *
-     * @param ts the transition function.
-     */
-
-    private[daut] def always(ts: Transitions) {
-      transitions = ts andThen (_ + this)
-    }
-
-    /**
-     * Updates the <code>transitions</code> variable to denote the transition function provided.
-     * This corresponds to a state where the monitor is just waiting (watching) until an event
-     * is submitted that makes a transition fire. The containing state becomes non-final, meaning
-     * that it is an error to be in this state on a call of the <code>end()</code> method.
-     *
-     * @param ts the transition function.
-     */
-
-    private[daut] def hot(ts: Transitions) {
-      transitions = ts
-      isFinal = false
-    }
-
-    /**
-     * Updates the <code>transitions</code> variable to denote the transition function provided,
-     * modified to yield an error if it does not fire on the next submitted event.
-     * The transition is weak in the sense that a next event does not have to occur.
-     * The containing state therefore becomes final.
-     *
-     * @param ts the transition function.
-     */
-
-    private[daut] def wnext(ts: Transitions) {
-      transitions = ts orElse { case _ => error }
-    }
-
-    /**
-     * Updates the <code>transitions</code> variable to denote the transition function provided,
-     * modified to yield an error if it does not fire on the next submitted event.
-     * The transition is strong in the sense that a next event has to occur.
-     * The containing state therefore becomes non-final.
-     *
-     * @param ts the transition function.
-     */
-
-    private[daut] def next(ts: Transitions) {
-      transitions = ts orElse { case _ => error }
-      isFinal = false
-    }
-
-    /**
-     * TODO ...
-     *
-     * @param ts1
-     * @return
-     */
-
-    private[daut] def unless(ts1: Transitions) = new {
-      def watch(ts2: Transitions) {
-        transitions = ts1 orElse (ts2 andThen (_ + thisState))
-      }
-    }
-
-    private[daut] def until(ts1: Transitions) = new {
-      def watch(ts2: Transitions) {
-        transitions = ts1 orElse (ts2 andThen (_ + thisState))
-        isFinal = false
-      }
-    }
 
     def apply(event: E): Option[Set[state]] =
       if (transitions.isDefinedAt(event))
         Some(transitions(event)) else None
 
     if (first) {
-      states += thisState
+      states += this
       first = false
     }
 
-    override def toString: String = "temporal operator"
+    /**
+     * The standard <code>toString</code> method overridden.
+     *
+     * @return text representation of state.
+     */
+
+    override def toString: String = "some state" // needs improvement.
   }
+
+  /**
+   * Special state indicating successful termination.
+   */
 
   protected case object ok extends state
 
+  /**
+   * Special state indicating a specification violation.
+   */
+
   protected case object error extends state
+
+  /**
+   * Returns an <code>error</code> state indicating a specification violation.
+   *
+   * @param msg message to be printed on standard out.
+   * @return the <code>error</code> state.
+   */
 
   protected def error(msg: String): state = {
     println("\n*** " + msg + "\n")
     error
   }
 
-  protected implicit def liftInterval(iv: during): Boolean = iv.on
+  /**
+   * The during-state takes two var-arg lists, {{{es1}}} and {{{es2}}} of events, and
+   * returns a state that continuously (always) monitors whether we are in an interval
+   * where an event in {{{es1}}} has occurred, but an event in {{{es2}}} has not yet occurred.
+   * The state is usually assigned to a local {{{val}}}-variable that can be queried
+   * e.g. in invariants, either simply using the during state as a Boolean (the state is lifted to a Booelean
+   * with an implicit function) or by using the {{{==>}}} method. Consider the following
+   * example illustrating a monitor that checks that at most one of two threads 1 and 2
+   * are in a critical section at any time, using an invariant. A thread {{{x}}} can enter a critical
+   * section with the {{{enter(x)}}} call, and leave with either an {{{exit(x)}}} call or an
+   * {{{abort(x)}}} call.
+   *
+   * {{{
+   * class CriticalSectionMonitor extends Monitor[Event] {
+   *   val critical1 = during(enter(1))(exit(1), abort(1))
+   *   val critical2 = during(enter(2))(exit(2), abort(1))
+   *
+   *   invariant {
+   *     !(critical1 && critical2)
+   *   }
+   * }
+   * }}}
+   *
+   * The invariant can also be written as follows, using the {{{==>}}} method:
+   *
+   * {{{
+   *   invariant {
+   *     critical1 ==> !critical2
+   *   }
+   * }}}
+   *
+   * @param es1 any of these events starts an interval.
+   * @param es2 any of these events ends an interval.
+   */
 
-  protected case class during(e1: E*)(e2: E*) extends state {
-    private val begin = e1.toSet
-    private val end = e2.toSet
+  protected case class during(es1: E*)(es2: E*) extends state {
+    /**
+     * The set of events starting an interval.
+     */
+
+    private val begin = es1.toSet
+
+    /**
+     * The set of events ending an interval.
+     */
+
+    private val end = es2.toSet
+
+    /**
+     * This variable is true when we are within an interval.
+     */
+
     private[daut] var on: Boolean = false
+
+    /**
+     * This method allows us, given a during-state {{{dur}}}, to write a Booelean
+     * expression of the form {{{dur ==> condition}}}, meaning: if {{{dur}}} is in the interval
+     * then the {{{condition}}} must hold.
+     *
+     * @param b the condition that must hold if the during-state is within the interval.
+     * @return true if the during state is not within an interval, or if the condition {{{b}}} holds.
+     */
 
     def ==>(b: Boolean) = {
       !on || b
     }
+
+    /**
+     * 
+     *
+     * @return
+     */
 
     def startsTrue: during = {
       on = true
@@ -385,35 +388,115 @@ class Monitor[E] {
     initial(this)
   }
 
+  protected implicit def liftInterval(iv: during): Boolean = iv.on
+
+  /**
+   * Returns a watch-state, where the transition function is exactly the transition function provided.
+   * This corresponds to a state where the monitor is just waiting (watching) until an event
+   * is submitted that makes a transition fire. The state is final.
+   *
+   * @param ts the transition function.
+   * @return a watch-state.
+   */
+
   protected def watch(ts: Transitions) = new state {
-    watch(ts)
+    transitions = ts
   }
+
+  /**
+   * Returns an always-state, where the transition function is the transition function provided,
+   * modified to always include the state in the resulting state set of any transition.
+   * This corresponds to a state where the monitor is always waiting  until an event
+   * is submitted that makes a transition fire, and where the state has a true
+   * self loop, no matter what transition fires. The state is final.
+   *
+   * @param ts the transition function.
+   * @return a always-state.
+   */
 
   protected def always(ts: Transitions) = new state {
-    always(ts)
+    transitions = ts andThen (_ + this)
   }
+
+  /**
+   * Returns a hot-state, where the transition function is the transition function provided.
+   * This corresponds to a state where the monitor is just waiting (watching) until an event
+   * is submitted that makes a transition fire. The state is non-final, meaning
+   * that it is an error to be in this state on a call of the <code>end()</code> method.
+   *
+   * @param ts the transition function.
+   * @return a hot-state.
+   */
 
   protected def hot(ts: Transitions) = new state {
-    hot(ts)
+    transitions = ts
+    isFinal = false
   }
+
+  /**
+   * Returns a wnext-state (weak next), where the transition function is the transition function provided,
+   * modified to yield an error if it does not fire on the next submitted event.
+   * The transition is weak in the sense that a next event does not have to occur (in contrast to strong next).
+   * The state is therefore final.
+   *
+   * @param ts the transition function.
+   * @return a wnext-state.
+   */
 
   protected def wnext(ts: Transitions) = new state {
-    wnext(ts)
+    transitions = ts orElse { case _ => error }
   }
 
+  /**
+   * Returns a next-state (strong next), where the transition function is the transition function provided,
+   * modified to yield an error if it does not fire on the next submitted event.
+   * The transition is strong in the sense that a next event has to occur.
+   * The state is therefore non-final.
+   *
+   * @param ts the transition function.
+   * @return a next-state.
+   */
+
   protected def next(ts: Transitions) = new state {
-    next(ts)
+    transitions = ts orElse { case _ => error }
+    isFinal = false
   }
+
+  /**
+   * An expression of the form <code>unless {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
+   * unless <code>ts1</code> fires. That is, the expression returns an unless-state, where the transition function is
+   * the combination of the two transition functions provided. The resulting transition function
+   * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+   * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
+   * The transition function <code>ts1</code> does not need to ever fire, which makes the state final.
+   *
+   * @param ts1 the transition function.
+   * @return an unless-state.
+   */
 
   protected def unless(ts1: Transitions) = new {
     def watch(ts2: Transitions) = new state {
-      unless(ts1) watch (ts2)
+      transitions = ts1 orElse (ts2 andThen (_ + this))
     }
   }
 
+  /**
+   * An expression of the form <code>until {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
+   * until <code>ts1</code> fires. That is, the expression returns an until-state, where the transition function is
+   * the combination of the two transition functions provided. The resulting transition function
+   * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+   * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
+   * The transition function <code>ts1</code> will need to eventually ever fire before <code>end()</code> is
+   * called, which makes the state non-final.
+   *
+   * @param ts1 the transition function.
+   * @return an unless-state.
+   */
+
   protected def until(ts1: Transitions) = new {
     def watch(ts2: Transitions) = new state {
-      until(ts1) watch (ts2)
+      transitions = ts1 orElse (ts2 andThen (_ + this))
+      isFinal = false
     }
   }
 
