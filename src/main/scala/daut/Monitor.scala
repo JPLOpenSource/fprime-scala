@@ -637,15 +637,27 @@ class Monitor[E] {
   }
 
   /**
-   * The {{{find}}} method returns the set of active states, each of which satisfies the
-   * provided
+   * The {{{find}}} method returns a set of states computed as follows.
+   * If the provided argument partial function {{{pf}}} is defined for any active states,
+   * the resulting set is the union of all the state sets obtained by
+   * applying the function to the active states for which it is defined.
+   * Otherwise the returned set is the set {{{otherwise}}} provided as
+   * argument to the {{{orelse}}} method.
+   *
+   * As an example, consider the following monitor, which checks that
+   * at most one task can acquire a lock at a time, and that
+   * a task cannot release a lock it has not acquired.
+   * This monitor illustrates the {{{find}}} function, which looks for stored
+   * facts matching a pattern, and the ensure function, which checks a
+   * condition (an assert). This function here in this example tests for
+   * the presence of a Locked fact which is created when a lock is taken.
    *
    * {{{
    * trait LockEvent
    * case class acquire(thread: Int, lock: Int) extends LockEvent
    * case class release(thread: Int, lock: Int) extends LockEvent
    *
-   * class LockMonitor extends Monitor[LockEvent] {
+   * class OneAtATime extends Monitor[LockEvent] {
    *   case class Locked(thread: Int, lock: Int) extends state {
    *     watch {
    *       case release(thread, lock) => ok
@@ -665,35 +677,97 @@ class Monitor[E] {
    * }
    * }}}
    *
-   * @param ts1
-   * @return
+   * A more sophisticated example involving nested {{{find}}} calls is
+   * the following that checks that when a task {{{t}}} is acquiring a
+   * lock that some other task holds, and {{{t}}} therefore cannot get it,
+   * then {{{t}}} is not allowed to hold any other locks (to prevent deadlocks).
+   *
+   * {{{
+   * class AvoidDeadlocks extends Monitor[LockEvent] {
+   *   case class Locked(thread: Int, lock: Int) extends state {
+   *     watch {
+   *       case release(thread, lock) => ok
+   *     }
+   *   }
+   *
+   *   always {
+   *     case acquire(t, l) => {
+   *       find {
+   *         case Locked(_,`l`) =>
+   *           find {
+   *             case Locked(`t`,x) if l != x => error
+   *           } orelse {
+   *             println("Can't lock but is not holding any other lock, so it's ok")
+   *           }
+   *       } orelse {
+   *         Locked(t,l)
+   *       }
+   *     }
+   *   }
+   * }
+   * }}}
+   *
+   * @param pf partial function.
+   * @return set of states produced from applying the partial function {{{fp}}} to active states.
    */
 
-  protected def find(ts1: PartialFunction[state, Set[state]]) = new {
+  protected def find(pf: PartialFunction[state, Set[state]]) = new {
     def orelse(otherwise: => Set[state]): Set[state] = {
-      val matchingStates = states filter (ts1.isDefinedAt(_))
+      val matchingStates = states filter (pf.isDefinedAt(_))
       if (!matchingStates.isEmpty) {
-        (for (matchingState <- matchingStates) yield ts1(matchingState)).flatten
+        (for (matchingState <- matchingStates) yield pf(matchingState)).flatten
       } else
         otherwise
     }
   }
 
+  /**
+   * Returns the state {{{ok}}} if the Boolean expression {{{b}}} is true, otherwise
+   * it returns the {{{error}}} state. The mothod can for example be used as the
+   * result of a transition.
+   *
+   * @param b Boolean condition.
+   * @return one of the states {{{ok}}} or {{{error}}}, depending on the value of {{{b}}}.
+   */
+
   protected def ensure(b: Boolean): state = {
     if (b) ok else error
   }
+
+  /**
+   * Checks whether the condition {{{b}}} is true, and if not, reports an error
+   * on standard out.
+   *
+   * @param b the Boolean condition to be checked.
+   */
 
   protected def check(b: Boolean): Unit = {
     if (!b) reportError()
   }
 
+  /**
+   * Checks whether the condition {{{b}}} is true, and if not, reports an error
+   * on standard out. The text message {{{e}}} becomes part of the error
+   * message.
+   *
+   * @param b the Boolean condition to be checked.
+   */
+
   protected def check(b: Boolean, e: String): Unit = {
     if (!b) reportError(e)
   }
 
+  /**
+   * Adds the argument state {{{s}}} to the set of initial states of the monitor.
+   *
+   * @param s state to be added as initial state.
+   */
+
   protected def initial(s: state) {
     states += s
   }
+
+  // TODO: ...
 
   protected implicit def convState2Boolean(s: state): Boolean =
     states contains s
