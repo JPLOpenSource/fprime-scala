@@ -25,12 +25,8 @@ object Util {
     }
   }
 
-  def randomInt(l: Int, h: Int): Int = {
-    random.between(l, h + 1)
-  }
-
   def randomBoolProb(p: Int): Boolean = {
-    val nr = randomInt(1, 100)
+    val nr = random.nextInt(100) + 1
     nr <= p
   }
 
@@ -226,7 +222,7 @@ class Producer extends Component {
   val r = scala.util.Random
 
   def newFile(): File = {
-    val size = r.between(1,10)
+    val size = r.nextInt(10) + 1
     var file: File = Nil
     for (_ <- 0 to size) {
       val value = r.nextInt(100)

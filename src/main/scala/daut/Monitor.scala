@@ -1,6 +1,6 @@
 package daut
 
-/**
+/*
  * Daut (Data automata) is an internal Scala DSL for writing event stream monitors. It
  * supports flavors of state machines, temporal logic, and rule-based programming, all in one
  * unified formalism. The underlying concept is that at any point during monitoring there is an
@@ -410,12 +410,9 @@ class Monitor[E] {
   }
 
   /**
-   * The during-state takes two var-arg lists, {{{es1}}} and {{{es2}}} of events, and
-   * returns a state that continuously (always) monitors whether we are in an interval
-   * where an event in {{{es1}}} has occurred, but an event in {{{es2}}} has not yet occurred.
    * The state is usually assigned to a local {{{val}}}-variable that can be queried
    * e.g. in invariants, either simply using the during state as a Boolean (the state is lifted to a Booelean
-   * with an implicit function) or by using the {{{==>}}} method. Consider the following
+   * with an implicit function) or by using the ==> method. Consider the following
    * example illustrating a monitor that checks that at most one of two threads 1 and 2
    * are in a critical section at any time, using an invariant. A thread {{{x}}} can enter a critical
    * section with the {{{enter(x)}}} call, and leave with either an {{{exit(x)}}} call or an
@@ -432,7 +429,7 @@ class Monitor[E] {
    * }
    * }}}
    *
-   * The invariant can also be written as follows, using the {{{==>}}} method:
+   *  The invariant can also be written as follows, using the ==> method:
    *
    * {{{
    *   invariant {
@@ -976,7 +973,6 @@ class Monitor[E] {
   /**
    * Allows applying a monitor {{{M}}} to an event {{{e}}}, as follows: {{{M(e)}}}.
    * This has the same meaning as the longer {{{M.verify(e)}}}.
-   *
    *
    * @param event the submitted event to be verified.
    */

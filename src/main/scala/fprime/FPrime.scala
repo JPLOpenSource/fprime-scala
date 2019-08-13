@@ -1,6 +1,6 @@
 package fprime
 
-/**
+/*
  * Internal DSL for F', supporting components, ports, commanding, parameters, and telelemtry.
  * F' is a framework (library, internal DSL) for creating a system of parallel executing
  * components. Components can be active or passive. An active component contains an internal

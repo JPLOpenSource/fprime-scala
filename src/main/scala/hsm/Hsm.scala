@@ -1,6 +1,6 @@
 package hsm
 
-/**
+/*
  * Internal DSL for Hierarchical State Machines (HSMs). HSMs are extended state machines
  * with the addition of super states, as well as enter and exit statements associated with
  * states.
@@ -286,7 +286,7 @@ trait HSM[Event] {
   var current: state = null
 
   /**
-   * Returns true iff. the name of the current state matches the {@link java.util.regex.Pattern}
+   * Returns true iff. the name of the current state matches the {{{java.util.regex.Pattern}}}
    * regular expression provided as argument.
    *
    * @param regexp tye regular expression the state name much match for the method to return true.
