@@ -104,7 +104,7 @@ trait SyncInput[S, T] {
 
 class GuardedSyncInput[S, T](implicit mutex: Mutex) extends SyncInput[S, T] {
   /**
-   * The <code>invoke</code> method calls <code>invokeGuarded</code> under a lock
+   * The {{{invoke}}} method calls {{{invokeGuarded}}} under a lock
    * on the mutex.
    *
    * @param a parameter to the method call.
@@ -118,7 +118,7 @@ class GuardedSyncInput[S, T](implicit mutex: Mutex) extends SyncInput[S, T] {
   }
 
   /**
-   * Called by <code>invoke</code> under a lock on the mutex. The user has to override
+   * Called by {{{invoke}}} under a lock on the mutex. The user has to override
    * this method to perform the desired action.
    *
    * @param a parameter to the method call.
@@ -158,7 +158,7 @@ class SyncOutput[S, T] {
 
   /**
    * Calling the invoke method corresponds to the method call. The method calls
-   * the <code>invoke</code> method in the connected input port.
+   * the {{{invoke}}} method in the connected input port.
    *
    * @param a parameter to the method call.
    * @return return value from the method call, can be of type Unit.
@@ -222,7 +222,7 @@ class Input[T](implicit actorRef: ActorRef, implicit val thisComponent: PassiveC
    * The user can override this method in case the message should be transformed before being sent
    * to the actor, for example if an internal data structure is used to distinguish between the inputs
    * to different input ports. In that case the overridden user defined method can call
-   * <code>invokeAny</code>, which is relaxed about the message type.
+   * {{{invokeAny}}}, which is relaxed about the message type.
    *
    * @param a the message being sent
    */
@@ -232,8 +232,8 @@ class Input[T](implicit actorRef: ActorRef, implicit val thisComponent: PassiveC
   }
 
   /**
-   * Can be called if the method <code>invoke</code> is overridden by the user. Useful due to
-   * the <code>Any</code> which does not care about the type of messages sent to the actor.
+   * Can be called if the method {{{invoke}}} is overridden by the user. Useful due to
+   * the {{{Any}}} which does not care about the type of messages sent to the actor.
    *
    * @param a message being sent to actor.
    */
@@ -253,7 +253,7 @@ class Input[T](implicit actorRef: ActorRef, implicit val thisComponent: PassiveC
 }
 
 /**
- * A queued input port can only be part of a <code>QueuedComponent</code>. Messages sent to a
+ * A queued input port can only be part of a {{{QueuedComponent}}}. Messages sent to a
  * queued input port get stored in a queue. However, the queue is here not accessed by an
  * internal actor thread (there is no such). Instead it can be read by other components.
  *
@@ -339,7 +339,7 @@ class Output[T](implicit componentName: String) {
 
   /**
    * Used for debugging. Prints source, target, and message sent upon call of
-   * the <code>invoke</code> method.
+   * the {{{invoke}}} method.
    *
    * @param source name of component sending message.
    * @param target name of component receiving message.
@@ -391,7 +391,7 @@ class ArrayOutput[T](size: Int) {
   /**
    * Calling the invoke method causes the argument message to be sent to the input
    * port at the given index. Each such message also gets broadcasted to ports
-   * registered with the <code>connectListeners</code> method.
+   * registered with the {{{connectListeners}}} method.
    *
    * @param index the index of the input port to send to.
    * @param a     the message being sent.
@@ -431,11 +431,11 @@ trait Command extends Serializable { // subclass this
   private[fprime] var isUrgent: Boolean = false
 
   /**
-   * This method can be called in a chaining manner. Suppose that <code>cmd</code> is
-   * a command. Then <code>cmd.urgent</code> is the same command as <code>cmd</code>
-   * except with the <code>isUrgent</code> flag set to true.
+   * This method can be called in a chaining manner. Suppose that {{{cmd}}} is
+   * a command. Then {{{cmd.urgent}}} is the same command as {{{cmd}}}
+   * except with the {{{isUrgent}}} flag set to true.
    *
-   * @return the command updated with the <code>isUrgent</code> flag set to true.
+   * @return the command updated with the {{{isUrgent}}} flag set to true.
    */
 
   def urgent: Command = {
@@ -445,7 +445,7 @@ trait Command extends Serializable { // subclass this
 }
 
 /**
- * A special command is the <code>Parameters</code> case class, which instructs setting
+ * A special command is the {{{Parameters}}} case class, which instructs setting
  * indicated parameter names to denote indicated integer values.
  *
  * @param data the mapping of parameter names to the parameter values they shall denote.
@@ -485,10 +485,10 @@ trait Event extends Observation // subclass this
 // FSW input
 
 /**
- * The <code>CommandInput</code> is a special <code>Input</code> port which accepts commands from
+ * The {{{CommandInput}}} is a special {{{Input}}} port which accepts commands from
  * ground. The port is special by handling a command right away in case the command has been
- * declared as urgent (a command <code>cmd</code> is declared urgent by calling the <code>urgent</code>
- * method on it as follows: <code>cmd.urgent</code>).
+ * declared as urgent (a command {{{cmd}}} is declared urgent by calling the {{{urgent}}}
+ * method on it as follows: {{{cmd.urgent}}}).
  *
  * @param actorRef  reference to Akka actor thread running internally in active component.
  *                  Any input is sent to that actor thread. Defined as implicit and assumed to
@@ -504,7 +504,7 @@ class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveC
    * the input port as part of its interface. The command will be sent to the Akka actor
    * representing the component's thread, unless the command is urgent, in which case it will
    * be processed right away (it is not going into the component's actor queue). All commands
-   * will be processed by the user defined <code>processCommand</code>, which the user has to
+   * will be processed by the user defined {{{processCommand}}}, which the user has to
    * override/define in the component containing the port.
    *
    * @param cmd the command being sent.
@@ -522,9 +522,9 @@ class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveC
 // FSW output
 
 /**
- * An <code>ObsOutput</code> port is a special <code>Output</code> port to which observations
+ * An {{{ObsOutput}}} port is a special {{{Output}}} port to which observations
  * can be sent, including events and telemetry. Events can be submitted with the standard
- * <code>invoke</code> method. Telemetry can be submitted with the special <code>logTelem</code>
+ * {{{invoke}}} method. Telemetry can be submitted with the special {{{logTelem}}}
  * method.
  *
  * @param componentName name of the component the port is part of. Defined as implicit
@@ -587,7 +587,7 @@ private[fprime] class Mutex
 
 /**
  * A passive component is like a class. Sending a message to a passive component is like calling
- * a method on the component, which returns with a value (potentially of type <code>Unit</code>
+ * a method on the component, which returns with a value (potentially of type {{{Unit}}}
  * if the "method" is just called for its side effect).
  */
 
@@ -613,16 +613,16 @@ trait PassiveComponent {
 
   /**
    * The parameters of this component, which can be assigned values with the
-   * <code>Parameters</code> command from ground. The parameters can be
+   * {{{Parameters}}} command from ground. The parameters can be
    * accessed from within the component to influence its behavior.
    */
 
   protected implicit var parameters: Map[ParameterName, Int] = Map()
 
   /**
-   * Sets the parameters of component based on a <code>Parameters</code> command from ground.
+   * Sets the parameters of component based on a {{{Parameters}}} command from ground.
    *
-   * @param parameters the <code>Parmeters</code> command.
+   * @param parameters the {{{Parmeters}}} command.
    */
 
   private def setParameters(parameters: Parameters): Unit = {
@@ -656,9 +656,9 @@ trait PassiveComponent {
 
   /**
    * This method is called to execute a command when an active component receives a such
-   * through a <code>CommandInput</code> port. It is either called when the command
+   * through a {{{CommandInput}}} port. It is either called when the command
    * asynchronously is picked off the component's actor queue, or called directly in case the
-   * command is urgent. The method calls the <code>processCommand</code> method which the user
+   * command is urgent. The method calls the {{{processCommand}}} method which the user
    * has to define.
    *
    * @param cmd command to be executed.
@@ -715,8 +715,8 @@ trait QueuedComponent[T] extends PassiveComponent {
   /**
    * Getting the next element of the queue (FIFO). Thread safe.
    *
-   * @return the next element <code>v</code> in the queue as <code>Some(v)</code>
-   *         if the queue is not empty, and <code>None</code> if the queue is
+   * @return the next element {{{v}}} in the queue as {{{Some(v)}}}
+   *         if the queue is not empty, and {{{None}}} if the queue is
    *         empty.
    */
 
@@ -737,10 +737,10 @@ trait Component extends PassiveComponent {
   /**
    * It meant to define the behavior of the component for each new message
    * submitted to the component. It must be overridden and defined by the user.
-   * Incoming messages are of type <code>Any</code> and the method returns no
+   * Incoming messages are of type {{{Any}}} and the method returns no
    * value of importance.
    *
-   * @return no return value beyond <code>()</code> of type <code>Unit</code>.
+   * @return no return value beyond {{{()}}} of type {{{Unit}}}.
    */
 
   protected def when: PartialFunction[Any, Unit]
@@ -753,7 +753,7 @@ trait Component extends PassiveComponent {
   protected implicit var actorRef: ActorRef = system.actorOf(Props(new TheActor))
 
   /**
-   * Variable indicating whether a timer has been set with the <code>setTimer</code>
+   * Variable indicating whether a timer has been set with the {{{setTimer}}}
    * method.
    */
 
@@ -790,9 +790,9 @@ trait Component extends PassiveComponent {
 
     /**
      * This method is called after each event processed by the actor. It initiates an actor timer if the
-     * <code>timeOut</code> variable has been set with the <code>setTimer</code>
-     * method. The actor timer will time out after the period indicated in the <code>timeOut</code> variable,
-     * by sending a <code>ReceiveTimeout</code> message to the actor, unless it is neutralized beforehand,
+     * {{{timeOut}}} variable has been set with the {{{setTimer}}}
+     * method. The actor timer will time out after the period indicated in the {{{timeOut}}} variable,
+     * by sending a {{{ReceiveTimeout}}} message to the actor, unless it is neutralized beforehand,
      * e.g. when an expected different message is received.
      */
 
@@ -808,8 +808,8 @@ trait Component extends PassiveComponent {
 
     /**
      * This method processes messages sent to the actor. If it is a command,
-     * it calls the user defined method <code>executeCommand</code> on it. Otherwise
-     * it calls the user defined <code>when</code> method on it. This method should not
+     * it calls the user defined method {{{executeCommand}}} on it. Otherwise
+     * it calls the user defined {{{when}}} method on it. This method should not
      * be overridden by the user.
      *
      * @return the method does not return any value of interest.

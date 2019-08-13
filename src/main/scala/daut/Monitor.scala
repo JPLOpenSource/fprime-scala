@@ -17,10 +17,10 @@ package daut
  *
  * The DSL is a simplification of the TraceContract internal Scala DSL by an order of magnitude less code.
  *
- * The general idea is to create a monitor as a class sub-classing the <code>Monitor</code> class,
- * create an instance of it, and then feed it with events with the <code>verify(event: Event)</code> method,
+ * The general idea is to create a monitor as a class sub-classing the {{{Monitor}}} class,
+ * create an instance of it, and then feed it with events with the {{{verify(event: Event)}}} method,
  * one by one, and in the case of a finite sequence of observations, finally calling the
- * <code>end()</code> method on it. If <code>end()</code> is called, it will be determined whether
+ * {{{end()}}} method on it. If {{{end()}}} is called, it will be determined whether
  * there are any outstanding obligations that have not been satisfied (expected events that did not occur).
  *
  * This can schematically be illustrated as follows:
@@ -40,7 +40,7 @@ package daut
  */
 
 /**
- * If the <code>STOP_ON_ERROR</code> flag is set to true, a <code>MonitorError</code> exception is thrown
+ * If the {{{STOP_ON_ERROR}}} flag is set to true, a {{{MonitorError}}} exception is thrown
  * if a monitor's specification is violated by the observed event stream.
  */
 
@@ -78,7 +78,7 @@ class Monitor[E] {
 
   /**
    * This variable holds invariants that have been defined by the user with one of the
-   * <code>invariant</code> methods. Invariants are Boolean valued functions that are
+   * {{{invariant}}} methods. Invariants are Boolean valued functions that are
    * evaluated after each submitted event has been processed by the monitor. An invariant
    * can e.g. check the values of variables declared local to the monitor. The violation of an
    * invariant is reported as an error.
@@ -88,7 +88,7 @@ class Monitor[E] {
 
   /**
    * For each submitted event this set contains all states that are to be removed
-   * from the set <code>states</code> of active states. A state needs to be removed
+   * from the set {{{states}}} of active states. A state needs to be removed
    * when leaving the state due to a fired transition.
    */
 
@@ -96,7 +96,7 @@ class Monitor[E] {
 
   /**
    * For each submitted event this set contains all states that are to be added
-   * to the set <code>states</code> of active states. A state needs to be added
+   * to the set {{{states}}} of active states. A state needs to be added
    * when entering the state due to a fired transition.
    */
 
@@ -207,7 +207,7 @@ class Monitor[E] {
 
   /**
    * Invariant method which takes an invariant Boolean valued expression (call by name)
-   * as argument and adds the corresponding lambda abstraction (argument of type <code>Unit</code>)
+   * as argument and adds the corresponding lambda abstraction (argument of type {{{Unit}}})
    * to the list of invariants to check after each submission of an event.
    *
    * @param inv the invariant expression to be checked after each submitted event.
@@ -220,7 +220,7 @@ class Monitor[E] {
 
   /**
    * Invariant method which takes an invariant Boolean valued expression (call by name)
-   * as argument and adds the corresponding lambda abstraction (argument of type <code>Unit</code>)
+   * as argument and adds the corresponding lambda abstraction (argument of type {{{Unit}}})
    * to the list of invariants to check after each submission of an event. The first argument
    * is a message that will be printed in case the invariant is violated.
    *
@@ -249,7 +249,7 @@ class Monitor[E] {
 
     /**
      * This variable is true for final (acceptance) states: that is states where it is
-     * acceptable to end up when the <code>end()</code> method is called. This corresponds to
+     * acceptable to end up when the {{{end()}}} method is called. This corresponds to
      * acceptance states in standard automaton theory.
      */
 
@@ -285,7 +285,7 @@ class Monitor[E] {
      * Updates the transition function to the transition function provided.
      * This corresponds to a state where the monitor is just waiting (watching) until an event
      * is submitted that makes a transition fire. The state is non-final, meaning
-     * that it is an error to be in this state on a call of the <code>end()</code> method.
+     * that it is an error to be in this state on a call of the {{{end()}}} method.
      *
      * @param ts the transition function.
      */
@@ -323,12 +323,12 @@ class Monitor[E] {
     }
 
     /**
-     * An expression of the form <code>unless {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
-     * unless <code>ts1</code> fires. That is, the expression updates the transition function as
+     * An expression of the form {{{unless {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
+     * unless {{{ts1}}} fires. That is, the expression updates the transition function as
      * the combination of the two transition functions provided. The resulting transition function
-     * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+     * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
      * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-     * The transition function <code>ts1</code> does not need to ever fire, which makes the state final.
+     * The transition function {{{ts1}}} does not need to ever fire, which makes the state final.
      *
      * @param ts1 the transition function.
      */
@@ -340,12 +340,12 @@ class Monitor[E] {
     }
 
     /**
-     * An expression of the form <code>until {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
-     * until <code>ts1</code> fires. That is, the expression updates the transition function as
+     * An expression of the form {{{until {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
+     * until {{{ts1}}} fires. That is, the expression updates the transition function as
      * the combination of the two transition functions provided. The resulting transition function
-     * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+     * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
      * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-     * The transition function <code>ts1</code> will need to eventually ever fire before <code>end()</code> is
+     * The transition function {{{ts1}}} will need to eventually ever fire before {{{end()}}} is
      * called, which makes the state non-final.
      *
      * @param ts1 the transition function.
@@ -360,8 +360,8 @@ class Monitor[E] {
 
     /**
      * Applies the state to an event. If the transition function associated with the state
-     * can fire, the resulting state set <code>ss</code> is returned as <code>Some(ss)</code>.
-     * If the transition function cannot fire <code>None</code> is returned.
+     * can fire, the resulting state set {{{ss}}} is returned as {{{Some(ss)}}}.
+     * If the transition function cannot fire {{{None}}} is returned.
      *
      * @param event the event the state is applied to.
      * @return the optional set of states resulting from taking a transition.
@@ -377,7 +377,7 @@ class Monitor[E] {
     }
 
     /**
-     * The standard <code>toString</code> method overridden.
+     * The standard {{{toString}}} method overridden.
      *
      * @return text representation of state.
      */
@@ -398,10 +398,10 @@ class Monitor[E] {
   protected case object error extends state
 
   /**
-   * Returns an <code>error</code> state indicating a specification violation.
+   * Returns an {{{error}}} state indicating a specification violation.
    *
    * @param msg message to be printed on standard out.
-   * @return the <code>error</code> state.
+   * @return the {{{error}}} state.
    */
 
   protected def error(msg: String): state = {
@@ -547,7 +547,7 @@ class Monitor[E] {
    * Returns a hot-state, where the transition function is the transition function provided.
    * This corresponds to a state where the monitor is just waiting (watching) until an event
    * is submitted that makes a transition fire. The state is non-final, meaning
-   * that it is an error to be in this state on a call of the <code>end()</code> method.
+   * that it is an error to be in this state on a call of the {{{end()}}} method.
    *
    * @param ts the transition function.
    * @return a hot-state.
@@ -586,12 +586,12 @@ class Monitor[E] {
   }
 
   /**
-   * An expression of the form <code>unless {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
-   * unless <code>ts1</code> fires. That is, the expression returns an unless-state, where the transition function is
+   * An expression of the form {{{unless {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
+   * unless {{{ts1}}} fires. That is, the expression returns an unless-state, where the transition function is
    * the combination of the two transition functions provided. The resulting transition function
-   * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+   * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
    * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-   * The transition function <code>ts1</code> does not need to ever fire, which makes the state final.
+   * The transition function {{{ts1}}} does not need to ever fire, which makes the state final.
    *
    * @param ts1 the transition function.
    * @return an unless-state.
@@ -604,12 +604,12 @@ class Monitor[E] {
   }
 
   /**
-   * An expression of the form <code>until {ts1} watch {ts2}</code> watches <code>ts2</code> repeatedly
-   * until <code>ts1</code> fires. That is, the expression returns an until-state, where the transition function is
+   * An expression of the form {{{until {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
+   * until {{{ts1}}} fires. That is, the expression returns an until-state, where the transition function is
    * the combination of the two transition functions provided. The resulting transition function
-   * first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+   * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
    * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-   * The transition function <code>ts1</code> will need to eventually ever fire before <code>end()</code> is
+   * The transition function {{{ts1}}} will need to eventually ever fire before {{{end()}}} is
    * called, which makes the state non-final.
    *
    * @param ts1 the transition function.
@@ -915,7 +915,14 @@ class Monitor[E] {
     def ==>(q: Boolean) = !p || q
   }
 
-  // TODO:
+  /**
+   * Submits an event to the monitor for verification against the specification.
+   * The event is "submitted" to each current state, each resulting in a new set
+   * of states. The result is the union of these sets of states. The method evaluates
+   * the invariants as part of the verification.
+   *
+   * @param event the submitted event.
+   */
 
   def verify(event: E) {
     verifyBeforeEvent(event)
@@ -946,6 +953,11 @@ class Monitor[E] {
     verifyAfterEvent(event)
   }
 
+  /**
+   * Ends the monitoring, reporting on all remaining current non-final states.
+   * These represent obligations that have not been fulfilled.
+   */
+
   def end() {
     if (PRINT) println(s"ENDING TRACE EVALUATION FOR $monitorName")
     val hotStates = states filter (!_.isFinal)
@@ -961,12 +973,20 @@ class Monitor[E] {
     }
   }
 
+  /**
+   * Allows applying a monitor {{{M}}} to an event {{{e}}}, as follows: {{{M(e)}}}.
+   * This has the same meaning as the longer {{{M.verify(e)}}}.
+   *
+   *
+   * @param event the submitted event to be verified.
+   */
+
   def apply(event: E): Unit = {
     verify(event)
   }
 
   /**
-   * This method is called <b>before</b> every call of <code>verify(event: E)</code>.
+   * This method is called <b>before</b> every call of {{{verify(event: E)}}}.
    * It can be overridden by user. Its body is by default empty.
    *
    * @param event the event being verified.
@@ -975,7 +995,7 @@ class Monitor[E] {
   protected def verifyBeforeEvent(event: E) {}
 
   /**
-   * This method is called <b>after</b> every call of <code>verify(event: E)</code>.
+   * This method is called <b>after</b> every call of {{{verify(event: E)}}}.
    * It can be overridden by user. Its body is by default empty.
    *
    * @param event the event being verified.
@@ -990,15 +1010,32 @@ class Monitor[E] {
    */
   protected def callBack(): Unit = {}
 
+  /**
+   * Prints an event on standard out.
+   *
+   * @param event the event to be printed.
+   */
+
   private def printEvent(event: E) {
     println("\n===[" + event + "]===\n")
   }
+
+  /**
+   * Returns the number of errors detected by the monitor, its sub-monitors, their sub-monitors.
+   * etc.
+   *
+   * @return the number of errors of the monitor and its sub-monitors.
+   */
 
   def getErrorCount: Int = {
     var count = errorCount
     for (m <- monitors) count += m.getErrorCount
     count
   }
+
+  /**
+   * Prints the current states of the monitor, and its sub-monitors.
+   */
 
   private def printStates() {
     val topline = "--- " + monitorName + ("-" * 20)
@@ -1011,6 +1048,10 @@ class Monitor[E] {
     println()
     for (m <- monitors) m.printStates()
   }
+
+  /**
+   * Prints a very visible ERROR banner, in case {{{PRINT_ERROR_BANNER}}} is true.
+   */
 
   private def reportError() {
     errorCount += 1
@@ -1033,6 +1074,13 @@ class Monitor[E] {
       throw MonitorError()
     }
   }
+
+  /**
+   * Reports a detected error.
+   *
+   * @param e text string explaining the error. This will be printed as part of the
+   *          error message.
+   */
 
   private def reportError(e: String): Unit = {
     println("***********")
