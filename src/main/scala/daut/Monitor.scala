@@ -767,43 +767,155 @@ class Monitor[E] {
     states += s
   }
 
-  // TODO: ...
+  /**
+   * Implicit function lifting a state to a Boolean, which is true iff. the state
+   * is amongst the current states. Hence, if {{{s}}} is a state then one can e.g.
+   * write an expression (denoting a state) of the form:
+   * {{{
+   *   if (s) error else ok
+   * }}}
+   *
+   * @param s the state to be lifted.
+   * @return true iff. the state {{{s}}} is amongst the current states.
+   */
 
   protected implicit def convState2Boolean(s: state): Boolean =
     states contains s
 
+  /**
+   * Implicit function lifting the {{{Unit}}} value {{{()}}} to the set:
+   * {{{Set(ok)}}}. This allows to write code with side-effects (and return value
+   * of type {{{Unit}}}) as a result of a transition.
+   *
+   * @param u the Unit value to be lifted.
+   * @return the state set {{{Set(ok)}}}.
+   */
+
   protected implicit def convUnit2StateSet(u: Unit): Set[state] =
     Set(ok)
+
+  /**
+   * Implicit function lifting an integer to the set: {{{Set(ok)}}}. This allows
+   * writing an integer valued expression as a result of a transition. This
+   * is specifically introduced to allow writing a call of {{{submit)(event : Event) : Int}}}
+   * on an HSM as a result of a transition, making the monitor reactive: not only monitoring,
+   * but also influencing the system monitored.
+   *
+   * @param d the integer to be lifted.
+   * @return the state set {{{Set(ok)}}} (not dependent of the integer value {{{d}}}).
+   */
 
   protected implicit def convInt2StateSet(d: Int): Set[state] =
     Set(ok)
 
+  /**
+   * Implicit function lifting a Boolean value {{{b}}} to the state set {{{Set(ok)}}}
+   * if {{{b}}} is true, and to {{{Set(error)}}} if {{{b}}} is false.
+   *
+   * @param b the Boolean to be lifted.
+   * @return if  {{{b}}} then {{{Set(ok)}}} else {{{Set(error)}}}.
+   */
+
   protected implicit def convBoolean2StateSet(b: Boolean): Set[state] =
     Set(if (b) ok else error)
+
+  /**
+   * Implicit function converting a state to the a singleton state containing that state,
+   * Recall that the result of a transition is a set of states. This function allows
+   * to write a single state as result of a transition. That is e.g. {{{ok}}} instead
+   * of {{{Set(ok)}}}.
+   *
+   * @param state the state to be lifted.
+   * @return the singleton set {{{Set(state}}}.
+   */
 
   protected implicit def convState2StateSet(state: state): Set[state] =
     Set(state)
 
+  /**
+   * Implicit function lifting a 2-tuple of states to the set of those states.
+   * This allows the more succinct notation {{{(state1,state2)}}} instead of
+   * {{{Set(state1,state2)}}}.
+   *
+   * @param states the 2-tuple of states to be lifted.
+   * @return the set containing the two states.
+   */
+
   protected implicit def conTuple2StateSet(states: (state, state)): Set[state] =
     Set(states._1, states._2)
+
+  /**
+   * Implicit function lifting a 3-tuple of states to the set of those states.
+   * This allows the more succinct notation {{{(state1,state2,state3)}}} instead of
+   * {{{Set(state1,state2,state3)}}}.
+   *
+   * @param states the 3-tuple of states to be lifted.
+   * @return the set containing the three states.
+   */
 
   protected implicit def conTriple2StateSet(states: (state, state, state)): Set[state] =
     Set(states._1, states._2, states._3)
 
+  /**
+   * Implicit function lifting a list of states to a set of states. This allows to
+   * write the result of a transition e.g. as a for-yield construct, as in the following
+   * result of a transition, which is a list of hot-states.
+   *
+   * {{{
+   *   always {
+   *     case StopAll(someList) => for (x <- someList) yield hot {case Stop(x) => ok}
+   *   }
+   * }}}
+   *
+   * @param states the list of states to be lifted.
+   * @return the set containing those states.
+   */
+
   protected implicit def convList2StateSet(states: List[state]): Set[state] =
     states.toSet
+
+  /**
+   * Implicit function lifting a state to an anonymous object defining the {{{&}}}-operator,
+   * which defines conjunction of states. Hence one can write {{{state1 & state2}}}, which then
+   * results in the set {{{Set(state1,state2)}}}.
+   *
+   * @param s1 the state to be lifted.
+   * @return the anonymous object defining the method {{{&(s2: state): Set[state]}}}.
+   */
 
   protected implicit def convState2AndState(s1: state) = new {
     def &(s2: state): Set[state] = Set(s1, s2)
   }
 
+  /**
+   * Implicit function lifting a set of states to an anonymous object defining the {{{&}}}-operator,
+   * which defines conjunction of states. Hence one can write {{{state1 & state2 & state3}}}, which then
+   * results in the set {{{Set(state1,state2,state3)}}}. This works by first lifting
+   * {{{state1 & state2}}} to the set {{{Set(state1,state2)}}}, and then apply {{{& state3}}} to
+   * obtain {{{Set(state1,state2,state3)}}}.
+   *
+   * @param set the set of states to be lifted.
+   * @return the anonymous object defining the method {{{&(s2: state): Set[state]}}}.
+   */
+
   protected implicit def conStateSet2AndStateSet(set: Set[state]) = new {
     def &(s: state): Set[state] = set + s
   }
 
+  /**
+   * Implicit function lifting a Boolean to an anonymous object defining the implication
+   * operator. This allows to write {{{b1 ==> b2}}} for two Boolean expressions
+   * {{{b1}}} and {{{b2}}}. It has the same meaning as {{{!b1 || b2}}}.
+   *
+   * @param p the Boolean to be lifted.
+   * @return the anonymous object defining the method {{{==>(q: Boolean)}}}.
+   */
+
   protected implicit def liftBoolean(p: Boolean) = new {
     def ==>(q: Boolean) = !p || q
   }
+
+  // TODO:
 
   def verify(event: E) {
     verifyBeforeEvent(event)
