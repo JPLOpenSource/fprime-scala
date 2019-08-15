@@ -1,5 +1,5 @@
 
-# F' (F Prime) in Scala
+# Component Based Programming in Scala
 
 The contents of this repository is a Scala DSL of a component-based framework for software development consiting to three components, all of which can be used together.
 
