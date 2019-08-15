@@ -1,11 +1,5 @@
 package hsm
 
-/*
- * Internal DSL for Hierarchical State Machines (HSMs). HSMs are extended state machines
- * with the addition of super states, as well as enter and exit statements associated with
- * states.
- */
-
 /**
  * The static variables of HSMs.
  */
@@ -19,7 +13,7 @@ object HSM {
   var TRACE : Boolean = false
 
   /**
-   * The execution trace of an HSM. Updated if {{{TRACE}}} is true.
+   * The execution trace of an HSM. Updated if `TRACE` is true.
    */
 
   private var trace : String = "" // TODO: use StringBuffer
@@ -35,7 +29,7 @@ object HSM {
   }
 
   /**
-   * Resets the {{{trace}}} variable.
+   * Resets the `trace` variable.
    */
 
   def resetTrace(): Unit = {
@@ -43,7 +37,7 @@ object HSM {
   }
 
   /**
-   * Prints the {{{trace}}} variable.
+   * Prints the `trace` variable.
    */
 
   def printTrace(): Unit = {
@@ -72,16 +66,16 @@ trait HSM[Event] {
 
   /**
    * Variable containing time consumed, simulating time progress when taking a transition.
-   * It is set with the {{{taking(d : Int)}}} method called on the target state. The used
-   * time is the return value of the {{{submit(event: Event): Int}}} method, but otherwise
+   * It is set with the `taking(d : Int)` method called on the target state. The used
+   * time is the return value of the `submit(event: Event): Int` method, but otherwise
    * serves no purpose.
    */
 
   private var delay = 0
 
   /**
-   * Cache mapping values of type {{{A}}} to values of type {{{B}}}. If the cash is not defined
-   * for an {{{A}}} value, the {{{B}}} value is computed with the {{{calculateIt}}} function. The cache
+   * Cache mapping values of type `A` to values of type `B`. If the cash is not defined
+   * for an `A` value, the `B` value is computed with the `calculateIt` function. The cache
    * is used for (1) mapping a state to its (possibly inner) initial state, and (2) for mapping
    * an (exit state, enter state) to the pair consisting of the states to exit and
    * the states to enter.
@@ -133,7 +127,7 @@ trait HSM[Event] {
   }
 
   /**
-   * The {{{skip}}} value represents code that does nothing. Used for transitions
+   * The `skip` value represents code that does nothing. Used for transitions
    * not annotated with user-defined code to execute.
    */
 
@@ -228,7 +222,7 @@ trait HSM[Event] {
   /**
    * Allows user to associate a callback function to the HSM, which will be executed after
    * each submission of an event to the HSM, as the last action to be executed in the
-   * {{{submit(event: Event) : Int}}} method. The function can be used for
+   * `submit(event: Event) : Int` method. The function can be used for
    * example for debugging purposes.
    *
    * @param callback the callback function.
@@ -238,10 +232,10 @@ trait HSM[Event] {
 
   /**
    * Lifts a state to a target (state,code) tuple. This is needed for transitions for which
-   * no target code is indicated with the {{{exec}}} method.
+   * no target code is indicated with the `exec` method.
    *
    * @param s the state to be lifted.
-   * @return the pair {{{(s,skip)}}}.
+   * @return the pair `(s,skip)`.
    */
 
   protected implicit def state2Target(s: state): Target =
@@ -259,7 +253,7 @@ trait HSM[Event] {
   protected implicit def state2Exec(s: state) = new {
     /**
      * Records the time that taking the transition resulting in this state takes. The time
-     * is returned as a value of the {{{submit(event : Event) : Int}}} method. It is
+     * is returned as a value of the `submit(event : Event) : Int` method. It is
      * up to the user to use this information. It is not otherwise used by the framework.
      *
      * @param d the speculated time this transition takes to execute.
@@ -271,8 +265,8 @@ trait HSM[Event] {
     /**
      * Associates code to be executed when transition ending in this state is taken.
      *
-     * @param code the code to be executed when transition leading to this state {{{S}}} is taken.
-     * @return the target of the transition {{{(S,(x: Unit) => code)}}}, a tuple consisting of
+     * @param code the code to be executed when transition leading to this state `S` is taken.
+     * @return the target of the transition `(S,(x: Unit) => code)`, a tuple consisting of
      *         the target state and the code to be executed when taking the transition, represented as a lambda term.
      */
 
@@ -286,7 +280,7 @@ trait HSM[Event] {
   var current: state = null
 
   /**
-   * Returns true iff. the name of the current state matches the {{{java.util.regex.Pattern}}}
+   * Returns true iff. the name of the current state matches the `java.util.regex.Pattern`
    * regular expression provided as argument.
    *
    * @param regexp tye regular expression the state name much match for the method to return true.
@@ -349,12 +343,12 @@ trait HSM[Event] {
   protected def states(ss: state*){}
 
   /**
-   * A substitute for calling e {{{submit)(event : Event) : Int}}} method, supporting
-   * the more succinct call {{{hsm(e)}}} instead of {{{hsm.submit(e)}}}.
+   * A substitute for calling e `submit)(event : Event) : Int` method, supporting
+   * the more succinct call `hsm(e)` instead of `hsm.submit(e)`.
    *
    * @param event the event submitted to the HSM.
    * @return the time the execution of the event takes in simulated time indicated with the method
-   *         {{{taken}}}.
+   *         `taken`.
    */
 
   def apply(event: Event): Int = {
@@ -368,9 +362,9 @@ trait HSM[Event] {
    *
    * @param s the current state.
    * @param event the submitted event.
-   * @return the innermost state {{{s</code, returned as {{{Some(s)}}},
+   * @return the innermost state `s`, returned as `Some(s)`,
    *         counted from the current state, which can trigger on the event. If
-   *         such a state does not exist {{{None}}} is returned.
+   *         such a state does not exist `None` is returned.
    */
 
   private def findTriggerHappyState(s: state, event: Event): Option[state] =
@@ -391,7 +385,7 @@ trait HSM[Event] {
    *
    * @param event the event submitted to the HSM.
    * @return the time the execution of the event takes in simulated time indicated with the method
-   *         {{{taken}}}.
+   *         `taken`.
    */
 
   def submit(event: Event): Int = {
@@ -418,13 +412,13 @@ trait HSM[Event] {
   }
 
   /**
-   * Given a state {{{s1}}} to exit and a (final) state {{{s2}}} to enter, this method
-   * returns a pair consisting of (1) all the super states of {{{s1}}} from inside out to exit, and (2) all
-   * the super states of {{{s2}}} from outside in to enter. The result is used to execute the exit
+   * Given a state `s1` to exit and a (final) state `s2` to enter, this method
+   * returns a pair consisting of (1) all the super states of `s1` from inside out to exit, and (2) all
+   * the super states of `s2` from outside in to enter. The result is used to execute the exit
    * codes of the states to exit and the enter codes of the states to enter. Note that a state that is a common
-   * super state of both {{{s1}}} and {{{s2}}} will not be included in the resulting lists.
+   * super state of both `s1` and `s2` will not be included in the resulting lists.
    *
-   * @param fromTo the pair of states {{{(s1,s2)}}} to exit respectively enter.
+   * @param fromTo the pair of states `(s1,s2)` to exit respectively enter.
    * @return the pair of lists of states to exit respectively enter.
    */
 
@@ -454,17 +448,17 @@ trait HSM[Event] {
     s.getInnerMostState
 
   /**
-   * Given a state {{{s1}}} to exit and a (final) state {{{s2}}} to enter as result of
+   * Given a state `s1` to exit and a (final) state `s2` to enter as result of
    * a transition, part of executing all necessary exit codes and enter codes is to first determine
-   * which states to exit and which states to enter. This method takes as argument all the super states {{{ss1}}}
-   * of {{{s1}}}, top down, and all the super states {{{ss2}}} of {{{s2}}}, top down,
-   * and strips the super states that are common in {{{ss1}}} and {{{ss2}}}. Note that a state
-   * that is a common super state of both {{{s1}}} and
-   * {{{s2}}} will not be included in the resulting lists.
+   * which states to exit and which states to enter. This method takes as argument all the super states `ss1`
+   * of `s1`, top down, and all the super states `ss2` of `s2`, top down,
+   * and strips the super states that are common in `ss1` and `ss2`. Note that a state
+   * that is a common super state of both `s1` and
+   * `s2` will not be included in the resulting lists.
    *
    * @param ss1 the list of super states (ordered top down) of the state to exit.
    * @param ss2 the list of super states (ordered top down) of the state to enter.
-   * @return the lists {{{(ss1',ss2')}}} where the common prefix of common super states have been
+   * @return the lists `(ss1',ss2')` where the common prefix of common super states have been
    *         removed.
    */
 
@@ -518,8 +512,8 @@ trait HSM[Event] {
 
     /**
      * The transitions out of a state are represented as a partial function, mapping
-     * an event to a target {{{(s, code)}}} consisting of the target state {{{s}}}
-     * and the {{{code}}} to execute when firing that transition.
+     * an event to a target `(s, code)` consisting of the target state `s`
+     * and the `code` to execute when firing that transition.
      */
 
     private[hsm] var transitions: Transitions = noTransitions
@@ -533,7 +527,7 @@ trait HSM[Event] {
      * the same name.
      *
      * @param obj the state to compare to.
-     * @return true if {{{this}}} state has the same name as the other {{{obj}}} state.
+     * @return true if `this` state has the same name as the other `obj` state.
      */
 
     override def equals(obj: scala.Any): Boolean = {
@@ -558,9 +552,9 @@ trait HSM[Event] {
         initialState.getInnerMostState
 
     /**
-     * Returns a list of the superstates of a state, ordered top down. So if }}}this}}}
-     * state has a superstate {{{A}}}, and {{{A}}} has a superstate {{{B}}},
-     * and {{{B}}} has no superstate, then the list returned is: {{{List(B,A,this)}}}.
+     * Returns a list of the superstates of a state, ordered top down. So if `this`
+     * state has a superstate `A`, and `A` has a superstate `B`,
+     * and `B` has no superstate, then the list returned is: `List(B,A,this)`.
      *
      * @return list of superstates of the state, ordered top down.
      */
@@ -591,8 +585,8 @@ trait HSM[Event] {
     /**
      * Used to define the transitions out of a state. The transitions are modeled as
      * a single partial function taking an event as argument, and returning a target, a pair
-     * {{{(s,code)}}} consisting of the target state {{{s}}} and the
-     * {{{code}}} to execute when firing that transition. The transition function
+     * `(s,code)` consisting of the target state `s` and the
+     * `code` to execute when firing that transition. The transition function
      * is only defined for those events for which it can fire, hence a partial function.
      *
      * @param ts the transitions out of the state represented as a partial function.
@@ -623,10 +617,10 @@ trait HSM[Event] {
   }
 
   /**
-   * The {{{stay}}} state is a special state. When used as target state in
+   * The `stay` state is a special state. When used as target state in
    * a transition, it represents a self-loop where the exit and enter codes are NOT
-   * executed. We just stay silently in the state. Otherwise, if in a state {{{S}}}
-   * and a transition leads to the same state as target, {{{S}}}, the state's exit and enter
+   * executed. We just stay silently in the state. Otherwise, if in a state `S`
+   * and a transition leads to the same state as target, `S`, the state's exit and enter
    * codes will be executed.
    */
 

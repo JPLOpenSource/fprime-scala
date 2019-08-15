@@ -1,46 +1,7 @@
 package daut
 
-/*
- * Daut (Data automata) is an internal Scala DSL for writing event stream monitors. It
- * supports flavors of state machines, temporal logic, and rule-based programming, all in one
- * unified formalism. The underlying concept is that at any point during monitoring there is an
- * active set of states, the _state soup_. States can be added and removed from this soup.
- * Each state in the soup either monitors the incoming event stream, or is used by other states to record
- * data (as in rule-based programming).
- *
- * The specification language specifically supports:
- *
- * - Automata, represented by states, parameterized with data (thereby the name Daut: Data automata).
- * - Temporal operators which generate states, resulting in more succinct specifications.
- * - Rule-based programming in that one can test for the presence of states and one can add states.
- * - General purpose programming in Scala when the other specification features fall short.
- *
- * The DSL is a simplification of the TraceContract internal Scala DSL by an order of magnitude less code.
- *
- * The general idea is to create a monitor as a class sub-classing the {{{Monitor}}} class,
- * create an instance of it, and then feed it with events with the {{{verify(event: Event)}}} method,
- * one by one, and in the case of a finite sequence of observations, finally calling the
- * {{{end()}}} method on it. If {{{end()}}} is called, it will be determined whether
- * there are any outstanding obligations that have not been satisfied (expected events that did not occur).
- *
- * This can schematically be illustrated as follows:
- *
- * {{{
- * class MyMonitor extends Monitor[SomeType] {
- * ...
- * }
- *
- * val m = new MyMonitor()
- *   m.verify(event1)
- *   m.verify(event2)
- * ...
- *   m.verify(eventN)
- *   m.end()
- * }}}
- */
-
 /**
- * If the {{{STOP_ON_ERROR}}} flag is set to true, a {{{MonitorError}}} exception is thrown
+ * If the `STOP_ON_ERROR` flag is set to true, a `MonitorError` exception is thrown
  * if a monitor's specification is violated by the observed event stream.
  */
 
@@ -78,7 +39,7 @@ class Monitor[E] {
 
   /**
    * This variable holds invariants that have been defined by the user with one of the
-   * {{{invariant}}} methods. Invariants are Boolean valued functions that are
+   * `invariant` methods. Invariants are Boolean valued functions that are
    * evaluated after each submitted event has been processed by the monitor. An invariant
    * can e.g. check the values of variables declared local to the monitor. The violation of an
    * invariant is reported as an error.
@@ -88,7 +49,7 @@ class Monitor[E] {
 
   /**
    * For each submitted event this set contains all states that are to be removed
-   * from the set {{{states}}} of active states. A state needs to be removed
+   * from the set `states` of active states. A state needs to be removed
    * when leaving the state due to a fired transition.
    */
 
@@ -96,7 +57,7 @@ class Monitor[E] {
 
   /**
    * For each submitted event this set contains all states that are to be added
-   * to the set {{{states}}} of active states. A state needs to be added
+   * to the set `states` of active states. A state needs to be added
    * when entering the state due to a fired transition.
    */
 
@@ -207,7 +168,7 @@ class Monitor[E] {
 
   /**
    * Invariant method which takes an invariant Boolean valued expression (call by name)
-   * as argument and adds the corresponding lambda abstraction (argument of type {{{Unit}}})
+   * as argument and adds the corresponding lambda abstraction (argument of type `Unit`)
    * to the list of invariants to check after each submission of an event.
    *
    * @param inv the invariant expression to be checked after each submitted event.
@@ -220,7 +181,7 @@ class Monitor[E] {
 
   /**
    * Invariant method which takes an invariant Boolean valued expression (call by name)
-   * as argument and adds the corresponding lambda abstraction (argument of type {{{Unit}}})
+   * as argument and adds the corresponding lambda abstraction (argument of type `Unit`)
    * to the list of invariants to check after each submission of an event. The first argument
    * is a message that will be printed in case the invariant is violated.
    *
@@ -249,7 +210,7 @@ class Monitor[E] {
 
     /**
      * This variable is true for final (acceptance) states: that is states where it is
-     * acceptable to end up when the {{{end()}}} method is called. This corresponds to
+     * acceptable to end up when the `end()` method is called. This corresponds to
      * acceptance states in standard automaton theory.
      */
 
@@ -285,7 +246,7 @@ class Monitor[E] {
      * Updates the transition function to the transition function provided.
      * This corresponds to a state where the monitor is just waiting (watching) until an event
      * is submitted that makes a transition fire. The state is non-final, meaning
-     * that it is an error to be in this state on a call of the {{{end()}}} method.
+     * that it is an error to be in this state on a call of the `end()` method.
      *
      * @param ts the transition function.
      */
@@ -323,12 +284,12 @@ class Monitor[E] {
     }
 
     /**
-     * An expression of the form {{{unless {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
-     * unless {{{ts1}}} fires. That is, the expression updates the transition function as
+     * An expression of the form `unless {ts1} watch {ts2`} watches `ts2` repeatedly
+     * unless `ts1` fires. That is, the expression updates the transition function as
      * the combination of the two transition functions provided. The resulting transition function
-     * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
+     * first tries `ts1`, and if it can fire that is chosen. Otherwise `t2` is tried,
      * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-     * The transition function {{{ts1}}} does not need to ever fire, which makes the state final.
+     * The transition function `ts1` does not need to ever fire, which makes the state final.
      *
      * @param ts1 the transition function.
      */
@@ -340,12 +301,12 @@ class Monitor[E] {
     }
 
     /**
-     * An expression of the form {{{until {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
-     * until {{{ts1}}} fires. That is, the expression updates the transition function as
+     * An expression of the form `until {ts1} watch {ts2`} watches `ts2` repeatedly
+     * until `ts1` fires. That is, the expression updates the transition function as
      * the combination of the two transition functions provided. The resulting transition function
-     * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
+     * first tries `ts1`, and if it can fire that is chosen. Otherwise `t2` is tried,
      * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-     * The transition function {{{ts1}}} will need to eventually ever fire before {{{end()}}} is
+     * The transition function `ts1` will need to eventually ever fire before `end()` is
      * called, which makes the state non-final.
      *
      * @param ts1 the transition function.
@@ -360,8 +321,8 @@ class Monitor[E] {
 
     /**
      * Applies the state to an event. If the transition function associated with the state
-     * can fire, the resulting state set {{{ss}}} is returned as {{{Some(ss)}}}.
-     * If the transition function cannot fire {{{None}}} is returned.
+     * can fire, the resulting state set `ss` is returned as `Some(ss)`.
+     * If the transition function cannot fire `None` is returned.
      *
      * @param event the event the state is applied to.
      * @return the optional set of states resulting from taking a transition.
@@ -377,7 +338,7 @@ class Monitor[E] {
     }
 
     /**
-     * The standard {{{toString}}} method overridden.
+     * The standard `toString` method overridden.
      *
      * @return text representation of state.
      */
@@ -398,10 +359,10 @@ class Monitor[E] {
   protected case object error extends state
 
   /**
-   * Returns an {{{error}}} state indicating a specification violation.
+   * Returns an `error` state indicating a specification violation.
    *
    * @param msg message to be printed on standard out.
-   * @return the {{{error}}} state.
+   * @return the `error` state.
    */
 
   protected def error(msg: String): state = {
@@ -410,13 +371,13 @@ class Monitor[E] {
   }
 
   /**
-   * The state is usually assigned to a local {{{val}}}-variable that can be queried
+   * The state is usually assigned to a local `val`-variable that can be queried
    * e.g. in invariants, either simply using the during state as a Boolean (the state is lifted to a Booelean
    * with an implicit function) or by using the ==> method. Consider the following
    * example illustrating a monitor that checks that at most one of two threads 1 and 2
-   * are in a critical section at any time, using an invariant. A thread {{{x}}} can enter a critical
-   * section with the {{{enter(x)}}} call, and leave with either an {{{exit(x)}}} call or an
-   * {{{abort(x)}}} call.
+   * are in a critical section at any time, using an invariant. A thread `x` can enter a critical
+   * section with the `enter(x)` call, and leave with either an `exit(x)` call or an
+   * `abort(x)` call.
    *
    * {{{
    * class CriticalSectionMonitor extends Monitor[Event] {
@@ -461,12 +422,12 @@ class Monitor[E] {
     private[daut] var on: Boolean = false
 
     /**
-     * This method allows us, given a during-state {{{dur}}}, to write a Booelean
-     * expression of the form {{{dur ==> condition}}}, meaning: if {{{dur}}} is in the interval
-     * then the {{{condition}}} must hold.
+     * This method allows us, given a during-state `dur`, to write a Booelean
+     * expression of the form `dur ==> condition`, meaning: if `dur` is in the interval
+     * then the `condition` must hold.
      *
      * @param b the condition that must hold if the during-state is within the interval.
-     * @return true if the during state is not within an interval, or if the condition {{{b}}} holds.
+     * @return true if the during state is not within an interval, or if the condition `b` holds.
      */
 
     def ==>(b: Boolean) = {
@@ -475,7 +436,7 @@ class Monitor[E] {
 
     /**
      * A call of this method on a during-state causes the state to initially be within
-     * an interval, as if one of the events in {{{es1}}} had occurred. As an example, one can
+     * an interval, as if one of the events in `es1` had occurred. As an example, one can
      * write:
      *
      * {{{
@@ -507,7 +468,7 @@ class Monitor[E] {
    * within the interval.
    *
    * @param iv the during-state to be lifted.
-   * @return true iff. the during-state {{{iv}}} is within the interval.
+   * @return true iff. the during-state `iv` is within the interval.
    */
 
   protected implicit def liftInterval(iv: during): Boolean = iv.on
@@ -544,7 +505,7 @@ class Monitor[E] {
    * Returns a hot-state, where the transition function is the transition function provided.
    * This corresponds to a state where the monitor is just waiting (watching) until an event
    * is submitted that makes a transition fire. The state is non-final, meaning
-   * that it is an error to be in this state on a call of the {{{end()}}} method.
+   * that it is an error to be in this state on a call of the `end()` method.
    *
    * @param ts the transition function.
    * @return a hot-state.
@@ -583,12 +544,12 @@ class Monitor[E] {
   }
 
   /**
-   * An expression of the form {{{unless {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
-   * unless {{{ts1}}} fires. That is, the expression returns an unless-state, where the transition function is
+   * An expression of the form `unless {ts1} watch {ts2`} watches `ts2` repeatedly
+   * unless `ts1` fires. That is, the expression returns an unless-state, where the transition function is
    * the combination of the two transition functions provided. The resulting transition function
-   * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
+   * first tries `ts1`, and if it can fire that is chosen. Otherwise `t2` is tried,
    * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-   * The transition function {{{ts1}}} does not need to ever fire, which makes the state final.
+   * The transition function `ts1` does not need to ever fire, which makes the state final.
    *
    * @param ts1 the transition function.
    * @return an unless-state.
@@ -601,12 +562,12 @@ class Monitor[E] {
   }
 
   /**
-   * An expression of the form {{{until {ts1} watch {ts2}}}} watches {{{ts2}}} repeatedly
-   * until {{{ts1}}} fires. That is, the expression returns an until-state, where the transition function is
+   * An expression of the form `until {ts1} watch {ts2`} watches `ts2` repeatedly
+   * until `ts1` fires. That is, the expression returns an until-state, where the transition function is
    * the combination of the two transition functions provided. The resulting transition function
-   * first tries {{{ts1}}}, and if it can fire that is chosen. Otherwise {{{t2}}} is tried,
+   * first tries `ts1`, and if it can fire that is chosen. Otherwise `t2` is tried,
    * and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-   * The transition function {{{ts1}}} will need to eventually ever fire before {{{end()}}} is
+   * The transition function `ts1` will need to eventually ever fire before `end()` is
    * called, which makes the state non-final.
    *
    * @param ts1 the transition function.
@@ -625,8 +586,8 @@ class Monitor[E] {
    * the state, and returns true. The method is used for rule-based programming.
    *
    * @param pred the partial function predicate tested on active states.
-   * @return true iff there exists an active state {{{s}}} such that {{{pred.isDefinedAt(s)}}}
-   *         and {{{pred(s) == true}}}.
+   * @return true iff there exists an active state `s` such that `pred.isDefinedAt(s)`
+   *         and `pred(s) == true`.
    */
 
   protected def exists(pred: PartialFunction[state, Boolean]): Boolean = {
@@ -634,17 +595,17 @@ class Monitor[E] {
   }
 
   /**
-   * The {{{find}}} method returns a set of states computed as follows.
-   * If the provided argument partial function {{{pf}}} is defined for any active states,
+   * The `find` method returns a set of states computed as follows.
+   * If the provided argument partial function `pf` is defined for any active states,
    * the resulting set is the union of all the state sets obtained by
    * applying the function to the active states for which it is defined.
-   * Otherwise the returned set is the set {{{otherwise}}} provided as
-   * argument to the {{{orelse}}} method.
+   * Otherwise the returned set is the set `otherwise` provided as
+   * argument to the `orelse` method.
    *
    * As an example, consider the following monitor, which checks that
    * at most one task can acquire a lock at a time, and that
    * a task cannot release a lock it has not acquired.
-   * This monitor illustrates the {{{find}}} function, which looks for stored
+   * This monitor illustrates the `find` function, which looks for stored
    * facts matching a pattern, and the ensure function, which checks a
    * condition (an assert). This function here in this example tests for
    * the presence of a Locked fact which is created when a lock is taken.
@@ -674,10 +635,10 @@ class Monitor[E] {
    * }
    * }}}
    *
-   * A more sophisticated example involving nested {{{find}}} calls is
-   * the following that checks that when a task {{{t}}} is acquiring a
-   * lock that some other task holds, and {{{t}}} therefore cannot get it,
-   * then {{{t}}} is not allowed to hold any other locks (to prevent deadlocks).
+   * A more sophisticated example involving nested `find` calls is
+   * the following that checks that when a task `t` is acquiring a
+   * lock that some other task holds, and `t` therefore cannot get it,
+   * then `t` is not allowed to hold any other locks (to prevent deadlocks).
    *
    * {{{
    * class AvoidDeadlocks extends Monitor[LockEvent] {
@@ -705,7 +666,7 @@ class Monitor[E] {
    * }}}
    *
    * @param pf partial function.
-   * @return set of states produced from applying the partial function {{{fp}}} to active states.
+   * @return set of states produced from applying the partial function `fp` to active states.
    */
 
   protected def find(pf: PartialFunction[state, Set[state]]) = new {
@@ -719,12 +680,12 @@ class Monitor[E] {
   }
 
   /**
-   * Returns the state {{{ok}}} if the Boolean expression {{{b}}} is true, otherwise
-   * it returns the {{{error}}} state. The mothod can for example be used as the
+   * Returns the state `ok` if the Boolean expression `b` is true, otherwise
+   * it returns the `error` state. The mothod can for example be used as the
    * result of a transition.
    *
    * @param b Boolean condition.
-   * @return one of the states {{{ok}}} or {{{error}}}, depending on the value of {{{b}}}.
+   * @return one of the states `ok` or `error`, depending on the value of `b`.
    */
 
   protected def ensure(b: Boolean): state = {
@@ -732,7 +693,7 @@ class Monitor[E] {
   }
 
   /**
-   * Checks whether the condition {{{b}}} is true, and if not, reports an error
+   * Checks whether the condition `b` is true, and if not, reports an error
    * on standard out.
    *
    * @param b the Boolean condition to be checked.
@@ -743,8 +704,8 @@ class Monitor[E] {
   }
 
   /**
-   * Checks whether the condition {{{b}}} is true, and if not, reports an error
-   * on standard out. The text message {{{e}}} becomes part of the error
+   * Checks whether the condition `b` is true, and if not, reports an error
+   * on standard out. The text message `e` becomes part of the error
    * message.
    *
    * @param b the Boolean condition to be checked.
@@ -755,7 +716,7 @@ class Monitor[E] {
   }
 
   /**
-   * Adds the argument state {{{s}}} to the set of initial states of the monitor.
+   * Adds the argument state `s` to the set of initial states of the monitor.
    *
    * @param s state to be added as initial state.
    */
@@ -766,51 +727,51 @@ class Monitor[E] {
 
   /**
    * Implicit function lifting a state to a Boolean, which is true iff. the state
-   * is amongst the current states. Hence, if {{{s}}} is a state then one can e.g.
+   * is amongst the current states. Hence, if `s` is a state then one can e.g.
    * write an expression (denoting a state) of the form:
    * {{{
    *   if (s) error else ok
    * }}}
    *
    * @param s the state to be lifted.
-   * @return true iff. the state {{{s}}} is amongst the current states.
+   * @return true iff. the state `s` is amongst the current states.
    */
 
   protected implicit def convState2Boolean(s: state): Boolean =
     states contains s
 
   /**
-   * Implicit function lifting the {{{Unit}}} value {{{()}}} to the set:
-   * {{{Set(ok)}}}. This allows to write code with side-effects (and return value
-   * of type {{{Unit}}}) as a result of a transition.
+   * Implicit function lifting the `Unit` value `()` to the set:
+   * `Set(ok)`. This allows to write code with side-effects (and return value
+   * of type `Unit`) as a result of a transition.
    *
    * @param u the Unit value to be lifted.
-   * @return the state set {{{Set(ok)}}}.
+   * @return the state set `Set(ok)`.
    */
 
   protected implicit def convUnit2StateSet(u: Unit): Set[state] =
     Set(ok)
 
   /**
-   * Implicit function lifting an integer to the set: {{{Set(ok)}}}. This allows
+   * Implicit function lifting an integer to the set: `Set(ok)`. This allows
    * writing an integer valued expression as a result of a transition. This
-   * is specifically introduced to allow writing a call of {{{submit)(event : Event) : Int}}}
+   * is specifically introduced to allow writing a call of `submit)(event : Event) : Int`
    * on an HSM as a result of a transition, making the monitor reactive: not only monitoring,
    * but also influencing the system monitored.
    *
    * @param d the integer to be lifted.
-   * @return the state set {{{Set(ok)}}} (not dependent of the integer value {{{d}}}).
+   * @return the state set `Set(ok)` (not dependent of the integer value `d`).
    */
 
   protected implicit def convInt2StateSet(d: Int): Set[state] =
     Set(ok)
 
   /**
-   * Implicit function lifting a Boolean value {{{b}}} to the state set {{{Set(ok)}}}
-   * if {{{b}}} is true, and to {{{Set(error)}}} if {{{b}}} is false.
+   * Implicit function lifting a Boolean value `b` to the state set `Set(ok)`
+   * if `b` is true, and to `Set(error)` if `b` is false.
    *
    * @param b the Boolean to be lifted.
-   * @return if  {{{b}}} then {{{Set(ok)}}} else {{{Set(error)}}}.
+   * @return if  `b` then `Set(ok)` else `Set(error)`.
    */
 
   protected implicit def convBoolean2StateSet(b: Boolean): Set[state] =
@@ -819,11 +780,11 @@ class Monitor[E] {
   /**
    * Implicit function converting a state to the a singleton state containing that state,
    * Recall that the result of a transition is a set of states. This function allows
-   * to write a single state as result of a transition. That is e.g. {{{ok}}} instead
-   * of {{{Set(ok)}}}.
+   * to write a single state as result of a transition. That is e.g. `ok` instead
+   * of `Set(ok)`.
    *
    * @param state the state to be lifted.
-   * @return the singleton set {{{Set(state}}}.
+   * @return the singleton set `Set(state`.
    */
 
   protected implicit def convState2StateSet(state: state): Set[state] =
@@ -831,8 +792,8 @@ class Monitor[E] {
 
   /**
    * Implicit function lifting a 2-tuple of states to the set of those states.
-   * This allows the more succinct notation {{{(state1,state2)}}} instead of
-   * {{{Set(state1,state2)}}}.
+   * This allows the more succinct notation `(state1,state2)` instead of
+   * `Set(state1,state2)`.
    *
    * @param states the 2-tuple of states to be lifted.
    * @return the set containing the two states.
@@ -843,8 +804,8 @@ class Monitor[E] {
 
   /**
    * Implicit function lifting a 3-tuple of states to the set of those states.
-   * This allows the more succinct notation {{{(state1,state2,state3)}}} instead of
-   * {{{Set(state1,state2,state3)}}}.
+   * This allows the more succinct notation `(state1,state2,state3)` instead of
+   * `Set(state1,state2,state3)`.
    *
    * @param states the 3-tuple of states to be lifted.
    * @return the set containing the three states.
@@ -872,12 +833,12 @@ class Monitor[E] {
     states.toSet
 
   /**
-   * Implicit function lifting a state to an anonymous object defining the {{{&}}}-operator,
-   * which defines conjunction of states. Hence one can write {{{state1 & state2}}}, which then
-   * results in the set {{{Set(state1,state2)}}}.
+   * Implicit function lifting a state to an anonymous object defining the `&`-operator,
+   * which defines conjunction of states. Hence one can write `state1 & state2`, which then
+   * results in the set `Set(state1,state2)`.
    *
    * @param s1 the state to be lifted.
-   * @return the anonymous object defining the method {{{&(s2: state): Set[state]}}}.
+   * @return the anonymous object defining the method `&(s2: state): Set[state]`.
    */
 
   protected implicit def convState2AndState(s1: state) = new {
@@ -885,14 +846,14 @@ class Monitor[E] {
   }
 
   /**
-   * Implicit function lifting a set of states to an anonymous object defining the {{{&}}}-operator,
-   * which defines conjunction of states. Hence one can write {{{state1 & state2 & state3}}}, which then
-   * results in the set {{{Set(state1,state2,state3)}}}. This works by first lifting
-   * {{{state1 & state2}}} to the set {{{Set(state1,state2)}}}, and then apply {{{& state3}}} to
-   * obtain {{{Set(state1,state2,state3)}}}.
+   * Implicit function lifting a set of states to an anonymous object defining the `&`-operator,
+   * which defines conjunction of states. Hence one can write `state1 & state2 & state3`, which then
+   * results in the set `Set(state1,state2,state3)`. This works by first lifting
+   * `state1 & state2` to the set `Set(state1,state2)`, and then apply `& state3` to
+   * obtain `Set(state1,state2,state3)`.
    *
    * @param set the set of states to be lifted.
-   * @return the anonymous object defining the method {{{&(s2: state): Set[state]}}}.
+   * @return the anonymous object defining the method `&(s2: state): Set[state]`.
    */
 
   protected implicit def conStateSet2AndStateSet(set: Set[state]) = new {
@@ -901,11 +862,11 @@ class Monitor[E] {
 
   /**
    * Implicit function lifting a Boolean to an anonymous object defining the implication
-   * operator. This allows to write {{{b1 ==> b2}}} for two Boolean expressions
-   * {{{b1}}} and {{{b2}}}. It has the same meaning as {{{!b1 || b2}}}.
+   * operator. This allows to write `b1 ==> b2` for two Boolean expressions
+   * `b1` and `b2`. It has the same meaning as `!b1 || b2`.
    *
    * @param p the Boolean to be lifted.
-   * @return the anonymous object defining the method {{{==>(q: Boolean)}}}.
+   * @return the anonymous object defining the method `==>(q: Boolean)`.
    */
 
   protected implicit def liftBoolean(p: Boolean) = new {
@@ -971,8 +932,8 @@ class Monitor[E] {
   }
 
   /**
-   * Allows applying a monitor {{{M}}} to an event {{{e}}}, as follows: {{{M(e)}}}.
-   * This has the same meaning as the longer {{{M.verify(e)}}}.
+   * Allows applying a monitor `M` to an event `e`, as follows: `M(e)`.
+   * This has the same meaning as the longer `M.verify(e)`.
    *
    * @param event the submitted event to be verified.
    */
@@ -982,7 +943,7 @@ class Monitor[E] {
   }
 
   /**
-   * This method is called <b>before</b> every call of {{{verify(event: E)}}}.
+   * This method is called <b>before</b> every call of `verify(event: E)`.
    * It can be overridden by user. Its body is by default empty.
    *
    * @param event the event being verified.
@@ -991,7 +952,7 @@ class Monitor[E] {
   protected def verifyBeforeEvent(event: E) {}
 
   /**
-   * This method is called <b>after</b> every call of {{{verify(event: E)}}}.
+   * This method is called <b>after</b> every call of `verify(event: E)`.
    * It can be overridden by user. Its body is by default empty.
    *
    * @param event the event being verified.
@@ -1046,7 +1007,7 @@ class Monitor[E] {
   }
 
   /**
-   * Prints a very visible ERROR banner, in case {{{PRINT_ERROR_BANNER}}} is true.
+   * Prints a very visible ERROR banner, in case `PRINT_ERROR_BANNER` is true.
    */
 
   private def reportError() {
