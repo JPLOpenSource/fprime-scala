@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>fprime documentation  - fprime.ObsOutput</title>
-          <meta name="description" content="fprime documentation - fprime.ObsOutput" />
-          <meta name="keywords" content="fprime documentation fprime.ObsOutput" />
+          <title>fprime documentation  - example6_cmd_telem.FloatChanged</title>
+          <meta name="description" content="fprime documentation - example6 cmd telem.FloatChanged" />
+          <meta name="keywords" content="fprime documentation example6 cmd telem.FloatChanged" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -69,10 +69,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
-    </li><li name="_root_.fprime" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="fprime"></a><a id="fprime:fprime"></a>
+    </li><li name="_root_.example6_cmd_telem" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="example6_cmd_telem"></a><a id="example6_cmd_telem:example6_cmd_telem"></a>
       <span class="permalink">
-      <a href="index.html#fprime" title="Permalink">
+      <a href="index.html#example6_cmd_telem" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -81,108 +81,54 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="Internal DSL for F', supporting components, ports, commanding, parameters, and telelemtry." href="index.html"><span class="name">fprime</span></a>
+        <a title="" href="index.html"><span class="name">example6_cmd_telem</span></a>
       </span>
       
-      <p class="shortcomment cmt">Internal DSL for F', supporting components, ports, commanding, parameters, and telelemtry.</p><div class="fullcomment"><div class="comment cmt"><p>Internal DSL for F', supporting components, ports, commanding, parameters, and telelemtry.
-F' is a framework (library, internal DSL) for creating a system of parallel executing
-components. Components can be active or passive. An active component contains an internal
-thread, while a passive component is like a traditional class. A component's interface is
-defined as a set of input ports and a set of output ports. A configuration of components
-is defined by linking output ports to input ports.</p><p>Ports can be synchronous or asynchronous. &quot;Sending a message&quot; over a synchronous port
-corresponds to calling a method, with an immediate return of a result value. In contrast,
-sending a message over an asynchronous port corresponds to message passing as in the actor
-model: the message ends up in the receiving components input queue for later processing by
-the component's thread. This is a non-blocking operation seen from the sender's point of view.
-A passive components cannot have asynchronous input ports.</p><p>The F' framework also supports sending comands to components, receiveing telemetry from
-components, and setting parameters in components.</p><p>The thread inside an active component repeatedly reads its input queue and processes the next
-input value sent to one of its input ports. All input ports are connected to the same single
-input queue.
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
     </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="ArrayOutput.html" title="An array output port supports an array of individual asynchronous output ports."></a>
-                        <a href="ArrayOutput.html" title="An array output port supports an array of individual asynchronous output ports.">ArrayOutput</a>
+                        <a class="class" href="A.html" title="********** Components **********"></a>
+                        <a href="A.html" title="********** Components **********">A</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Command.html" title="Commands from ground controls the spacecraft/rover."></a>
-                        <a href="Command.html" title="Commands from ground controls the spacecraft/rover.">Command</a>
+                        <a class="class" href="B.html" title=""></a>
+                        <a href="B.html" title="">B</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="CommandInput.html" title="The CommandInput is a special Input port which accepts commands from ground."></a>
-                        <a href="CommandInput.html" title="The CommandInput is a special Input port which accepts commands from ground.">CommandInput</a>
+                        <a class="class" href="C.html" title=""></a>
+                        <a href="C.html" title="">C</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="CommandOutput.html" title="Special output port for ground for sending commmands."></a>
-                        <a href="CommandOutput.html" title="Special output port for ground for sending commmands.">CommandOutput</a>
+                        <a class="class" href="DecreaseFloatWith.html" title=""></a>
+                        <a href="DecreaseFloatWith.html" title="">DecreaseFloatWith</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Component.html" title="An active component behaves like a thread to which messages can be sent over ports asynchronously."></a>
-                        <a href="Component.html" title="An active component behaves like a thread to which messages can be sent over ports asynchronously.">Component</a>
+                        <a class="class" href="DecreaseIntWith.html" title=""></a>
+                        <a href="DecreaseIntWith.html" title="">DecreaseIntWith</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g."></a>
-                        <a href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g.">Event</a>
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">FloatChanged</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return."></a>
-                        <a href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return.">GuardedSyncInput</a>
+                        <a class="class" href="Ground.html" title="****** Ground ******"></a>
+                        <a href="Ground.html" title="****** Ground ******">Ground</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="Input.html" title="Asynchronous input port."></a>
-                        <a href="Input.html" title="Asynchronous input port.">Input</a>
+                        <a class="class" href="IncreaseFloatWith.html" title=""></a>
+                        <a href="IncreaseFloatWith.html" title="">IncreaseFloatWith</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="ObsInput.html" title="Special input port for ground for receiving observations from the spacecraft/rover."></a>
-                        <a href="ObsInput.html" title="Special input port for ground for receiving observations from the spacecraft/rover.">ObsInput</a>
+                        <a class="class" href="IncreaseIntWith.html" title="******** Commands ********"></a>
+                        <a href="IncreaseIntWith.html" title="******** Commands ********">IncreaseIntWith</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="" title="An ObsOutput port is a special Output port to which observations can be sent, including events and telemetry."></a>
-                        <a href="" title="An ObsOutput port is a special Output port to which observations can be sent, including events and telemetry.">ObsOutput</a>
+                        <a class="class" href="IntChanged.html" title="****** Events ******"></a>
+                        <a href="IntChanged.html" title="****** Events ******">IntChanged</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Observation.html" title="Observations are data sent from the spacecraft/rover to ground."></a>
-                        <a href="Observation.html" title="Observations are data sent from the spacecraft/rover to ground.">Observation</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="class" href="Output.html" title="Asynchronous output port."></a>
-                        <a href="Output.html" title="Asynchronous output port.">Output</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="class" href="Parameters.html" title="A special command is the Parameters case class, which instructs setting indicated parameter names to denote indicated integer values."></a>
-                        <a href="Parameters.html" title="A special command is the Parameters case class, which instructs setting indicated parameter names to denote indicated integer values.">Parameters</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="trait" href="PassiveComponent.html" title="A passive component is like a class."></a>
-                        <a href="PassiveComponent.html" title="A passive component is like a class.">PassiveComponent</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="trait" href="QueuedComponent.html" title="A queued component is a passive component (like a class), which has an additional queue of messages built in."></a>
-                        <a href="QueuedComponent.html" title="A queued component is a passive component (like a class), which has an additional queue of messages built in.">QueuedComponent</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="class" href="QueuedInput.html" title="A queued input port can only be part of a QueuedComponent."></a>
-                        <a href="QueuedInput.html" title="A queued input port can only be part of a QueuedComponent.">QueuedInput</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="trait" href="SyncInput.html" title="A synchronous input port corresponds to a method in a class."></a>
-                        <a href="SyncInput.html" title="A synchronous input port corresponds to a method in a class.">SyncInput</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="class" href="SyncOutput.html" title="A synchronous output port corresponds to a method call."></a>
-                        <a href="SyncOutput.html" title="A synchronous output port corresponds to a method call.">SyncOutput</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="class" href="Telemetry.html" title="Telemetry is a special kind of observation, which provides information about the value of a collection of variables having floating point values."></a>
-                        <a href="Telemetry.html" title="Telemetry is a special kind of observation, which provides information about the value of a collection of variables having floating point values.">Telemetry</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="object" href="Util$.html" title="**** Util ****"></a>
-                        <a href="Util$.html" title="**** Util ****">Util</a>
-                      </li><li class="current-entities indented1">
-                        <span class="separator"></span>
-                        <a class="trait" href="iInput.html" title="An asynchronous input port interface."></a>
-                        <a href="iInput.html" title="An asynchronous input port interface.">iInput</a>
+                        <a class="object" href="Main$.html" title="**** Main ****"></a>
+                        <a href="Main$.html" title="**** Main ****">Main</a>
                       </li>
               </ul>
             </div>
@@ -191,9 +137,9 @@ input queue.
             <body class="class type">
       <div id="definition">
         <div class="big-circle class">c</div>
-        <p id="owner"><a href="index.html" class="extype" name="fprime">fprime</a></p>
-        <h1>ObsOutput<span class="permalink">
-      <a href="../fprime/ObsOutput.html" title="Permalink">
+        <p id="owner"><a href="index.html" class="extype" name="example6_cmd_telem">example6_cmd_telem</a></p>
+        <h1>FloatChanged<span class="permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -203,23 +149,19 @@ input queue.
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">class</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ObsOutput</span><span class="result"> extends <a href="Output.html" class="extype" name="fprime.Output">Output</a>[<a href="Observation.html" class="extype" name="fprime.Observation">Observation</a>]</span>
+        <span class="name">FloatChanged</span><span class="params">(<span name="component">component: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Float">Float</span></span>)</span><span class="result"> extends <a href="../fprime/Event.html" class="extype" name="fprime.Event">Event</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An <code>ObsOutput</code> port is a special <code>Output</code> port to which observations
-can be sent, including events and telemetry. Events can be submitted with the standard
-<code>invoke</code> method. Telemetry can be submitted with the special <code>logTelem</code>
-method.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="Output.html" class="extype" name="fprime.Output">Output</a>[<a href="Observation.html" class="extype" name="fprime.Observation">Observation</a>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="../fprime/Event.html" class="extype" name="fprime.Event">Event</a>, <a href="../fprime/Observation.html" class="extype" name="fprime.Observation">Observation</a>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -245,7 +187,7 @@ method.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="fprime.ObsOutput"><span>ObsOutput</span></li><li class="in" name="fprime.Output"><span>Output</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="example6_cmd_telem.FloatChanged"><span>FloatChanged</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="fprime.Event"><span>Event</span></li><li class="in" name="fprime.Observation"><span>Observation</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -265,10 +207,10 @@ method.
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="fprime.ObsOutput#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;()(implicitcomponentName:String):fprime.ObsOutput"></a><a id="&lt;init&gt;:ObsOutput"></a>
+              <ol><li name="example6_cmd_telem.FloatChanged#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(component:String,value:Float):example6_cmd_telem.FloatChanged"></a><a id="&lt;init&gt;:FloatChanged"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#&lt;init&gt;()(implicitcomponentName:String):fprime.ObsOutput" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#&lt;init&gt;(component:String,value:Float):example6_cmd_telem.FloatChanged" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -277,11 +219,10 @@ method.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ObsOutput</span><span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="componentName">componentName: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">FloatChanged</span><span class="params">(<span name="component">component: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Float">Float</span></span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">componentName</dt><dd class="cmt"><p>name of the component the port is part of. Defined as implicit
-                     and assumed to be in scope in the active component the port is part of.</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
@@ -295,7 +236,7 @@ method.
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -311,7 +252,7 @@ method.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html###():Int" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -327,7 +268,7 @@ method.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -343,7 +284,7 @@ method.
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -359,7 +300,7 @@ method.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#clone():Object" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -380,27 +321,26 @@ method.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="fprime.Output#connect" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="connect(in:fprime.iInput[T]*):Unit"></a><a id="connect(iInput[Observation]*):Unit"></a>
+    </li><li name="example6_cmd_telem.FloatChanged#component" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="component:String"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#connect(in:fprime.iInput[T]*):Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#component:String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">connect</span><span class="params">(<span name="in">in: <a href="iInput.html" class="extype" name="fprime.iInput">iInput</a>[<a href="Observation.html" class="extype" name="fprime.Observation">Observation</a>]*</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">component</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">Connects this asynchronous output port to one or more asynchronous input ports.</p><div class="fullcomment"><div class="comment cmt"><p>Connects this asynchronous output port to one or more asynchronous input ports.
-</p></div><dl class="paramcmts block"><dt class="param">in</dt><dd class="cmt"><p>the asynchronous input ports to connect to, provided as varargs.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Output.html" class="extype" name="fprime.Output">Output</a></dd></dl></div>
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -413,26 +353,10 @@ method.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
-      <span class="permalink">
-      <a href="../fprime/ObsOutput.html#equals(x$1:Any):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#finalize():Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -454,7 +378,7 @@ method.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#getClass():Class[_]" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -470,48 +394,10 @@ method.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
-      <span class="permalink">
-      <a href="../fprime/ObsOutput.html#hashCode():Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
-        </dd></dl></div>
-    </li><li name="fprime.Output#invoke" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="invoke(a:T):Unit"></a><a id="invoke(Observation):Unit"></a>
-      <span class="permalink">
-      <a href="../fprime/ObsOutput.html#invoke(a:T):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">invoke</span><span class="params">(<span name="a">a: <a href="Observation.html" class="extype" name="fprime.Observation">Observation</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Calling the invoke method causes the argument message to be sent to the input
-ports registered as receivers.</p><div class="fullcomment"><div class="comment cmt"><p>Calling the invoke method causes the argument message to be sent to the input
-ports registered as receivers.
-</p></div><dl class="paramcmts block"><dt class="param">a</dt><dd class="cmt"><p>the message being sent.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Output.html" class="extype" name="fprime.Output">Output</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -524,47 +410,10 @@ ports registered as receivers.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="fprime.ObsOutput#logEvent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logEvent(event:fprime.Event):Unit"></a><a id="logEvent(Event):Unit"></a>
-      <span class="permalink">
-      <a href="../fprime/ObsOutput.html#logEvent(event:fprime.Event):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">logEvent</span><span class="params">(<span name="event">event: <a href="Event.html" class="extype" name="fprime.Event">Event</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Submits an event.</p><div class="fullcomment"><div class="comment cmt"><p>Submits an event. A call <code>logEvent(e)</code> has the same meaning as <code>invoke(e)</code>,
-and is introduced only to make calls of event logging stand out in the
-program text.
-</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event being submitted as an observation.</p></dd></dl></div>
-    </li><li name="fprime.ObsOutput#logTelem" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logTelem(data:(fprime.Util.TelemetryName,Float)*)(implicitcomponentName:String):Unit"></a><a id="logTelem((TelemetryName,Float)*)(String):Unit"></a>
-      <span class="permalink">
-      <a href="../fprime/ObsOutput.html#logTelem(data:(fprime.Util.TelemetryName,Float)*)(implicitcomponentName:String):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">logTelem</span><span class="params">(<span name="data">data: (<a href="Util$.html#TelemetryName=String" class="extmbr" name="fprime.Util.TelemetryName">TelemetryName</a>, <span class="extype" name="scala.Float">Float</span>)*</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="componentName">componentName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Submits a telemetry observation reporting on the values of telemetry variables.</p><div class="fullcomment"><div class="comment cmt"><p>Submits a telemetry observation reporting on the values of telemetry variables.
-</p></div><dl class="paramcmts block"><dt class="param">data</dt><dd class="cmt"><p>the mapping from telemetry names to values to be reported.</p></dd><dt class="param">componentName</dt><dd class="cmt"><p>name of the component the port is part of. Defined as implicit
-                     and assumed to be in scope in the active component the port is part of.</p></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -580,7 +429,7 @@ program text.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#notify():Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -599,7 +448,7 @@ program text.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#notifyAll():Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -618,7 +467,7 @@ program text.
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -631,26 +480,26 @@ program text.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
+    </li><li name="example6_cmd_telem.FloatChanged#value" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="value:Float"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#toString():String" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#value:Float" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">value</span><span class="result">: <span class="extype" name="scala.Float">Float</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+      
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#wait():Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -672,7 +521,7 @@ program text.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -694,7 +543,7 @@ program text.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../fprime/ObsOutput.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../example6_cmd_telem/FloatChanged.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -725,8 +574,18 @@ program text.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="fprime.Output">
-              <h3>Inherited from <a href="Output.html" class="extype" name="fprime.Output">Output</a>[<a href="Observation.html" class="extype" name="fprime.Observation">Observation</a>]</h3>
+        <div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="fprime.Event">
+              <h3>Inherited from <a href="../fprime/Event.html" class="extype" name="fprime.Event">Event</a></h3>
+            </div><div class="parent" name="fprime.Observation">
+              <h3>Inherited from <a href="../fprime/Observation.html" class="extype" name="fprime.Observation">Observation</a></h3>
+            </div><div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
