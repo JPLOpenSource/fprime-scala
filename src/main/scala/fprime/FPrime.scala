@@ -510,7 +510,7 @@ class CommandInput(implicit actorRef: ActorRef, implicit val component: PassiveC
 
 class ObsOutput(implicit componentName: String) extends Output[Observation] {
   /**
-   * submits a telemetry observation reporting on the values of telemetry variables.
+   * Submits a telemetry observation reporting on the values of telemetry variables.
    *
    * @param data          the mapping from telemetry names to values to be reported.
    * @param componentName name of the component the port is part of. Defined as implicit
@@ -522,6 +522,18 @@ class ObsOutput(implicit componentName: String) extends Output[Observation] {
       case (x, y) => (componentName + "." + x, y)
     }
     invoke(Telemetry(map.toMap))
+  }
+
+  /**
+   * Submits an event. A call `logEvent(e)` has the same meaning as `invoke(e)`,
+   * and is introduced only to make calls of event logging stand out in the
+   * program text.
+   *
+   * @param event the event being submitted as an observation.
+   */
+
+  def logEvent(event: Event): Unit = {
+    invoke(event)
   }
 }
 
