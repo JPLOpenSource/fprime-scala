@@ -80,7 +80,7 @@ object Configuration {
   }
 
   /**
-   * Prints the component topology in GrapgViz's dot format.
+   * Prints the component topology in GraphViz's dot format.
    * An example is the following.
    *
    * {{{
