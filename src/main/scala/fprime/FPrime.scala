@@ -450,9 +450,9 @@ trait Observation extends Serializable // subclass this
 case class Telemetry(data: Map[TelemetryName, Float]) extends Observation
 
 /**
- * Events are observations indicating discrete events occuring, such as e.g. a command being
- * dispatched, and a command succeeding. Events can be defined as case classes and case
- * objects subclassing this trait.
+ * Events are observations sent to ground indicating discrete events occurring, such as
+ * e.g. a command being dispatched, and a command succeeding. Events can be defined as
+ * case classes and case objects subclassing this trait.
  */
 
 trait Event extends Observation // subclass this
@@ -614,7 +614,7 @@ trait PassiveComponent {
    * @param parameters the `Parmeters` command.
    */
 
-  private def setParameters(parameters: Parameters): Unit = {
+  protected def setParameters(parameters: Parameters): Unit = {
     val Parameters(map) = parameters
     for ((name, value) <- map) {
       setParameter(name, value)
@@ -788,16 +788,17 @@ trait Component extends PassiveComponent {
     private def resetTimer(): Unit = {
       timeOut match {
         case None =>
+          context.setReceiveTimeout(Duration.Undefined)
         case Some(time) =>
-          // println(s"activating timer with $time milliseconds in $componentName")
+          println(s"activating timer with $time milliseconds in $componentName")
           context.setReceiveTimeout(time milliseconds)
           timeOut = None
       }
     }
 
     /**
-     * This method processes messages sent to the actor. If it is a command,
-     * it calls the user defined method `executeCommand` on it. Otherwise
+     * This method processes messages sent to the actor. If it is a parameter
+     * command, it sets the parameters accordingly. Otherwise
      * it calls the user defined `when` method on it. This method should not
      * be overridden by the user.
      *
@@ -805,10 +806,10 @@ trait Component extends PassiveComponent {
      */
 
     override def receive: PartialFunction[Any, Unit] = {
-      case cmd: Command =>
-        executeCommand(cmd)
-        resetTimer()
+      case parameters: Parameters =>
+        setParameters(parameters)
       case ReceiveTimeout =>
+        println(s"timeout in $componentName")
         context.setReceiveTimeout(Duration.Undefined)
         when(ReceiveTimeout)
         resetTimer()

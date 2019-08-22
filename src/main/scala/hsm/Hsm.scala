@@ -102,21 +102,21 @@ trait HSM[Event] {
    * Type of code occurring as actions on transitions.
    */
 
-  private type Code = Unit => Unit
+  protected type Code = Unit => Unit
 
   /**
    * The target of a transition consists of a target state as well as the
    * code to execute if taking the transition.
    */
 
-  private type Target = (state, Code)
+  protected type Target = (state, Code)
 
   /**
    * The event dependent behavior of a state is modeled as a partial function
    * from events to targets.
    */
 
-  private type Transitions = PartialFunction[Event, Target]
+  protected type Transitions = PartialFunction[Event, Target]
 
   /**
    * By default, unless redefined by the user, a state has no transitions.
