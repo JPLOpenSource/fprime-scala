@@ -121,8 +121,12 @@ input queue.
                         <a href="Component.html" title="An active component behaves like a thread to which messages can be sent over ports asynchronously.">Component</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g."></a>
-                        <a href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g.">Event</a>
+                        <a class="object" href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format."></a>
+                        <a href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format.">Configuration</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="trait" href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g."></a>
+                        <a href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g.">Event</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
                         <a class="class" href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return."></a>
@@ -206,7 +210,7 @@ input queue.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Command</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Command</span><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -217,7 +221,7 @@ defined as case classes and case objects subclassing this trait.
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">
               Known Subclasses
@@ -248,7 +252,7 @@ defined as case classes and case objects subclassing this trait.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="fprime.Command"><span>Command</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="fprime.Command"><span>Command</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -654,9 +658,7 @@ except with the <code>isUrgent</code> flag set to true.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
-              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
-            </div><div class="parent" name="java.io.Serializable">
+        <div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>

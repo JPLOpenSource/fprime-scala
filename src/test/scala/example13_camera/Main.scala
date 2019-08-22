@@ -182,6 +182,8 @@ object Main {
     camera.o_obs.connect(ground.i_obs)
     ground.o_cmd.connect(imaging.i_cmd)
 
+    Configuration.show("/Users/khavelun/Desktop/config.dot")
+
     ground.i_int.invoke(2)
   }
 }

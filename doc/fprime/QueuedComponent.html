@@ -121,8 +121,12 @@ input queue.
                         <a href="Component.html" title="An active component behaves like a thread to which messages can be sent over ports asynchronously.">Component</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g."></a>
-                        <a href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g.">Event</a>
+                        <a class="object" href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format."></a>
+                        <a href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format.">Configuration</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="trait" href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g."></a>
+                        <a href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g.">Event</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
                         <a class="class" href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return."></a>
@@ -665,6 +669,23 @@ accessed from within the component to influence its behavior.
       </span>
       
       <p class="shortcomment cmt">The queue of messages.</p>
+    </li><li name="fprime.PassiveComponent#setParameters" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setParameters(parameters:fprime.Parameters):Unit"></a><a id="setParameters(Parameters):Unit"></a>
+      <span class="permalink">
+      <a href="../fprime/QueuedComponent.html#setParameters(parameters:fprime.Parameters):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setParameters</span><span class="params">(<span name="parameters">parameters: <a href="Parameters.html" class="extype" name="fprime.Parameters">Parameters</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Sets the parameters of component based on a <code>Parameters</code> command from ground.</p><div class="fullcomment"><div class="comment cmt"><p>Sets the parameters of component based on a <code>Parameters</code> command from ground.
+</p></div><dl class="paramcmts block"><dt class="param">parameters</dt><dd class="cmt"><p>the <code>Parmeters</code> command.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="PassiveComponent.html" class="extype" name="fprime.PassiveComponent">PassiveComponent</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

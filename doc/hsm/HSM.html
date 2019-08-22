@@ -178,7 +178,62 @@ provides all the internal DSL methods for defining an HSM.
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="hsm.HSM.state" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+              <ol><li name="hsm.HSM.Code" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Code=Unit=&gt;Unit"></a><a id="Code:Code"></a>
+      <span class="permalink">
+      <a href="../hsm/HSM.html#Code=Unit=&gt;Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Code</span><span class="result alias"> = (<span class="extype" name="scala.Unit">Unit</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Type of code occurring as actions on transitions.</p><div class="fullcomment"><div class="comment cmt"><p>Type of code occurring as actions on transitions.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="hsm.HSM.Target" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Target=(HSM.this.state,HSM.this.Code)"></a><a id="Target:Target"></a>
+      <span class="permalink">
+      <a href="../hsm/HSM.html#Target=(HSM.this.state,HSM.this.Code)" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Target</span><span class="result alias"> = (<a href="HSM$state.html" class="extype" name="hsm.HSM.state">state</a>, <a href="#Code=Unit=&gt;Unit" class="extmbr" name="hsm.HSM.Code">Code</a>)</span>
+      </span>
+      
+      <p class="shortcomment cmt">The target of a transition consists of a target state as well as the
+code to execute if taking the transition.</p><div class="fullcomment"><div class="comment cmt"><p>The target of a transition consists of a target state as well as the
+code to execute if taking the transition.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="hsm.HSM.Transitions" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Transitions=PartialFunction[Event,HSM.this.Target]"></a><a id="Transitions:Transitions"></a>
+      <span class="permalink">
+      <a href="../hsm/HSM.html#Transitions=PartialFunction[Event,HSM.this.Target]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Transitions</span><span class="result alias"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="hsm.HSM.Event">Event</span>, <a href="#Target=(HSM.this.state,HSM.this.Code)" class="extmbr" name="hsm.HSM.Target">Target</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">The event dependent behavior of a state is modeled as a partial function
+from events to targets.</p><div class="fullcomment"><div class="comment cmt"><p>The event dependent behavior of a state is modeled as a partial function
+from events to targets.
+</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="hsm.HSM.state" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="stateextendsProductwithSerializable"></a><a id="state:state"></a>
       <span class="permalink">
       <a href="../hsm/HSM.html#stateextendsProductwithSerializable" title="Permalink">
@@ -656,7 +711,7 @@ associating code to execute when the transition is taken.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">state2Target</span><span class="params">(<span name="s">s: <a href="HSM$state.html" class="extype" name="hsm.HSM.state">state</a></span>)</span><span class="result">: <span class="extype" name="hsm.HSM.Target">Target</span></span>
+        <span class="name">state2Target</span><span class="params">(<span name="s">s: <a href="HSM$state.html" class="extype" name="hsm.HSM.state">state</a></span>)</span><span class="result">: <a href="#Target=(HSM.this.state,HSM.this.Code)" class="extmbr" name="hsm.HSM.Target">Target</a></span>
       </span>
       
       <p class="shortcomment cmt">Lifts a state to a target (state,code) tuple.</p><div class="fullcomment"><div class="comment cmt"><p>Lifts a state to a target (state,code) tuple. This is needed for transitions for which

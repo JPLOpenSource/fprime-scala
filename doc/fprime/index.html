@@ -121,8 +121,12 @@ input queue.
                         <a href="Component.html" title="An active component behaves like a thread to which messages can be sent over ports asynchronously.">Component</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g."></a>
-                        <a href="Event.html" title="Events are observations indicating discrete events occuring, such as e.g.">Event</a>
+                        <a class="object" href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format."></a>
+                        <a href="Configuration$.html" title="This class supports the visualization of components and their connections using the GraphViz dot format.">Configuration</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="trait" href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g."></a>
+                        <a href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g.">Event</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
                         <a class="class" href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return."></a>
@@ -308,7 +312,7 @@ Each individual output port can be invoked using its port index.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="Commands from ground controls the spacecraft/rover." href="Command.html"><span class="name">Command</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Commands from ground controls the spacecraft/rover." href="Command.html"><span class="name">Command</span></a><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Commands from ground controls the spacecraft/rover.</p><div class="fullcomment"><div class="comment cmt"><p>Commands from ground controls the spacecraft/rover. Commands can be
@@ -383,12 +387,13 @@ methods to be called).
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="Events are observations indicating discrete events occuring, such as e.g." href="Event.html"><span class="name">Event</span></a><span class="result"> extends <a href="Observation.html" class="extype" name="fprime.Observation">Observation</a></span>
+        <a title="Events are observations sent to ground indicating discrete events occurring, such as e.g." href="Event.html"><span class="name">Event</span></a><span class="result"> extends <a href="Observation.html" class="extype" name="fprime.Observation">Observation</a></span>
       </span>
       
-      <p class="shortcomment cmt">Events are observations indicating discrete events occuring, such as e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Events are observations indicating discrete events occuring, such as e.g. a command being
-dispatched, and a command succeeding. Events can be defined as case classes and case
-objects subclassing this trait.
+      <p class="shortcomment cmt">Events are observations sent to ground indicating discrete events occurring, such as
+e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Events are observations sent to ground indicating discrete events occurring, such as
+e.g. a command being dispatched, and a command succeeding. Events can be defined as
+case classes and case objects subclassing this trait.
 </p></div></div>
     </li><li name="fprime.GuardedSyncInput" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="GuardedSyncInput[S,T]extendsSyncInput[S,T]"></a><a id="GuardedSyncInput[S,T]:GuardedSyncInput[S,T]"></a>
@@ -476,7 +481,7 @@ method.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="Observations are data sent from the spacecraft/rover to ground." href="Observation.html"><span class="name">Observation</span></a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="Observations are data sent from the spacecraft/rover to ground." href="Observation.html"><span class="name">Observation</span></a><span class="result"> extends <span class="extype" name="java.io.Serializable">Serializable</span></span>
       </span>
       
       <p class="shortcomment cmt">Observations are data sent from the spacecraft/rover to ground.</p><div class="fullcomment"><div class="comment cmt"><p>Observations are data sent from the spacecraft/rover to ground. Any observation type must
@@ -659,7 +664,24 @@ orientation, temperature, etc.
         <div class="values members">
               <h3>Value Members</h3>
               <ol>
-                <li name="fprime.Util" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+                <li name="fprime.Configuration" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Configuration"></a><a id="Configuration:Configuration"></a>
+      <span class="permalink">
+      <a href="../fprime/index.html#Configuration" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="This class supports the visualization of components and their connections using the GraphViz dot format." href="Configuration$.html"><span class="name">Configuration</span></a>
+      </span>
+      
+      <p class="shortcomment cmt">This class supports the visualization of components and their
+connections using the GraphViz dot format.</p>
+    </li><li name="fprime.Util" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Util"></a><a id="Util:Util"></a>
       <span class="permalink">
       <a href="../fprime/index.html#Util" title="Permalink">

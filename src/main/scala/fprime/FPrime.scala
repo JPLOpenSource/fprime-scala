@@ -4,6 +4,7 @@ import scala.language.postfixOps
 import akka.actor.{Actor, ActorRef, ActorSystem, Props, ReceiveTimeout}
 import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
+import java.io._
 
 /** ****
  * Util
@@ -42,6 +43,87 @@ object Util {
 }
 
 import Util._
+
+/**
+ * This class supports the visualization of components and their
+ * connections using the GraphViz dot format.
+ */
+
+object Configuration {
+  /**
+   * Contains connections created between components. Each connection is represented
+   * by a triple of the form: `(source, target, kind)`, all string values,
+   * where `source` is the name of the component possessing the output port
+   * and `target` is the name of the component possessing the input port,
+   * and where `kind` is the kind of input port: `"Input"` (normal input port),
+   * `"ObsInput"` (an observation port), `"CommandInput"` (a command port).
+   */
+
+  private var connections : List[(String,String,String)] = Nil
+
+  /**
+   * Adds a connection. A connection is represented by a triple of the form:
+   * `(source, target, kind)`, all string values, where `source` is the name of the
+   * component possessing the output port and `target` is the name of the component
+   * possessing the input port, and where `kind` is the kind of input port: `"Input"`
+   * (normal input port), `"ObsInput"` (an observation port), `"CommandInput"`
+   * (a command port).
+   *
+   * @param source the component sending messages.
+   * @param target the component receiving messages.
+   * @param kind the kind of input port at the receiving end:
+   *             `"Input"`, `"ObsInput"`, or `"CommandInput"`.
+   */
+
+  private[fprime] def addConnection(source: String, target: String, kind: String): Unit = {
+    connections = (source, target, kind) :: connections
+  }
+
+  /**
+   * Prints the component topology in GrapgViz's dot format.
+   * An example is the following.
+   *
+   * {{{
+   *   digraph Components  {
+   *     Imaging [shape=box]
+   *     Camera  [shape=box]
+   *     Ground  [shape=oval]
+   *
+   *     Imaging -> Camera
+   *     Camera -> Imaging
+   *     Camera -> Ground [style=dashed, color="#ff0000"]
+   *     Imaging -> Ground [style=dashed, color="#ff0000"]
+   *     Ground -> Imaging [color="#0000ff"]
+   *   }
+   * }}}
+   *
+   * @param fileName name of file to write dot file to.
+   */
+
+  def show(fileName: String): Unit = {
+    val pw = new PrintWriter(new File(fileName))
+    val components : Set[String] =
+      (for ((source,target,_) <- connections) yield Set(source,target)).flatten.toSet
+    pw.write("digraph Components  {\n")
+    for (component <- components) {
+      pw.write(s"  $component")
+      val shape = if (component == "Ground") "oval" else "box"
+      pw.write(s" [shape=$shape]\n")
+    }
+    pw.write("\n")
+    for ((source, target, kind) <- connections) {
+      pw.write(s"  $source -> $target")
+      val format = kind match {
+        case "Input" => ""
+        case "ObsInput" => "[style=dashed, color=\"#ff0000\"]"
+        case "CommandInput" => "[color=\"#0000ff\"]"
+      }
+      pw.write(s" $format\n")
+    }
+    pw.write("}\n")
+    pw.close()
+  }
+}
 
 // =========================
 // === Synchronous Ports ===
@@ -296,6 +378,9 @@ class Output[T](implicit componentName: String) {
    */
 
   def connect(in: iInput[T]*): Unit = {
+    for (target <- in) {
+      Configuration.addConnection(componentName, target.getComponentName, target.getClass.getSimpleName)
+    }
     otherEnds ++= in.toList
   }
 
