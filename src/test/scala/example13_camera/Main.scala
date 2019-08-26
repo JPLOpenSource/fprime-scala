@@ -8,11 +8,11 @@ package example13_camera
  * September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer Science Volume 10479.
  */
 
-import akka.actor.ReceiveTimeout
 import fprime._
 import hsm._
 import daut._
 
+import akka.actor.ReceiveTimeout
 import scala.language.postfixOps
 
 // Messages:
