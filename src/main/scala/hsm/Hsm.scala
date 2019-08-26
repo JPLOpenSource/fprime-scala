@@ -65,15 +65,6 @@ trait HSM[Event] {
   private val hsmName : String = this.getClass.getSimpleName
 
   /**
-   * Variable containing time consumed, simulating time progress when taking a transition.
-   * It is set with the `taking(d : Int)` method called on the target state. The used
-   * time is the return value of the `submit(event: Event): Int` method, but otherwise
-   * serves no purpose.
-   */
-
-  private var delay = 0
-
-  /**
    * Cache mapping values of type `A` to values of type `B`. If the cash is not defined
    * for an `A` value, the `B` value is computed with the `calculateIt` function. The cache
    * is used for (1) mapping a state to its (possibly inner) initial state, and (2) for mapping
@@ -222,7 +213,7 @@ trait HSM[Event] {
   /**
    * Allows user to associate a callback function to the HSM, which will be executed after
    * each submission of an event to the HSM, as the last action to be executed in the
-   * `submit(event: Event) : Int` method. The function can be used for
+   * `submit(event: Event) : Boolean` method. The function can be used for
    * example for debugging purposes.
    *
    * @param callback the callback function.
@@ -251,17 +242,6 @@ trait HSM[Event] {
    */
 
   protected implicit def state2Exec(s: state) = new {
-    /**
-     * Records the time that taking the transition resulting in this state takes. The time
-     * is returned as a value of the `submit(event : Event) : Int` method. It is
-     * up to the user to use this information. It is not otherwise used by the framework.
-     *
-     * @param d the speculated time this transition takes to execute.
-     * @return the original state unchanged.
-     */
-
-    def taking(d: Int):state = { delay += d ; s }
-
     /**
      * Associates code to be executed when transition ending in this state is taken.
      *
@@ -343,17 +323,14 @@ trait HSM[Event] {
   protected def states(ss: state*){}
 
   /**
-   * A substitute for calling e `submit)(event : Event) : Int` method, supporting
+   * A substitute for calling e `submit)(event : Event) : Boolean` method, supporting
    * the more succinct call `hsm(e)` instead of `hsm.submit(e)`.
    *
    * @param event the event submitted to the HSM.
-   * @return the time the execution of the event takes in simulated time indicated with the method
-   *         `taken`.
+   * @return true iff. a transition triggered on the event.
    */
 
-  def apply(event: Event): Int = {
-    submit(event)
-  }
+  def apply(event: Event): Boolean = submit(event)
 
   /**
    * Given a state and an event, this method finds the innermost state, moving inside out
@@ -376,7 +353,7 @@ trait HSM[Event] {
       findTriggerHappyState(s.parent, event)
 
   /**
-   * Submits an event to the HSM. If the current state or one of its superstates is has a transition
+   * Submits an event to the HSM. If the current state or one of its superstates has a transition
    * that can be triggered by this event, the following will happen:
    * (1) the exit codes of the states to exit are executed,
    * (2) the code on the transition is executed,
@@ -384,14 +361,13 @@ trait HSM[Event] {
    * (4) and we end up in the target state.
    *
    * @param event the event submitted to the HSM.
-   * @return the time the execution of the event takes in simulated time indicated with the method
-   *         `taken`.
+   * @return true iff. a transition triggered on the event.
    */
 
-  def submit(event: Event): Int = {
-    delay = 0
+  def submit(event: Event): Boolean = {
     findTriggerHappyState(current, event) match {
       case None =>
+        return false
       case Some(triggerState) =>
         val (transitionState, transitionCode) = triggerState.transitions(event)
         val targetState = initialCache.get(transitionState)
@@ -407,8 +383,8 @@ trait HSM[Event] {
           current = targetState
         }
         announceQuiescent()
+        return true
     }
-    delay
   }
 
   /**

@@ -883,9 +883,14 @@ trait Component extends PassiveComponent {
 
     /**
      * This method processes messages sent to the actor. If it is a parameter
-     * command, it sets the parameters accordingly. Otherwise
-     * it calls the user defined `when` method on it. This method should not
-     * be overridden by the user.
+     * command, it sets the parameters accordingly.
+     * If it is a timeout, it calls the user defined `when` on it if
+     * the `when` method is ready to receive a timeout. If not the timeout
+     * is dropped permanently. If none of these cases apply, it is tested whether
+     * `when` is defined for the event. If it is it calls the user defined `when` method on it.
+     * This method should not be overridden by the user. If none of these cases
+     * apply, the event is dropped, and handled by the `unhandled` method,
+     * which re-inserts the message in the message queue for later consumption.
      *
      * @return the method does not return any value of interest.
      */
@@ -896,11 +901,31 @@ trait Component extends PassiveComponent {
       case ReceiveTimeout =>
         println(s"timeout in $componentName")
         context.setReceiveTimeout(Duration.Undefined)
-        when(ReceiveTimeout)
+        if (when.isDefinedAt(ReceiveTimeout)) when(ReceiveTimeout)
         resetTimer()
-      case other =>
+      case other if when.isDefinedAt(other) =>
+        println(s"####### RECEIVING $other in $componentName")
         when(other)
         resetTimer()
+    }
+
+    /**
+     * Akka actors by default drop messages in the input queue that do not
+     * match the partial function provided to the `receive` method. This is
+     * undesirable from an F' point of view. When a message is dropped this
+     * method is called by Akka on the dropped messsage. Here the method is
+     * overridden to put the message back on the queue.
+     *
+     * A preferable solution would be that non-matching messages are not
+     * removed from the queue. It is, however, not clear whether this can
+     * be achieved.
+     *
+     * @param message the dropped message.
+     */
+
+    override def unhandled(message: Any): Unit = {
+      println(s"+++++ $componentName LOST MESSAGE: $message")
+      self forward message
     }
   }
 
