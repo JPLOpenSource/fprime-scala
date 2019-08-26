@@ -129,6 +129,10 @@ input queue.
                         <a href="Event.html" title="Events are observations sent to ground indicating discrete events occurring, such as e.g.">Event</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
+                        <a class="object" href="FPrimeOptions$.html" title="F' options to be set by the user."></a>
+                        <a href="FPrimeOptions$.html" title="F' options to be set by the user.">FPrimeOptions</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
                         <a class="class" href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return."></a>
                         <a href="GuardedSyncInput.html" title="A guarded synchronous port corresponds to a synchronized method in Java: when invoked, a lock is taken on the component's mutex, which is released upon return.">GuardedSyncInput</a>
                       </li><li class="current-entities indented1">
@@ -181,8 +185,8 @@ input queue.
                         <a href="Telemetry.html" title="Telemetry is a special kind of observation, which provides information about the value of a collection of variables having floating point values.">Telemetry</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="object" href="Util$.html" title="**** Util ****"></a>
-                        <a href="Util$.html" title="**** Util ****">Util</a>
+                        <a class="object" href="Util$.html" title="Utilities."></a>
+                        <a href="Util$.html" title="Utilities.">Util</a>
                       </li><li class="current-entities indented1">
                         <span class="separator"></span>
                         <a class="trait" href="iInput.html" title="An asynchronous input port interface."></a>
@@ -470,7 +474,7 @@ runs an actor.
       </span>
       
       <p class="shortcomment cmt">Executes a command.</p><div class="fullcomment"><div class="comment cmt"><p>Executes a command. The method has to be overridden and defined by the user as part of
-the component definition.
+the component definition. The method will assertion fail by default for any command.
 </p></div><dl class="paramcmts block"><dt class="param">cmd</dt><dd class="cmt"><p>command to be executed.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="PassiveComponent.html" class="extype" name="fprime.PassiveComponent">PassiveComponent</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
@@ -710,7 +714,7 @@ and where the component sends itself a message to progress.
       </span>
       
       <p class="shortcomment cmt">Sets the timer to a specific number of seconds.</p><div class="fullcomment"><div class="comment cmt"><p>Sets the timer to a specific number of seconds.
-</p></div><dl class="paramcmts block"><dt class="param">time</dt><dd class="cmt"><p>time in seconds.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">time</dt><dd class="cmt"><p>time in milliseconds.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

@@ -92,6 +92,10 @@ states.
                         <a class="object" href="HSM$.html" title="The static variables of HSMs."></a>
                         <a class="trait" href="" title="A hiearchical state machine must be defined as a class subclassing this trait, which provides all the internal DSL methods for defining an HSM."></a>
                         <a href="" title="A hiearchical state machine must be defined as a class subclassing this trait, which provides all the internal DSL methods for defining an HSM.">HSM</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="object" href="HSMOptions$.html" title="HSM options to be set by the user."></a>
+                        <a href="HSMOptions$.html" title="HSM options to be set by the user.">HSMOptions</a>
                       </li>
               </ul>
             </div>
@@ -310,28 +314,10 @@ respectively exiting the state.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="hsm.HSM#PRINT" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="PRINT:Boolean"></a>
-      <span class="permalink">
-      <a href="../hsm/HSM.html#PRINT:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PRINT</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">When true debugging information is printed as the HSM executes.</p><div class="fullcomment"><div class="comment cmt"><p>When true debugging information is printed as the HSM executes. Can be set by user.
-The default value is false.
-</p></div></div>
     </li><li name="hsm.HSM#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(event:Event):Int"></a><a id="apply(Event):Int"></a>
+      <a id="apply(event:Event):Boolean"></a><a id="apply(Event):Boolean"></a>
       <span class="permalink">
-      <a href="../hsm/HSM.html#apply(event:Event):Int" title="Permalink">
+      <a href="../hsm/HSM.html#apply(event:Event):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -340,14 +326,13 @@ The default value is false.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="event">event: <span class="extype" name="hsm.HSM.Event">Event</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">apply</span><span class="params">(<span name="event">event: <span class="extype" name="hsm.HSM.Event">Event</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
-      <p class="shortcomment cmt">A substitute for calling e <code>submit)(event : Event) : Int</code> method, supporting
-the more succinct call <code>hsm(e)</code> instead of <code>hsm.submit(e)</code>.</p><div class="fullcomment"><div class="comment cmt"><p>A substitute for calling e <code>submit)(event : Event) : Int</code> method, supporting
+      <p class="shortcomment cmt">A substitute for calling e <code>submit)(event : Event) : Boolean</code> method, supporting
+the more succinct call <code>hsm(e)</code> instead of <code>hsm.submit(e)</code>.</p><div class="fullcomment"><div class="comment cmt"><p>A substitute for calling e <code>submit)(event : Event) : Boolean</code> method, supporting
 the more succinct call <code>hsm(e)</code> instead of <code>hsm.submit(e)</code>.
-</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event submitted to the HSM.</p></dd><dt>returns</dt><dd class="cmt"><p>the time the execution of the event takes in simulated time indicated with the method
-        <code>taken</code>.</p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event submitted to the HSM.</p></dd><dt>returns</dt><dd class="cmt"><p>true iff. a transition triggered on the event.</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -673,15 +658,15 @@ for example for debugging purposes.
       
       <p class="shortcomment cmt">Allows user to associate a callback function to the HSM, which will be executed after
 each submission of an event to the HSM, as the last action to be executed in the
-<code>submit(event: Event) : Int</code> method.</p><div class="fullcomment"><div class="comment cmt"><p>Allows user to associate a callback function to the HSM, which will be executed after
+<code>submit(event: Event) : Boolean</code> method.</p><div class="fullcomment"><div class="comment cmt"><p>Allows user to associate a callback function to the HSM, which will be executed after
 each submission of an event to the HSM, as the last action to be executed in the
-<code>submit(event: Event) : Int</code> method. The function can be used for
+<code>submit(event: Event) : Boolean</code> method. The function can be used for
 example for debugging purposes.
 </p></div><dl class="paramcmts block"><dt class="param">callback</dt><dd class="cmt"><p>the callback function.</p></dd></dl></div>
     </li><li name="hsm.HSM#state2Exec" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="state2Exec(s:HSM.this.state):AnyRef{deftaking(d:Int):HSM.this.state;defexec(code:=&gt;Unit):(HSM.this.state,Unit=&gt;Unit)}"></a><a id="state2Exec(state):AnyRef{.../*2definitionsintyperefinement*/}"></a>
+      <a id="state2Exec(s:HSM.this.state):AnyRef{defexec(code:=&gt;Unit):(HSM.this.state,Unit=&gt;Unit)}"></a><a id="state2Exec(state):AnyRef{defexec(code:=&gt;Unit):(HSM.this.state,Unit=&gt;Unit)}"></a>
       <span class="permalink">
-      <a href="../hsm/HSM.html#state2Exec(s:HSM.this.state):AnyRef{deftaking(d:Int):HSM.this.state;defexec(code:=&gt;Unit):(HSM.this.state,Unit=&gt;Unit)}" title="Permalink">
+      <a href="../hsm/HSM.html#state2Exec(s:HSM.this.state):AnyRef{defexec(code:=&gt;Unit):(HSM.this.state,Unit=&gt;Unit)}" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -690,7 +675,7 @@ example for debugging purposes.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">state2Exec</span><span class="params">(<span name="s">s: <a href="HSM$state.html" class="extype" name="hsm.HSM.state">state</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { ... /* 2 definitions in type refinement */ }</span>
+        <span class="name">state2Exec</span><span class="params">(<span name="s">s: <a href="HSM$state.html" class="extype" name="hsm.HSM.state">state</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def exec(code: =&gt; Unit): (HSM.this.state, Unit =&gt; Unit) }</span>
       </span>
       
       <p class="shortcomment cmt">Lifts a target state of a transition to define additional methods on it, one for indicating how
@@ -737,9 +722,9 @@ objects representing the states due to Scala's lazy initialization approach,
 where an object is only initialized when used for the first time.
 </p></div><dl class="paramcmts block"><dt class="param">ss</dt><dd class="cmt"><p>the states to be recorded (and therefore initialized)</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="hsm.HSM#submit" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="submit(event:Event):Int"></a><a id="submit(Event):Int"></a>
+      <a id="submit(event:Event):Boolean"></a><a id="submit(Event):Boolean"></a>
       <span class="permalink">
-      <a href="../hsm/HSM.html#submit(event:Event):Int" title="Permalink">
+      <a href="../hsm/HSM.html#submit(event:Event):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -748,17 +733,16 @@ where an object is only initialized when used for the first time.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">submit</span><span class="params">(<span name="event">event: <span class="extype" name="hsm.HSM.Event">Event</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+        <span class="name">submit</span><span class="params">(<span name="event">event: <span class="extype" name="hsm.HSM.Event">Event</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
-      <p class="shortcomment cmt">Submits an event to the HSM.</p><div class="fullcomment"><div class="comment cmt"><p>Submits an event to the HSM. If the current state or one of its superstates is has a transition
+      <p class="shortcomment cmt">Submits an event to the HSM.</p><div class="fullcomment"><div class="comment cmt"><p>Submits an event to the HSM. If the current state or one of its superstates has a transition
 that can be triggered by this event, the following will happen:
 (1) the exit codes of the states to exit are executed,
 (2) the code on the transition is executed,
 (3) the enter codes on the states to enter are executed,
 (4) and we end up in the target state.
-</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event submitted to the HSM.</p></dd><dt>returns</dt><dd class="cmt"><p>the time the execution of the event takes in simulated time indicated with the method
-        <code>taken</code>.</p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event submitted to the HSM.</p></dd><dt>returns</dt><dd class="cmt"><p>true iff. a transition triggered on the event.</p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

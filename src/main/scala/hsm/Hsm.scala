@@ -1,17 +1,31 @@
 package hsm
 
 /**
- * The static variables of HSMs.
+ * HSM options to be set by the user.
  */
 
-object HSM {
+object HSMOptions {
   /**
    * To be set to true when tracing is desired. Tracing causes
    * printing the trace of state transitions occurring in the HSMs.
+   * The default value is false.
    */
 
   var TRACE : Boolean = false
 
+  /**
+   * When true debugging information is printed as HSMs execute. Can be set by user.
+   * The default value is false.
+   */
+
+  var PRINT = false
+}
+
+/**
+ * The static variables of HSMs.
+ */
+
+object HSM {
   /**
    * The execution trace of an HSM. Updated if `TRACE` is true.
    */
@@ -160,13 +174,6 @@ trait HSM[Event] {
   private var announceQuiescent: Unit => Unit = { case _ => }
 
   /**
-   * When true debugging information is printed as the HSM executes. Can be set by user.
-   * The default value is false.
-   */
-
-  var PRINT = false
-
-  /**
    * Logs a transition for debugging purposes.
    *
    * @param exitStates the states exited due to the transition.
@@ -175,16 +182,16 @@ trait HSM[Event] {
    */
 
   private def recordTransition(exitStates: List[state], event: Event, enterStates: List[state]): Unit = {
-    if (PRINT || HSM.TRACE) {
+    if (HSMOptions.PRINT || HSMOptions.TRACE) {
       val exitStateNames = exitStates.map(_.stateName).mkString(",")
       val enterStateNames = enterStates.map(_.stateName).mkString(",")
       val msg = s"$hsmName : [$exitStateNames] --  $event --> [$enterStateNames]"
-      if (PRINT) {
+      if (HSMOptions.PRINT) {
         println()
         println(s"--- $msg")
         println()
       }
-      if (HSM.TRACE) {
+      if (HSMOptions.TRACE) {
         HSM.addToTrace(msg)
       }
     }
@@ -299,7 +306,7 @@ trait HSM[Event] {
     )
   }
 
-  if (PRINT) { printHeader() }
+  if (false) { printHeader() } // currently disabled.
 
   /**
    * Declares a state as initial in the HSM.

@@ -5,7 +5,7 @@ package example13_camera
  * "Modeling and Monitoring of Hierarchical State Machines in Scala",
  * Klaus Havelund and Rajeev Joshi,
  * 9th International Workshop on Software Engineering for Resilient Systems (SERENE 2017),
- * September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer Science.
+ * September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer Science Volume 10479.
  */
 
 import akka.actor.ReceiveTimeout
@@ -61,6 +61,23 @@ class Imaging extends Component {
   val o_cam = new Output[Imaging2Camera]
   val o_obs = new ObsOutput
 
+  object MissedEvents {
+    private var missedEvents : List[Any] = Nil
+
+    def add(event : Any): Unit = {
+      missedEvents ++=  List(event)
+    }
+
+    def submit(): Unit = {
+      missedEvents match {
+        case Nil =>
+        case event :: rest =>
+          missedEvents = rest
+          selfTrigger(event)
+      }
+    }
+  }
+
   object Machine extends HSM[Any] {
     var duration: Int = 0
     val DARK_THRESHOLD = 5
@@ -72,11 +89,10 @@ class Imaging extends Component {
 
     object off extends state() {
       entry {
-        println("*** ENTERING off STATE")
+        MissedEvents.submit()
       }
       when {
         case TakeImage(d) => on exec {
-          println(s"@@@@@@ RECEIVING TakeImage($d)")
           o_obs.logEvent(EvrTakeImage(d))
           duration = d
           o_cam.invoke(PowerOn)
@@ -85,9 +101,6 @@ class Imaging extends Component {
     }
 
     object on extends state() {
-      entry {
-        println("*** ENTERING on STATE")
-      }
       when {
         case ShutDown => off exec {
           o_obs.logEvent(EvrImageAborted)
@@ -97,23 +110,15 @@ class Imaging extends Component {
     }
 
     object powering extends state(on, true) {
-      entry {
-        println("*** ENTERING powering STATE")
-      }
       when {
         case Ready => exposing
       }
     }
 
-    object exposing extends state(on) {
-      entry {
-        println("*** ENTERING exposing STATE")
-      }
-    }
+    object exposing extends state(on)
 
     object exposing_light extends state(exposing, true) {
       entry {
-        println("*** ENTERING exposing_light STATE")
         o_cam.invoke(Open)
         setTimer(duration)
       }
@@ -129,7 +134,6 @@ class Imaging extends Component {
 
     object exposing_dark extends state(exposing) {
       entry {
-        println("*** ENTERING exposing_dark STATE")
         setTimer(duration)
       }
       when {
@@ -139,7 +143,6 @@ class Imaging extends Component {
 
     object saving extends state(on) {
       entry {
-        println("*** ENTERING saving STATE")
         o_cam.invoke(SaveData)
       }
       when {
@@ -153,10 +156,7 @@ class Imaging extends Component {
   }
 
   override def when: PartialFunction[Any, Unit] = {
-    case input =>
-      if (!Machine(input)) {
-         selfTrigger(input)
-      }
+    case input => if (!Machine(input)) MissedEvents.add(input)
   }
 }
 
@@ -194,9 +194,10 @@ class Camera extends Component {
   }
 }
 
-class Verifier extends Component {
+class Ground extends Component {
+  val i_int = new Input[Int]
   val i_obs = new ObsInput
-  val o_obs = new ObsOutput
+  val o_cmd = new CommandOutput
 
   object SaveOrAbort extends Monitor[Observation] {
     always {
@@ -208,19 +209,8 @@ class Verifier extends Component {
   }
 
   override def when: PartialFunction[Any, Unit] = {
-    case obs: Observation => SaveOrAbort.verify(obs)
-  }
-}
-
-class Ground extends Component {
-  val i_int = new Input[Int]
-  val i_obs = new ObsInput
-  val o_cmd = new CommandOutput
-
-  override def when: PartialFunction[Any, Unit] = {
     case d: Int => o_cmd.invoke(TakeImage(d))
-    case o: Observation =>
-      println(s"===> observation: $o")
+    case o: Observation => SaveOrAbort.verify(o)
   }
 }
 
@@ -228,26 +218,25 @@ class Ground extends Component {
 
 object Main {
   def main(args: Array[String]): Unit = {
+    FPrimeOptions.DEBUG = true
+    HSMOptions.PRINT = true
+    HSMOptions.TRACE = true
+
     val imaging = new Imaging
     val camera = new Camera
-    val verifier = new Verifier
     val ground = new Ground
 
     imaging.o_cam.connect(camera.i_img)
     imaging.o_obs.connect(ground.i_obs)
-    imaging.o_obs.connect(verifier.i_obs)
     camera.o_img.connect(imaging.i_cam)
     camera.o_obs.connect(ground.i_obs)
-    camera.o_obs.connect(verifier.i_obs)
-    verifier.o_obs.connect(ground.i_obs)
     ground.o_cmd.connect(imaging.i_cmd)
 
     Configuration.show("/Users/khavelun/Desktop/config.dot")
 
-    ground.i_int.invoke(1)
-    println("================ GETTING PAST FIRST IMAGE COMMAND")
-    ground.i_int.invoke(1)
-    println("================ GETTING PAST SECOND IMAGE COMMAND")
+    ground.i_int.invoke(1000)
+    ground.i_int.invoke(2000)
+    ground.i_int.invoke(3000)
   }
 }
 

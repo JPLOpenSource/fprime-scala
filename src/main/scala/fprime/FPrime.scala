@@ -6,9 +6,24 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import java.io._
 
-/** ****
- * Util
- * *****/
+/**
+ * F' options to be set by the user.
+ */
+
+object FPrimeOptions {
+
+  /**
+   * Debug flag. When set to true various debugging information will
+   * be printed on standard out as an application executes. The default
+   * value is false.
+   */
+
+  var DEBUG : Boolean = false
+}
+
+/**
+ * Utilities.
+ */
 
 object Util {
   /**
@@ -20,6 +35,17 @@ object Util {
    * Names of parameters that can be set in a component.
    */
   type ParameterName = String
+
+  /**
+   * Prints a message on standard out if the `DEBUG` flag is set.
+   * Used for debugging purposes.
+   *
+   * @param msg the message to be printed.
+   */
+
+  def debug(msg : => String): Unit = {
+    if (FPrimeOptions.DEBUG) println(s"| $msg")
+  }
 
   /**
    * The following Akka configuration instructs Akka to serialize all
@@ -395,21 +421,8 @@ class Output[T](implicit componentName: String) {
     assert(!otherEnds.isEmpty, "Output port has not been connected to input port when sending $a")
     for (otherEnd <- otherEnds) {
       otherEnd.invoke(a)
-      debug(componentName, otherEnd.getComponentName, a)
+      debug(s"$componentName -[$a]-> ${otherEnd.getComponentName}")
     }
-  }
-
-  /**
-   * Used for debugging. Prints source, target, and message sent upon call of
-   * the `invoke` method.
-   *
-   * @param source name of component sending message.
-   * @param target name of component receiving message.
-   * @param msg    the message sent.
-   */
-
-  private def debug(source: String, target: String, msg: T): Unit = {
-    println(s"$source ---> $target : [$msg]")
   }
 }
 
@@ -748,13 +761,13 @@ trait PassiveComponent {
 
   /**
    * Executes a command. The method has to be overridden and defined by the user as part of
-   * the component definition.
+   * the component definition. The method will assertion fail by default for any command.
    *
    * @param cmd command to be executed.
    */
 
   protected def executeCommand(cmd: Command): Unit = {
-    println(s"*** no command handling implemented for component $componentName. $cmd is not processed!")
+    assert(false, s"*** no command handling implemented for component $componentName. $cmd is not processed!")
   }
 }
 
@@ -836,11 +849,11 @@ trait Component extends PassiveComponent {
   /**
    * Sets the timer to a specific number of seconds.
    *
-   * @param time time in seconds.
+   * @param time time in milliseconds.
    */
 
   protected def setTimer(time: Int): Unit = {
-    timeOut = Some(time * 1000)
+    timeOut = Some(time)
   }
 
   /**
@@ -873,9 +886,8 @@ trait Component extends PassiveComponent {
     private def resetTimer(): Unit = {
       timeOut match {
         case None =>
-          context.setReceiveTimeout(Duration.Undefined)
         case Some(time) =>
-          println(s"activating timer with $time milliseconds in $componentName")
+          debug(s">>> set timer with $time milliseconds in $componentName")
           context.setReceiveTimeout(time milliseconds)
           timeOut = None
       }
@@ -899,12 +911,12 @@ trait Component extends PassiveComponent {
       case parameters: Parameters =>
         setParameters(parameters)
       case ReceiveTimeout =>
-        println(s"timeout in $componentName")
+        debug(s"<<< timeout in $componentName")
         context.setReceiveTimeout(Duration.Undefined)
         if (when.isDefinedAt(ReceiveTimeout)) when(ReceiveTimeout)
         resetTimer()
-      case other if when.isDefinedAt(other) =>
-        println(s"####### RECEIVING $other in $componentName")
+      case other =>
+        debug(s"? $componentName : $other")
         when(other)
         resetTimer()
     }
@@ -924,8 +936,7 @@ trait Component extends PassiveComponent {
      */
 
     override def unhandled(message: Any): Unit = {
-      println(s"+++++ $componentName LOST MESSAGE: $message")
-      self forward message
+      assert(false, s"+++++ $componentName LOST MESSAGE: $message")
     }
   }
 
