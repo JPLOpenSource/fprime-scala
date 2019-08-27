@@ -105,9 +105,28 @@ case object EvrSaveData extends Event
 case object EvrImageSaved extends Event
 case object EvrImageAborted extends Event
 ```
+The Imaging HSM is shown graphically below.
 
-The `Imaging` component is programmed as a hierachical state machine. It is defined as a class subclassing the `Component` class, and defines two input ports, one for receiving commmands from ground, and one for receving messages from the camera, and two outout ports,
-one for sending messages to the camera and one for sending observation events to ground.
+![Imaging HSM](imaging.png)
+
+The HSM can receive a `TakeImage(d)` command from ground, where `d` denotes the exposure duration.  It responds to this request by sending a messade to the camera to power on, and waiting until the camera is ready.  It then aks the camera to open the shutter for the specified exposure duration (using a timer service which generates a timeout event after a specified period). Following this, it optionally takes a so-called dark exposure with the shutter closed (but only if the ambient temperature is above a specified threshold). A dark exposure allows determination of the noise from camera electronics, so that this can be subtracted from the acquired image.
+Finally, it saves the image data, and powers off the camera.
+
+Following standard HSM notation, the filled out black circles indicate the initial substate that is entered whenever a parent state is entered. Thus, for instance, a transition to the `on` state ends with the HSM in the `powering` state.  Associated with each state are also two optional code fragments, called the `entry` and `exit` actions.  The `entry` action is executed whenever the HSM transitions into a state, whereas the 
+`exit` action is executed whenever the HSM transitions out of a state. Finally, the labeled 
+arrows between states show the transitions that are caused in response to events received by the HSM.  A label has the form: 
+
+    <event> if <condition> / <action>
+
+which denotes that the transition is triggered when the HSM receives the specified `<event>` and the (optional) `<condition>` is true.  In response, the HSM transitions to the target state, and executes the specified (optional) `<action>`.  As an example, suppose the HSM is in state `exposing_light`, and it receives the event `ShutDown` (for which a transition is defined in the parent `on` state).  This would cause the HSM to perform the following actions (in order): 
+
+1. the `exit` actions for the states `exposing_light`, `exposing` (no action), and `on` (no action).
+2. the actions associated with the transition
+3. the `entry` action for the state `off`.
+
+Note that the `entry` action for the `off` state is `MissedEvents.submit()`. This is caused by the fact that the HSM may receive events when in a particular state that it is not prepared to process. These events are then stored for later re-submission as done here. This is a consequence of an F' component only having one input queue to which all input ports of the component connect.
+
+The HSM in Scala is embedded in the Imaging component below. It is defined as a class subclassing the `Component` class, and defines two input ports, one for receiving commands from ground, and one for receving messages from the camera, and two outout ports, one for sending messages to the camera and one for sending observation events to ground.
 
 ```scala
 class Imaging extends Component {
@@ -309,20 +328,19 @@ The main program declares the components, connects them, and then asks the groun
 ```scala
 object Main {
   def main(args: Array[String]): Unit = {
-    FPrimeOptions.DEBUG = true
-    HSMOptions.PRINT = true
-    HSMOptions.TRACE = true
-
+    // Create component instances:
     val imaging = new Imaging
     val camera = new Camera
     val ground = new Ground
 
+    // Connect components:
     imaging.o_cam.connect(camera.i_img)
     imaging.o_obs.connect(ground.i_obs)
     camera.o_img.connect(imaging.i_cam)
     camera.o_obs.connect(ground.i_obs)
     ground.o_cmd.connect(imaging.i_cmd)
 
+    // Take three pictures:
     ground.i_int.invoke(1000)
     ground.i_int.invoke(2000)
     ground.i_int.invoke(3000)
