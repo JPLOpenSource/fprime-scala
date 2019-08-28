@@ -57,7 +57,7 @@ which can be found in [papers/fprime/serene-2017.pdf](papers/hsm/serene-2017.pdf
 
 The example is that of an imaging application on board a spacecraft, consisiting of two components (`Imaging` and `Camera`) and a `Ground` component. The `Imaging` component is given commands from ground to orchestrate the taking of an image with the shutter being open for a certain duration. The `Imaging` component communicates with the `Camera`. Furthermore, events, reporting what is happening, are sent to ground. The `Imaging` component is programmed as a hiearchical state machine and the ground, also a component, is programmed as a data automaton monitor. Each component has input ports (white) and output ports (blue). Output ports are connected to input ports.
 
-![Component topology](components.pdf)
+![Component topology](components.png)
 
 We start by declaring the package and importing F', HSM, and Daut
 
