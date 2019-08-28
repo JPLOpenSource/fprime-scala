@@ -46,7 +46,8 @@ The three DSLs mentioned above can be used together. For example, a system can b
 
 ## Example
 
-In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `example13_camera` in the test directory, which is a rendering of the example presented in the paper:
+In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `example13_camera` in the test directory, which is a rendering of the example presented in the following paper,
+which can be found in [papers/fprime/serene-2017.pdf](papers/hsm/serene-2017.pdf):
 
     "Modeling and Monitoring of Hierarchical State Machines in Scala",
     Klaus Havelund and Rajeev Joshi,
@@ -54,21 +55,16 @@ In the following is shown an example illustrating the concepts provided in this 
     September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer 
     Science Volume 10479.
 
-which can be found in `papers/fprime/serene-2017.pdf`. 
+The example is that of an imaging application on board a spacecraft, consisiting of two components (`Imaging` and `Camera`) and a `Ground` component. The `Imaging` component is given commands from ground to orchestrate the taking of an image with the shutter being open for a certain duration. The `Imaging` component communicates with the `Camera`. Furthermore, events, reporting what is happening, are sent to ground. The `Imaging` component is programmed as a hiearchical state machine and the ground, also a component, is programmed as a data automaton monitor. Each component has input ports (white) and output ports (blue). Output ports are connected to input ports.
 
-The example is that of an imaging application on board a spacecraft. An `Imaging` component is given commands from ground to orchestrate the taking of an image with the shutter being open for a certain duration. The `Imaging` component communicates with the `Camera`. Furthermore, events, reporting what is happening, are sent to ground. The `Imaging` component is programmed as a hiearchical state machine and the ground, also a component, is progranned as a data automaton monitor.
+![Component topology](components.pdf)
 
 We start by declaring the package and importing F', HSM, and Daut
 
 ```scala
-package example13_camera
-
 import fprime._
 import hsm._
 import daut._
-
-import akka.actor.ReceiveTimeout
-import scala.language.postfixOps
 ```
 
 Then we declare the messages that are sent between components. First commands, which are
