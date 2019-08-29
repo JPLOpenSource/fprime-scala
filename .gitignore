@@ -2,3 +2,7 @@
 .idea/
 project/
 target/
+TraceMonitor.scala
+ast.dot
+dejavu-profile.csv
+dejavu-results
