@@ -753,20 +753,6 @@ class Monitor[E] {
     Set(ok)
 
   /**
-   * Implicit function lifting an integer to the set: `Set(ok)`. This allows
-   * writing an integer valued expression as a result of a transition. This
-   * is specifically introduced to allow writing a call of `submit)(event : Event) : Int`
-   * on an HSM as a result of a transition, making the monitor reactive: not only monitoring,
-   * but also influencing the system monitored.
-   *
-   * @param d the integer to be lifted.
-   * @return the state set `Set(ok)` (not dependent of the integer value `d`).
-   */
-
-  protected implicit def convInt2StateSet(d: Int): Set[state] =
-    Set(ok)
-
-  /**
    * Implicit function lifting a Boolean value `b` to the state set `Set(ok)`
    * if `b` is true, and to `Set(error)` if `b` is false.
    *

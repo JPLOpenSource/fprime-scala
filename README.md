@@ -46,12 +46,13 @@ The three DSLs mentioned above can be used together. For example, a system can b
 
 ### Documentation
 
-- See `doc` folder for API documentation for each of the three packages (F', HSM, and Daut)
-- For Daut, see in addition [README-DAUT.md](README-DAUT.md)
+- For an example of combining F', HSM, and Daut, see example below.
+- For specific documentation on Daut, see [README-DAUT.md](README-DAUT.md).
+- Otherwise, see `doc` folder for API documentation for each of the three packages (F', HSM, and Daut).
 
-## Example
+## Example combining F', HSM, and Daut
 
-In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `example13_camera` in the test directory, which is a rendering of the example presented in the following paper,
+In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `fprime13_camera` in the test directory, which is a rendering of the example presented in the following paper,
 which can be found in [papers/fprime/serene-2017.pdf](papers/hsm/serene-2017.pdf):
 
     "Modeling and Monitoring of Hierarchical State Machines in Scala",
