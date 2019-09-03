@@ -44,6 +44,11 @@ The DSL supports writing event monitors that have either a temporal logic appear
 
 The three DSLs mentioned above can be used together. For example, a system can be built as an F' application with interacting components, and where a component can contain a hierachical state machine or a data automaton monitor.
 
+### Documentation
+
+- See `doc` folder for API documentation for each of the three packages (F', HSM, and Daut)
+- For Daut, see in addition [README-DAUT.md](README-DAUT.md)
+
 ## Example
 
 In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `example13_camera` in the test directory, which is a rendering of the example presented in the following paper,
