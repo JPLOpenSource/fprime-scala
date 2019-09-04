@@ -3,9 +3,9 @@
         <head>
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-          <title>fprime documentation  - daut.Monitor.state</title>
-          <meta name="description" content="fprime documentation - daut.Monitor.state" />
-          <meta name="keywords" content="fprime documentation daut.Monitor.state" />
+          <title>fprime documentation  - qtl.Options</title>
+          <meta name="description" content="fprime documentation - qtl.Options" />
+          <meta name="keywords" content="fprime documentation qtl.Options" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
@@ -69,10 +69,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
-    </li><li name="_root_.daut" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="daut"></a><a id="daut:daut"></a>
+    </li><li name="_root_.qtl" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="qtl"></a><a id="qtl:qtl"></a>
       <span class="permalink">
-      <a href="index.html#daut" title="Permalink">
+      <a href="index.html#qtl" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -81,77 +81,65 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="Daut (Data automata) is an internal Scala DSL for writing event stream monitors." href="index.html"><span class="name">daut</span></a>
+        <a title="" href="index.html"><span class="name">qtl</span></a>
       </span>
       
-      <p class="shortcomment cmt">Daut (Data automata) is an internal Scala DSL for writing event stream monitors.</p><div class="fullcomment"><div class="comment cmt"><p>Daut (Data automata) is an internal Scala DSL for writing event stream monitors. It
-supports flavors of state machines, temporal logic, and rule-based programming, all in one
-unified formalism. The underlying concept is that at any point during monitoring there is an
-active set of states, the _state soup_. States can be added and removed from this soup.
-Each state in the soup either monitors the incoming event stream, or is used by other states to record
-data (as in rule-based programming).</p><p>The specification language specifically supports:</p><ul><li>Automata, represented by states, parameterized with data (thereby the name Daut: Data automata).</li><li>Temporal operators which generate states, resulting in more succinct specifications.</li><li>Rule-based programming in that one can test for the presence of states and one can add states.</li><li>General purpose programming in Scala when the other specification features fall short.</li></ul><p>The DSL is a simplification of the TraceContract (<a href="https://github.com/havelund/tracecontract" target="_blank">https://github.com/havelund/tracecontract</a>) internal Scala DSL by an order of magnitude less code.</p><p>The general idea is to create a monitor as a class sub-classing the <code>Monitor</code> class,
-create an instance of it, and then feed it with events with the <code>verify(event: Event)</code> method,
-one by one, and in the case of a finite sequence of observations, finally calling the
-<code>end()</code> method on it. If <code>end()</code> is called, it will be determined whether
-there are any outstanding obligations that have not been satisfied (expected events that did not occur).</p><p>This can schematically be illustrated as follows:</p><pre><span class="kw">class</span> MyMonitor <span class="kw">extends</span> Monitor[SomeType] {
-...
-}
-
-<span class="kw">object</span> Main {
-  <span class="kw">def</span> main(args: <span class="std">Array</span>[<span class="std">String</span>]) {
-    <span class="kw">val</span> m = <span class="kw">new</span> MyMonitor()
-    m.verify(event1)
-    m.verify(event2)
-    ...
-    m.verify(eventN)
-    m.end()
-  }
-}</pre></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
-    </li><li name="daut.Monitor" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="Monitor[E]extendsAnyRef"></a><a id="Monitor[E]:Monitor[E]"></a>
-      <span class="permalink">
-      <a href="../daut/index.html#Monitor[E]extendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="Any monitor must sub-class this class." href="Monitor.html"><span class="name">Monitor</span></a><span class="tparams">[<span name="E">E</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Any monitor must sub-class this class.</p><div class="fullcomment"><div class="comment cmt"><p>Any monitor must sub-class this class. It provides all the DSL constructs for writing
-a monitor.
-</p></div><dl class="paramcmts block"><dt class="tparam">E</dt><dd class="cmt"><p>the type of events submitted to the monitor.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="daut">daut</a></dd></dl></div>
-    </li><li class="current-entities indented2">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="_root_">root</a></dd></dl></div>
+    </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="class" href="Monitor$during.html" title="The state is usually assigned to a local val-variable that can be queried e.g."></a>
-                        <a href="Monitor$during.html" title="The state is usually assigned to a local val-variable that can be queried e.g.">during</a>
-                      </li><li class="current-entities indented2">
+                        <a class="class" href="BDDGenerator.html" title="An object of this class represents all the variables in a formula."></a>
+                        <a href="BDDGenerator.html" title="An object of this class represents all the variables in a formula.">BDDGenerator</a>
+                      </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="object" href="Monitor$error$.html" title="Special state indicating a specification violation."></a>
-                        <a href="Monitor$error$.html" title="Special state indicating a specification violation.">error</a>
-                      </li><li class="current-entities indented2">
+                        <a class="class" href="C.html" title=""></a>
+                        <a href="C.html" title="">C</a>
+                      </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="object" href="Monitor$ok$.html" title="Special state indicating successful termination."></a>
-                        <a href="Monitor$ok$.html" title="Special state indicating successful termination.">ok</a>
-                      </li><li class="current-entities indented2">
+                        <a class="class" href="Formula.html" title="Every formula will be defined as a class extending this class."></a>
+                        <a href="Formula.html" title="Every formula will be defined as a class extending this class.">Formula</a>
+                      </li><li class="current-entities indented1">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="A state of the monitor."></a>
-                        <a href="" title="A state of the monitor.">state</a>
+                        <a class="class" href="Monitor.html" title="The generic Monitor class."></a>
+                        <a href="Monitor.html" title="The generic Monitor class.">Monitor</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="object" href="" title=""></a>
+                        <a href="" title="">Options</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="trait" href="Pattern.html" title="Patterns for checking whether the state contains a certain event."></a>
+                        <a href="Pattern.html" title="Patterns for checking whether the state contains a certain event.">Pattern</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="class" href="State.html" title="A state in a trace."></a>
+                        <a href="State.html" title="A state in a trace.">State</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="class" href="TraceStatistics.html" title="Maintains trace statistics for a monitoring session."></a>
+                        <a href="TraceStatistics.html" title="Maintains trace statistics for a monitoring session.">TraceStatistics</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="object" href="Util$.html" title=""></a>
+                        <a href="Util$.html" title="">Util</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="class" href="V.html" title=""></a>
+                        <a href="V.html" title="">V</a>
+                      </li><li class="current-entities indented1">
+                        <span class="separator"></span>
+                        <a class="class" href="Variable.html" title="A variable is represented by an object of this class."></a>
+                        <a href="Variable.html" title="A variable is represented by an object of this class.">Variable</a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="object value">
       <div id="definition">
-        <div class="big-circle trait">t</div>
-        <p id="owner"><a href="index.html" class="extype" name="daut">daut</a>.<a href="Monitor.html" class="extype" name="daut.Monitor">Monitor</a></p>
-        <h1>state<span class="permalink">
-      <a href="../daut/Monitor$state.html" title="Permalink">
+        <div class="big-circle object">o</div>
+        <p id="owner"><a href="index.html" class="extype" name="qtl">qtl</a></p>
+        <h1>Options<span class="permalink">
+      <a href="../qtl/Options$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -161,26 +149,20 @@ a monitor.
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">state</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">Options</span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A state of the monitor.
-</p></div><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Self Type</dt><dd><a href="" class="extype" name="daut.Monitor.state">state</a></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">
-              Known Subclasses
-            </span>
-            <div class="subClasses hiddenContent"><a href="Monitor$during.html" class="extype" name="daut.Monitor.during">during</a>, <a href="Monitor$error$.html" class="extype" name="daut.Monitor.error">error</a>, <a href="Monitor$ok$.html" class="extype" name="daut.Monitor.ok">ok</a></div>
-          </div></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -205,7 +187,7 @@ a monitor.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="daut.Monitor.state"><span>state</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="qtl.Options"><span>Options</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -235,7 +217,7 @@ a monitor.
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -251,7 +233,7 @@ a monitor.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html###():Int" title="Permalink">
+      <a href="../qtl/Options$.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -267,7 +249,7 @@ a monitor.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -280,51 +262,122 @@ a monitor.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="daut.Monitor.state#always" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="always(ts:Monitor.this.Transitions):Unit"></a><a id="always(Transitions):Unit"></a>
+    </li><li name="qtl.Options#BITS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BITS:Int"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#always(ts:Monitor.this.Transitions):Unit" title="Permalink">
+      <a href="../qtl/Options$.html#BITS:Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">always</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">BITS</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       
-      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
-modified to always include the state in the resulting state set of any transition.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
-modified to always include the state in the resulting state set of any transition.
-This corresponds to a state where the monitor is always waiting  until an event
-is submitted that makes a transition fire, and where the state has a true
-self loop, no matter what transition fires. The state is final.
-</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="daut.Monitor.state#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(event:E):Option[Set[Monitor.this.state]]"></a><a id="apply(E):Option[Set[state]]"></a>
+      
+    </li><li name="qtl.Options#DEBUG" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DEBUG:Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#apply(event:E):Option[Set[Monitor.this.state]]" title="Permalink">
+      <a href="../qtl/Options$.html#DEBUG:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="event">event: <span class="extype" name="daut.Monitor.E">E</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Set">Set</span>[<a href="" class="extype" name="daut.Monitor.state">state</a>]]</span>
+        <span class="name">DEBUG</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
-      <p class="shortcomment cmt">Applies the state to an event.</p><div class="fullcomment"><div class="comment cmt"><p>Applies the state to an event. If the transition function associated with the state
-can fire, the resulting state set <code>ss</code> is returned as <code>Some(ss)</code>.
-If the transition function cannot fire <code>None</code> is returned.
-</p></div><dl class="paramcmts block"><dt class="param">event</dt><dd class="cmt"><p>the event the state is applied to.</p></dd><dt>returns</dt><dd class="cmt"><p>the optional set of states resulting from taking a transition.</p></dd></dl></div>
+      
+    </li><li name="qtl.Options#PRINT" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PRINT:Boolean"></a>
+      <span class="permalink">
+      <a href="../qtl/Options$.html#PRINT:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PRINT</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
+    </li><li name="qtl.Options#PRINT_LINENUMBER_EACH" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PRINT_LINENUMBER_EACH:Int"></a>
+      <span class="permalink">
+      <a href="../qtl/Options$.html#PRINT_LINENUMBER_EACH:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PRINT_LINENUMBER_EACH</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="qtl.Options#PROFILE" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PROFILE:Boolean"></a>
+      <span class="permalink">
+      <a href="../qtl/Options$.html#PROFILE:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PROFILE</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
+    </li><li name="qtl.Options#STATISTICS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="STATISTICS:Boolean"></a>
+      <span class="permalink">
+      <a href="../qtl/Options$.html#STATISTICS:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">STATISTICS</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
+    </li><li name="qtl.Options#UNIT_TEST" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="UNIT_TEST:Boolean"></a>
+      <span class="permalink">
+      <a href="../qtl/Options$.html#UNIT_TEST:Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">UNIT_TEST</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../qtl/Options$.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -340,7 +393,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#clone():Object" title="Permalink">
+      <a href="../qtl/Options$.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -364,7 +417,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -380,7 +433,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -396,7 +449,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#finalize():Unit" title="Permalink">
+      <a href="../qtl/Options$.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -418,7 +471,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#getClass():Class[_]" title="Permalink">
+      <a href="../qtl/Options$.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -437,7 +490,7 @@ If the transition function cannot fire <code>None</code> is returned.
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#hashCode():Int" title="Permalink">
+      <a href="../qtl/Options$.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -453,30 +506,10 @@ If the transition function cannot fire <code>None</code> is returned.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="daut.Monitor.state#hot" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hot(ts:Monitor.this.Transitions):Unit"></a><a id="hot(Transitions):Unit"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#hot(ts:Monitor.this.Transitions):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hot</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Updates the transition function to the transition function provided.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided.
-This corresponds to a state where the monitor is just waiting (watching) until an event
-is submitted that makes a transition fire. The state is non-final, meaning
-that it is an error to be in this state on a call of the <code>end()</code> method.
-</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -492,7 +525,7 @@ that it is an error to be in this state on a call of the <code>end()</code> meth
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../qtl/Options$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -505,31 +538,10 @@ that it is an error to be in this state on a call of the <code>end()</code> meth
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="daut.Monitor.state#next" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="next(ts:Monitor.this.Transitions):Unit"></a><a id="next(Transitions):Unit"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#next(ts:Monitor.this.Transitions):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">next</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
-modified to yield an error if it does not fire on the next submitted event.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
-modified to yield an error if it does not fire on the next submitted event.
-The transition is strong in the sense that a next event has to occur.
-The state is therefore non-final.
-</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#notify():Unit" title="Permalink">
+      <a href="../qtl/Options$.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -548,7 +560,7 @@ The state is therefore non-final.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#notifyAll():Unit" title="Permalink">
+      <a href="../qtl/Options$.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -567,7 +579,7 @@ The state is therefore non-final.
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../qtl/Options$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -580,10 +592,10 @@ The state is therefore non-final.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="daut.Monitor.state#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#toString():String" title="Permalink">
+      <a href="../qtl/Options$.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -592,62 +604,14 @@ The state is therefore non-final.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">The standard <code>toString</code> method overridden.</p><div class="fullcomment"><div class="comment cmt"><p>The standard <code>toString</code> method overridden.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>text representation of state.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="daut.Monitor.state">state</a> → AnyRef → Any</dd></dl></div>
-    </li><li name="daut.Monitor.state#unless" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="unless(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a><a id="unless(Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#unless(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">unless</span><span class="params">(<span name="ts1">ts1: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def watch(ts2: Monitor.this.Transitions): Unit }</span>
-      </span>
-      
-      <p class="shortcomment cmt">An expression of the form <code>unless {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
-unless <code>ts1</code> fires.</p><div class="fullcomment"><div class="comment cmt"><p>An expression of the form <code>unless {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
-unless <code>ts1</code> fires. That is, the expression updates the transition function as
-the combination of the two transition functions provided. The resulting transition function
-first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
-and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-The transition function <code>ts1</code> does not need to ever fire, which makes the state final.
-</p></div><dl class="paramcmts block"><dt class="param">ts1</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="daut.Monitor.state#until" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="until(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a><a id="until(Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#until(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">until</span><span class="params">(<span name="ts1">ts1: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def watch(ts2: Monitor.this.Transitions): Unit }</span>
-      </span>
-      
-      <p class="shortcomment cmt">An expression of the form <code>until {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
-until <code>ts1</code> fires.</p><div class="fullcomment"><div class="comment cmt"><p>An expression of the form <code>until {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
-until <code>ts1</code> fires. That is, the expression updates the transition function as
-the combination of the two transition functions provided. The resulting transition function
-first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
-and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
-The transition function <code>ts1</code> will need to eventually ever fire before <code>end()</code> is
-called, which makes the state non-final.
-</p></div><dl class="paramcmts block"><dt class="param">ts1</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#wait():Unit" title="Permalink">
+      <a href="../qtl/Options$.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -669,7 +633,7 @@ called, which makes the state non-final.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../qtl/Options$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -691,7 +655,7 @@ called, which makes the state non-final.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../daut/Monitor$state.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../qtl/Options$.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -712,46 +676,6 @@ called, which makes the state non-final.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="daut.Monitor.state#watch" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="watch(ts:Monitor.this.Transitions):Unit"></a><a id="watch(Transitions):Unit"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#watch(ts:Monitor.this.Transitions):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">watch</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Updates the transition function to exactly the transition function provided.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to exactly the transition function provided.
-This corresponds to a state where the monitor is just waiting (watching) until an event
-is submitted that makes a transition fire. The state is final.
-</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="daut.Monitor.state#wnext" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="wnext(ts:Monitor.this.Transitions):Unit"></a><a id="wnext(Transitions):Unit"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor$state.html#wnext(ts:Monitor.this.Transitions):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">wnext</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
-modified to yield an error if it does not fire on the next submitted event.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
-modified to yield an error if it does not fire on the next submitted event.
-The transition is weak in the sense that a next event does not have to occur (in contrast to strong next).
-The state is therefore final.
-</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li>
               </ol>
             </div>

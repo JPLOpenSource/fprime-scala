@@ -1,11 +1,6 @@
-package daut1
+package faut1
 
 import daut._
-import daut.Monitor
-
-trait LockEvent
-case class acquire(thread: Int, lock: Int) extends LockEvent
-case class release(thread: Int, lock: Int) extends LockEvent
 
 /**
  * A task acquiring a lock should eventually release it. At most one task
@@ -15,7 +10,11 @@ case class release(thread: Int, lock: Int) extends LockEvent
  * fact (Locked) to record history. This is effectively in part a past time property.
  */
 
-class TestMonitor extends Monitor[LockEvent] {
+trait LockEvent
+case class acquire(thread: Int, lock: Int) extends LockEvent
+case class release(thread: Int, lock: Int) extends LockEvent
+
+class AcquireRelease extends Monitor[LockEvent] {
   case class Locked(thread: Int, lock: Int) extends state {
     hot {
       case acquire(_, `lock`) => error
@@ -31,7 +30,7 @@ class TestMonitor extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val m = new TestMonitor
+    val m = new AcquireRelease
     m.verify(acquire(1, 10))
     m.verify(acquire(2, 10))
   }

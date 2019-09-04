@@ -329,6 +329,28 @@ then the <code>condition</code> must hold.</p><div class="fullcomment"><div clas
 expression of the form <code>dur ==&gt; condition</code>, meaning: if <code>dur</code> is in the interval
 then the <code>condition</code> must hold.
 </p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the condition that must hold if the during-state is within the interval.</p></dd><dt>returns</dt><dd class="cmt"><p>true if the during state is not within an interval, or if the condition <code>b</code> holds.</p></dd></dl></div>
+    </li><li name="daut.Monitor.state#always" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="always(ts:Monitor.this.Transitions):Unit"></a><a id="always(Transitions):Unit"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#always(ts:Monitor.this.Transitions):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">always</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
+modified to always include the state in the resulting state set of any transition.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
+modified to always include the state in the resulting state set of any transition.
+This corresponds to a state where the monitor is always waiting  until an event
+is submitted that makes a transition fire, and where the state has a true
+self loop, no matter what transition fires. The state is final.
+</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
     </li><li name="daut.Monitor.state#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="apply(event:E):Option[Set[Monitor.this.state]]"></a><a id="apply(E):Option[Set[state]]"></a>
       <span class="permalink">
@@ -461,6 +483,26 @@ If the transition function cannot fire <code>None</code> is returned.
                 <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="daut.Monitor.state#hot" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hot(ts:Monitor.this.Transitions):Unit"></a><a id="hot(Transitions):Unit"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#hot(ts:Monitor.this.Transitions):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hot</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Updates the transition function to the transition function provided.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided.
+This corresponds to a state where the monitor is just waiting (watching) until an event
+is submitted that makes a transition fire. The state is non-final, meaning
+that it is an error to be in this state on a call of the <code>end()</code> method.
+</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -493,6 +535,27 @@ If the transition function cannot fire <code>None</code> is returned.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="daut.Monitor.state#next" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="next(ts:Monitor.this.Transitions):Unit"></a><a id="next(Transitions):Unit"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#next(ts:Monitor.this.Transitions):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">next</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
+modified to yield an error if it does not fire on the next submitted event.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
+modified to yield an error if it does not fire on the next submitted event.
+The transition is strong in the sense that a next event has to occur.
+The state is therefore non-final.
+</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
@@ -583,6 +646,53 @@ write:</p><pre><span class="kw">val</span> dur = during(BEGIN)(END) startsTrue</
       
       <p class="shortcomment cmt">The standard <code>toString</code> method overridden.</p><div class="fullcomment"><div class="comment cmt"><p>The standard <code>toString</code> method overridden.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>text representation of state.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a> → AnyRef → Any</dd></dl></div>
+    </li><li name="daut.Monitor.state#unless" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unless(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a><a id="unless(Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#unless(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unless</span><span class="params">(<span name="ts1">ts1: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def watch(ts2: Monitor.this.Transitions): Unit }</span>
+      </span>
+      
+      <p class="shortcomment cmt">An expression of the form <code>unless {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
+unless <code>ts1</code> fires.</p><div class="fullcomment"><div class="comment cmt"><p>An expression of the form <code>unless {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
+unless <code>ts1</code> fires. That is, the expression updates the transition function as
+the combination of the two transition functions provided. The resulting transition function
+first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
+The transition function <code>ts1</code> does not need to ever fire, which makes the state final.
+</p></div><dl class="paramcmts block"><dt class="param">ts1</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
+    </li><li name="daut.Monitor.state#until" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="until(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a><a id="until(Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#until(ts1:Monitor.this.Transitions):AnyRef{defwatch(ts2:Monitor.this.Transitions):Unit}" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">until</span><span class="params">(<span name="ts1">ts1: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def watch(ts2: Monitor.this.Transitions): Unit }</span>
+      </span>
+      
+      <p class="shortcomment cmt">An expression of the form <code>until {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
+until <code>ts1</code> fires.</p><div class="fullcomment"><div class="comment cmt"><p>An expression of the form <code>until {ts1} watch {ts2</code>} watches <code>ts2</code> repeatedly
+until <code>ts1</code> fires. That is, the expression updates the transition function as
+the combination of the two transition functions provided. The resulting transition function
+first tries <code>ts1</code>, and if it can fire that is chosen. Otherwise <code>t2</code> is tried,
+and if it can fire it is made to fire, and the unless-state is re-added to the resulting state set.
+The transition function <code>ts1</code> will need to eventually ever fire before <code>end()</code> is
+called, which makes the state non-final.
+</p></div><dl class="paramcmts block"><dt class="param">ts1</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
@@ -651,6 +761,46 @@ write:</p><pre><span class="kw">val</span> dur = during(BEGIN)(END) startsTrue</
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="daut.Monitor.state#watch" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="watch(ts:Monitor.this.Transitions):Unit"></a><a id="watch(Transitions):Unit"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#watch(ts:Monitor.this.Transitions):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">watch</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Updates the transition function to exactly the transition function provided.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to exactly the transition function provided.
+This corresponds to a state where the monitor is just waiting (watching) until an event
+is submitted that makes a transition fire. The state is final.
+</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
+    </li><li name="daut.Monitor.state#wnext" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wnext(ts:Monitor.this.Transitions):Unit"></a><a id="wnext(Transitions):Unit"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor$during.html#wnext(ts:Monitor.this.Transitions):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wnext</span><span class="params">(<span name="ts">ts: <a href="Monitor.html#Transitions=PartialFunction[E,Set[Monitor.this.state]]" class="extmbr" name="daut.Monitor.Transitions">Transitions</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Updates the transition function to the transition function provided,
+modified to yield an error if it does not fire on the next submitted event.</p><div class="fullcomment"><div class="comment cmt"><p>Updates the transition function to the transition function provided,
+modified to yield an error if it does not fire on the next submitted event.
+The transition is weak in the sense that a next event does not have to occur (in contrast to strong next).
+The state is therefore final.
+</p></div><dl class="paramcmts block"><dt class="param">ts</dt><dd class="cmt"><p>the transition function.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a></dd></dl></div>
     </li>
               </ol>
             </div>

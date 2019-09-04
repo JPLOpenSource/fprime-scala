@@ -1,4 +1,4 @@
-package daut4
+package daut8_map
 
 import daut._
 import daut.Monitor
@@ -28,7 +28,7 @@ class TestMonitor1 extends Monitor[LockEvent] {
 
   always {
     case acquire(t, l) => {
-      find {
+      map {
         case Locked(_,`l`) => error("allocated more than once")
       } orelse {
         Locked(t,l)
@@ -65,9 +65,9 @@ class TestMonitor2 extends Monitor[LockEvent] {
 
   always {
     case acquire(t, l) => {
-      find {
+      map {
         case Locked(_,`l`) =>
-          find {
+          map {
             case Locked(`t`,x) if l != x => error
           } orelse {
             println("Can't lock but is not holding any other lock, so it's ok")

@@ -224,7 +224,7 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    private[daut] def watch(ts: Transitions) {
+    protected def watch(ts: Transitions) {
       transitions = ts
     }
 
@@ -238,7 +238,7 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    private[daut] def always(ts: Transitions) {
+    protected def always(ts: Transitions) {
       transitions = ts andThen (_ + this)
     }
 
@@ -251,7 +251,7 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    private[daut] def hot(ts: Transitions) {
+    protected def hot(ts: Transitions) {
       transitions = ts
       isFinal = false
     }
@@ -265,7 +265,7 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    private[daut] def wnext(ts: Transitions) {
+    protected def wnext(ts: Transitions) {
       transitions = ts orElse { case _ => error }
     }
 
@@ -278,7 +278,7 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    private[daut] def next(ts: Transitions) {
+    protected def next(ts: Transitions) {
       transitions = ts orElse { case _ => error }
       isFinal = false
     }
@@ -294,7 +294,7 @@ class Monitor[E] {
      * @param ts1 the transition function.
      */
 
-    private[daut] def unless(ts1: Transitions) = new {
+    protected def unless(ts1: Transitions) = new {
       def watch(ts2: Transitions) {
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
       }
@@ -312,7 +312,7 @@ class Monitor[E] {
      * @param ts1 the transition function.
      */
 
-    private[daut] def until(ts1: Transitions) = new {
+    protected def until(ts1: Transitions) = new {
       def watch(ts2: Transitions) {
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
         isFinal = false
@@ -595,7 +595,7 @@ class Monitor[E] {
   }
 
   /**
-   * The `find` method returns a set of states computed as follows.
+   * The `map` method returns a set of states computed as follows.
    * If the provided argument partial function `pf` is defined for any active states,
    * the resulting set is the union of all the state sets obtained by
    * applying the function to the active states for which it is defined.
@@ -605,7 +605,7 @@ class Monitor[E] {
    * As an example, consider the following monitor, which checks that
    * at most one task can acquire a lock at a time, and that
    * a task cannot release a lock it has not acquired.
-   * This monitor illustrates the `find` function, which looks for stored
+   * This monitor illustrates the `map` function, which looks for stored
    * facts matching a pattern, and the ensure function, which checks a
    * condition (an assert). This function here in this example tests for
    * the presence of a Locked fact which is created when a lock is taken.
@@ -624,7 +624,7 @@ class Monitor[E] {
    *
    *   always {
    *     case acquire(t, l) => {
-   *       find {
+   *       map {
    *         case Locked(_,`l`) => error("allocated more than once")
    *       } orelse {
    *         Locked(t,l)
@@ -635,7 +635,7 @@ class Monitor[E] {
    * }
    * }}}
    *
-   * A more sophisticated example involving nested `find` calls is
+   * A more sophisticated example involving nested `map` calls is
    * the following that checks that when a task `t` is acquiring a
    * lock that some other task holds, and `t` therefore cannot get it,
    * then `t` is not allowed to hold any other locks (to prevent deadlocks).
@@ -644,15 +644,15 @@ class Monitor[E] {
    * class AvoidDeadlocks extends Monitor[LockEvent] {
    *   case class Locked(thread: Int, lock: Int) extends state {
    *     watch {
-   *       case release(thread, lock) => ok
+   *       case release(`thread`, `lock`) => ok
    *     }
    *   }
    *
    *   always {
    *     case acquire(t, l) => {
-   *       find {
+   *       map {
    *         case Locked(_,`l`) =>
-   *           find {
+   *           map {
    *             case Locked(`t`,x) if l != x => error
    *           } orelse {
    *             println("Can't lock but is not holding any other lock, so it's ok")
@@ -669,7 +669,7 @@ class Monitor[E] {
    * @return set of states produced from applying the partial function `fp` to active states.
    */
 
-  protected def find(pf: PartialFunction[state, Set[state]]) = new {
+  protected def map(pf: PartialFunction[state, Set[state]]) = new {
     def orelse(otherwise: => Set[state]): Set[state] = {
       val matchingStates = states filter (pf.isDefinedAt(_))
       if (!matchingStates.isEmpty) {

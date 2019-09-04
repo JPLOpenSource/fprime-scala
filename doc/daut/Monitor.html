@@ -622,27 +622,6 @@ This allows the more succinct notation <code>(state1,state2)</code> instead of
 if <code>b</code> is true, and to <code>Set(error)</code> if <code>b</code> is false.</p><div class="fullcomment"><div class="comment cmt"><p>Implicit function lifting a Boolean value <code>b</code> to the state set <code>Set(ok)</code>
 if <code>b</code> is true, and to <code>Set(error)</code> if <code>b</code> is false.
 </p></div><dl class="paramcmts block"><dt class="param">b</dt><dd class="cmt"><p>the Boolean to be lifted.</p></dd><dt>returns</dt><dd class="cmt"><p>if  <code>b</code> then <code>Set(ok)</code> else <code>Set(error)</code>.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="daut.Monitor#convInt2StateSet" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="convInt2StateSet(d:Int):Set[Monitor.this.state]"></a><a id="convInt2StateSet(Int):Set[state]"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor.html#convInt2StateSet(d:Int):Set[Monitor.this.state]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">convInt2StateSet</span><span class="params">(<span name="d">d: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Implicit function lifting an integer to the set: <code>Set(ok)</code>.</p><div class="fullcomment"><div class="comment cmt"><p>Implicit function lifting an integer to the set: <code>Set(ok)</code>. This allows
-writing an integer valued expression as a result of a transition. This
-is specifically introduced to allow writing a call of <code>submit)(event : Event) : Int</code>
-on an HSM as a result of a transition, making the monitor reactive: not only monitoring,
-but also influencing the system monitored.
-</p></div><dl class="paramcmts block"><dt class="param">d</dt><dd class="cmt"><p>the integer to be lifted.</p></dd><dt>returns</dt><dd class="cmt"><p>the state set <code>Set(ok)</code> (not dependent of the integer value <code>d</code>).</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="daut.Monitor#convList2StateSet" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="convList2StateSet(states:List[Monitor.this.state]):Set[Monitor.this.state]"></a><a id="convList2StateSet(List[state]):Set[state]"></a>
       <span class="permalink">
@@ -872,78 +851,6 @@ the state, and returns true. The method is used for rule-based programming.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="daut.Monitor#find" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="find(pf:PartialFunction[Monitor.this.state,Set[Monitor.this.state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}"></a><a id="find(PartialFunction[state,Set[state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}"></a>
-      <span class="permalink">
-      <a href="../daut/Monitor.html#find(pf:PartialFunction[Monitor.this.state,Set[Monitor.this.state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">find</span><span class="params">(<span name="pf">pf: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a>]]</span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def orelse(otherwise: =&gt; Set[Monitor.this.state]): Set[Monitor.this.state] }</span>
-      </span>
-      
-      <p class="shortcomment cmt">The <code>find</code> method returns a set of states computed as follows.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>find</code> method returns a set of states computed as follows.
-If the provided argument partial function <code>pf</code> is defined for any active states,
-the resulting set is the union of all the state sets obtained by
-applying the function to the active states for which it is defined.
-Otherwise the returned set is the set <code>otherwise</code> provided as
-argument to the <code>orelse</code> method.</p><p>As an example, consider the following monitor, which checks that
-at most one task can acquire a lock at a time, and that
-a task cannot release a lock it has not acquired.
-This monitor illustrates the <code>find</code> function, which looks for stored
-facts matching a pattern, and the ensure function, which checks a
-condition (an assert). This function here in this example tests for
-the presence of a Locked fact which is created when a lock is taken.</p><pre><span class="kw">trait</span> LockEvent
-<span class="kw">case</span> <span class="kw">class</span> acquire(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> LockEvent
-<span class="kw">case</span> <span class="kw">class</span> release(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> LockEvent
-
-<span class="kw">class</span> OneAtATime <span class="kw">extends</span> Monitor[LockEvent] {
-  <span class="kw">case</span> <span class="kw">class</span> Locked(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> state {
-    watch {
-      <span class="kw">case</span> release(thread, lock) <span class="kw">=&gt;</span> ok
-    }
-  }
-
-  always {
-    <span class="kw">case</span> acquire(t, l) <span class="kw">=&gt;</span> {
-      find {
-        <span class="kw">case</span> Locked(_,`l`) <span class="kw">=&gt;</span> error(<span class="lit">"allocated more than once"</span>)
-      } orelse {
-        Locked(t,l)
-      }
-    }
-    <span class="kw">case</span> release(t, l) <span class="kw">=&gt;</span> ensure(Locked(t,l))
-  }
-}</pre><p>A more sophisticated example involving nested <code>find</code> calls is
-the following that checks that when a task <code>t</code> is acquiring a
-lock that some other task holds, and <code>t</code> therefore cannot get it,
-then <code>t</code> is not allowed to hold any other locks (to prevent deadlocks).</p><pre><span class="kw">class</span> AvoidDeadlocks <span class="kw">extends</span> Monitor[LockEvent] {
-  <span class="kw">case</span> <span class="kw">class</span> Locked(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> state {
-    watch {
-      <span class="kw">case</span> release(thread, lock) <span class="kw">=&gt;</span> ok
-    }
-  }
-
-  always {
-    <span class="kw">case</span> acquire(t, l) <span class="kw">=&gt;</span> {
-      find {
-        <span class="kw">case</span> Locked(_,`l`) <span class="kw">=&gt;</span>
-          find {
-            <span class="kw">case</span> Locked(`t`,x) <span class="kw">if</span> l != x <span class="kw">=&gt;</span> error
-          } orelse {
-            println(<span class="lit">"Can't lock but is not holding any other lock, so it's ok"</span>)
-          }
-      } orelse {
-        Locked(t,l)
-      }
-    }
-  }
-}</pre></div><dl class="paramcmts block"><dt class="param">pf</dt><dd class="cmt"><p>partial function.</p></dd><dt>returns</dt><dd class="cmt"><p>set of states produced from applying the partial function <code>fp</code> to active states.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -1134,6 +1041,78 @@ operator. This allows to write <code>b1 ==&gt; b2</code> for two Boolean express
       <p class="shortcomment cmt">This function lifts a during-state to a Boolean value, true iff.</p><div class="fullcomment"><div class="comment cmt"><p>This function lifts a during-state to a Boolean value, true iff. the during-state is
 within the interval.
 </p></div><dl class="paramcmts block"><dt class="param">iv</dt><dd class="cmt"><p>the during-state to be lifted.</p></dd><dt>returns</dt><dd class="cmt"><p>true iff. the during-state <code>iv</code> is within the interval.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="daut.Monitor#map" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="map(pf:PartialFunction[Monitor.this.state,Set[Monitor.this.state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}"></a><a id="map(PartialFunction[state,Set[state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}"></a>
+      <span class="permalink">
+      <a href="../daut/Monitor.html#map(pf:PartialFunction[Monitor.this.state,Set[Monitor.this.state]]):AnyRef{deforelse(otherwise:=&gt;Set[Monitor.this.state]):Set[Monitor.this.state]}" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="params">(<span name="pf">pf: <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a>, <span class="extype" name="scala.Predef.Set">Set</span>[<a href="Monitor$state.html" class="extype" name="daut.Monitor.state">state</a>]]</span>)</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span> { def orelse(otherwise: =&gt; Set[Monitor.this.state]): Set[Monitor.this.state] }</span>
+      </span>
+      
+      <p class="shortcomment cmt">The <code>map</code> method returns a set of states computed as follows.</p><div class="fullcomment"><div class="comment cmt"><p>The <code>map</code> method returns a set of states computed as follows.
+If the provided argument partial function <code>pf</code> is defined for any active states,
+the resulting set is the union of all the state sets obtained by
+applying the function to the active states for which it is defined.
+Otherwise the returned set is the set <code>otherwise</code> provided as
+argument to the <code>orelse</code> method.</p><p>As an example, consider the following monitor, which checks that
+at most one task can acquire a lock at a time, and that
+a task cannot release a lock it has not acquired.
+This monitor illustrates the <code>map</code> function, which looks for stored
+facts matching a pattern, and the ensure function, which checks a
+condition (an assert). This function here in this example tests for
+the presence of a Locked fact which is created when a lock is taken.</p><pre><span class="kw">trait</span> LockEvent
+<span class="kw">case</span> <span class="kw">class</span> acquire(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> LockEvent
+<span class="kw">case</span> <span class="kw">class</span> release(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> LockEvent
+
+<span class="kw">class</span> OneAtATime <span class="kw">extends</span> Monitor[LockEvent] {
+  <span class="kw">case</span> <span class="kw">class</span> Locked(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> state {
+    watch {
+      <span class="kw">case</span> release(thread, lock) <span class="kw">=&gt;</span> ok
+    }
+  }
+
+  always {
+    <span class="kw">case</span> acquire(t, l) <span class="kw">=&gt;</span> {
+      map {
+        <span class="kw">case</span> Locked(_,`l`) <span class="kw">=&gt;</span> error(<span class="lit">"allocated more than once"</span>)
+      } orelse {
+        Locked(t,l)
+      }
+    }
+    <span class="kw">case</span> release(t, l) <span class="kw">=&gt;</span> ensure(Locked(t,l))
+  }
+}</pre><p>A more sophisticated example involving nested <code>map</code> calls is
+the following that checks that when a task <code>t</code> is acquiring a
+lock that some other task holds, and <code>t</code> therefore cannot get it,
+then <code>t</code> is not allowed to hold any other locks (to prevent deadlocks).</p><pre><span class="kw">class</span> AvoidDeadlocks <span class="kw">extends</span> Monitor[LockEvent] {
+  <span class="kw">case</span> <span class="kw">class</span> Locked(thread: <span class="std">Int</span>, lock: <span class="std">Int</span>) <span class="kw">extends</span> state {
+    watch {
+      <span class="kw">case</span> release(`thread`, `lock`) <span class="kw">=&gt;</span> ok
+    }
+  }
+
+  always {
+    <span class="kw">case</span> acquire(t, l) <span class="kw">=&gt;</span> {
+      map {
+        <span class="kw">case</span> Locked(_,`l`) <span class="kw">=&gt;</span>
+          map {
+            <span class="kw">case</span> Locked(`t`,x) <span class="kw">if</span> l != x <span class="kw">=&gt;</span> error
+          } orelse {
+            println(<span class="lit">"Can't lock but is not holding any other lock, so it's ok"</span>)
+          }
+      } orelse {
+        Locked(t,l)
+      }
+    }
+  }
+}</pre></div><dl class="paramcmts block"><dt class="param">pf</dt><dd class="cmt"><p>partial function.</p></dd><dt>returns</dt><dd class="cmt"><p>set of states produced from applying the partial function <code>fp</code> to active states.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="daut.Monitor#monitor" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="monitor(monitors:daut.Monitor[E]*):Unit"></a><a id="monitor(Monitor[E]*):Unit"></a>
       <span class="permalink">

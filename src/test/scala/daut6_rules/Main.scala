@@ -1,4 +1,4 @@
-package daut2
+package daut6_rules
 
 import daut._
 import daut.Monitor
