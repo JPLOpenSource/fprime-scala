@@ -1,4 +1,4 @@
-package faut1
+package daut4_rules
 
 import daut._
 
@@ -11,20 +11,20 @@ import daut._
  */
 
 trait LockEvent
-case class acquire(thread: Int, lock: Int) extends LockEvent
-case class release(thread: Int, lock: Int) extends LockEvent
+case class acquire(t: Int, x: Int) extends LockEvent
+case class release(t: Int, x: Int) extends LockEvent
 
 class AcquireRelease extends Monitor[LockEvent] {
-  case class Locked(thread: Int, lock: Int) extends state {
+  case class Locked(t: Int, x: Int) extends state {
     hot {
-      case acquire(_, `lock`) => error
-      case release(`thread`, `lock`) => ok
+      case acquire(_, `x`) => error
+      case release(`t`, `x`) => ok
     }
   }
 
   always {
-    case acquire(t, l)                  => Locked(t, l)
-    case release(t, l) if !Locked(t, l) => error
+    case acquire(t, x)                  => Locked(t, x)
+    case release(t, x) if !Locked(t, x) => error
   }
 }
 

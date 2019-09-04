@@ -7,7 +7,7 @@ The contents of this repository is a Scala DSL of a component-based framework fo
 
 ### F' (F Prime) 
 
-A small subset of the framework developed in C++ and described in the following paper, which has been the basis for the Scala implementation (see papers/fprime folder):
+A small subset of the framework developed in C++ and described in the following paper, which has been the basis for the Scala implementation (see doc/papers/fprime folder):
 
 *  **F Prime: An Open-Source Framework for Small-Scale Flight Software Systems**,   Robert L. Bocchino Jr., Timothy K. Canham, Garth J. Watney, Leonard J. Reder, 
    Jeffrey W. Levison,
@@ -18,7 +18,7 @@ F' supports programming a system as a collection of parallel executing component
 ### HSM (Hiearchical State Machines)
 
 A Scala DSL for writing Hiearchical State Machines (HSMs). The DSL is described in the paper
-(see papers/hsm folder):
+(see doc/papers/hsm folder):
 
 * **Modeling and Monitoring of Hierarchical State Machines in Scala**, 
    Klaus Havelund and Rajeev Joshi, 
@@ -30,7 +30,7 @@ and transitions between states. The concept corresponds to state charts.
 
 ### Daut (Data automata)
 
-A Scala DSL for writing temporal event monitors. A version of the DSL is described in the paper (see papers/daut folder):
+A Scala DSL for writing temporal event monitors. A version of the DSL is described in the paper (see doc/papers/daut folder):
 
 * **Data Automata in Scala**,
   Klaus Havelund, 
@@ -48,12 +48,12 @@ The three DSLs mentioned above can be used together. For example, a system can b
 
 - For an example of combining F', HSM, and Daut, see example below.
 - For specific documentation on Daut, see [README-DAUT.md](README-DAUT.md).
-- Otherwise, see `doc` folder for API documentation for each of the three packages (F', HSM, and Daut).
+- Otherwise, see `doc/api` folder for API documentation for each of the three packages (F', HSM, and Daut).
 
-## Example combining F', HSM, and Daut
+## Example Combining F', HSM, and Daut
 
 In the following is shown an example illustrating the concepts provided in this repository. It illustrates the use of F', HSM (Hierarchical State Machines), and Daut (Data automata monitors). The example can be found as package `fprime13_camera` in the test directory, which is a rendering of the example presented in the following paper,
-which can be found in [papers/fprime/serene-2017.pdf](papers/hsm/serene-2017.pdf):
+which can be found in [doc/papers/fprime/serene-2017.pdf](doc/papers/hsm/serene-2017.pdf):
 
     "Modeling and Monitoring of Hierarchical State Machines in Scala",
     Klaus Havelund and Rajeev Joshi,
