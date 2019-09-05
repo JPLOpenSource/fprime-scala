@@ -364,6 +364,90 @@ However, the use of case classes has one advantage: if we turn on printing mode,
 setting a monitor's `PRINT` flag to true (see below), then case class states will be printed nicely,
 whereas this is not the case when using anonymous states (using the function approach).
 
+## Verifying Real-Time Properties
+
+Daut supports monitoring of some forms of timing properties. We shall consider the lock
+acquisition and release scenario again, but slightly modified such that events carry a time stamp. We shall then formulate a property about these time stamps.
+
+### The Events
+
+The events now carry an additional time stamp `ts` indicating when the lock was acquired, respectively released:
+
+```scala
+trait LockEvent
+case class acquire(t:Int, x:Int, ts:Int) extends LockEvent
+case class release(t:Int, x:Int, ts:Int) extends LockEvent
+```
+
+### The Property
+
+The property now states that locks should be released in a timely manner:
+
+- _"Property ReleaseWithin: A task acquiring a lock should eventually release
+it within 500 milliseconds."_
+
+### The Monitor
+
+The monitor can be formulated as a monitor class parameterized with the number of time
+units within which a lock must be released after it has been acquired:
+
+```scala
+class ReleaseWithin(limit: Int) extends Monitor[LockEvent] {
+  always {
+    case acquire(t, x, ts1) =>
+      hot {
+        case release(`t`,`x`, ts2) => ensure(ts2 - ts1 <= limit)
+      }
+  }
+}
+```
+
+The function `ensure(b: Boolean): state` returns either the `ok` state or the `error` state, depending on whether the Boolean condition `b` is true or not.
+
+This can actually be expressed slightly more elegantly, leaving out the call of `ensure` and just provide its argument, as in:
+
+```scala
+class ReleaseWithin(limit: Int) extends Monitor[LockEvent] {
+  always {
+    case acquire(t, x, ts1) =>
+      hot {
+        case release(`t`,`x`, ts2) => ts2 - ts1 <= limit
+      }
+  }
+}
+```
+
+This is due to the before mentioned implicit function:
+
+```scala
+implicit def convBoolean2StateSet(b: Boolean): Set[state] = Set(if (b) ok else error)
+```
+
+Finally, it should be mentioned that one can call the function 
+`check(b: Boolean): Unit` at any point. It will report an error in case the Boolean
+condition `b` is false, but otherwise will let the monitor progress as if no error had occurred.
+
+### The Main Program
+
+Finally, we can instantiate the monitor:-
+
+```scala
+object Main {
+  def main(args: Array[String]) {
+    val m = new ReleaseWithin(500) printSteps()
+    m.verify(acquire(1, 10, 100))
+    m.verify(release(1, 10, 800)) // violates property
+    m.end()
+  }
+}
+```          
+
+PS: note the call of `printSteps()` on the monitor (which returns the monitor). It has the same effect as adding `m.PRINT = true`.
+
+### Limitations of this Approach
+
+The above described approach to the verification of timing properties is limited in the sense that it cannot detect a timing violation as soon as it occurs. For example, after an `acquire` event, if no `release` event occurs within the time window, the monitor will not know until either a proper `release` occurs, perhaps much later, or until the `end()` method is called and we find ourselves in the hot state. This can only be improved upon by e.g. introducing other more regularly occuring events containing time stamps and then include those in the specification. The TraceContract system has timers internal to the monitor, but Daut does currently not support this.
+
 ## Code in Specs and Invariants
 
 This example illustrates the use of Scala code as part of a specification, and the use of
