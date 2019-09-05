@@ -44,7 +44,7 @@ In the following, we shall illustrate the API by going through a collection of e
 
 Consider the monitoring of acquisition and release of locks by threads. We shall in other words monitor a sequence of events, where each event indicates either the acquisition of a lock by a thread, or the release of a lock by a thread. We can then formulate various policies about such acquisitions and releases as Daut monitors.
 
-### Events
+#### Events
 
 Let us start by modeling the type `LockEvent` of events:
 
