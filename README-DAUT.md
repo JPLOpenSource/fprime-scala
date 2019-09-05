@@ -266,7 +266,7 @@ object Main {
 }
 ```
 
-## States as Case Classes
+## States as Case Classes, towards Rule-Based Programming
 
 Above we saw how state machines can be modeled using state-returning functions. There is an alternative way of modeling states, which becomes useful when we want to use techniques known from rule-based programming. In rule-based programming one can query whether a particular state is in the _state soup_, as a condition to taking a transition. This is particularly useful for modeling properties reasoning about the past (the past is stored as states). In order to do that, we need to make states objects (of case classes). This technique can be used as a general technique for modeling state machines, but is only strictly needed when quering states in this manner.
 
@@ -363,6 +363,72 @@ Both solutions in this case work equally well from a monitoring point of view.
 However, the use of case classes has one advantage: if we turn on printing mode,
 setting a monitor's `PRINT` flag to true (see below), then case class states will be printed nicely,
 whereas this is not the case when using anonymous states (using the function approach).
+
+## More Rule-Based Programming
+
+This section illustrates some of the more esoteric functions, namely `exists` and `map`, 
+for searching the _state soup_ for states that satisfy certain conditions. These functions 
+have similarities to Scala's functions with the same names.
+
+#### The Property
+
+Let's first sketch the property we want to monitor.
+
+- _"At most one task can acquire a lock at a time. A task cannot release a lock it has not acquired."_
+
+We provide two alternative formulations of this property, one using the
+`exists` function and one using the `map` function. These functions have the following signatures (the `map` function returns an object on which the `orelse` function is defined):
+
+```scala
+def exists(pred: PartialFunction[state, Boolean]): Boolean 
+def map(pf: PartialFunction[state, Set[state]]) orelse (set: => Set[state]): Set[state]
+```
+
+The `exists` function searches the _state soup_ for a state that satisfies the partial function predicate `pred` provided as argument, and returns true of one that matches is found.
+
+The `map` function searches the _state soup_ for states mathcing the partial function `pf`, and returns the union of applying `pf` to all these states. Alternatively if no matching state is found
+it returns the `set` provided as second argument.
+
+#### The Monitor using the exists Function
+
+```scala
+class MonitorUsingExists extends Monitor[LockEvent] {
+  case class Locked(t: Isnt, x: Int) extends state {
+    watch {
+      case release(`t`, `x`) => ok
+    }
+  }
+
+  always {
+    case acquire(t, x) =>
+      if (exists {case Locked(_, `x`) => true}) error else Locked(t, x)
+    case release(t, x) => ensure(Locked(t,x))
+  }
+}
+```
+
+#### The Monitor using the map Function
+
+```scala
+class MonitorUsingMap extends Monitor[LockEvent] {
+  case class Locked(t: Int, x: Int) extends state {
+    watch {
+      case release(`t`, `x`) => ok
+    }
+  }
+
+  always {
+    case acquire(t, x) => {
+      map {
+        case Locked(_,`x`) => error
+      } orelse {
+        Locked(t, x)
+      }
+    }
+    case release(t, x) => ensure(Locked(t, x))
+  }
+}
+```
 
 ## Verifying Real-Time Properties
 
