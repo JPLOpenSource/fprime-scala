@@ -391,6 +391,10 @@ it returns the `set` provided as second argument.
 
 #### The Monitor using the exists Function
 
+The idea is to add a state `Locked(t, x)` to the _state soup_ when a lock is
+acquired. This state removes itself on a proper `release` event by the same thread of the same lock. Upon acquisition of a lock, we only add such a `Locked(t, x)` event if no other thread already holds the lock
+(another `Locked(_,x)` state exists in the _state soup_).
+
 ```scala
 class MonitorUsingExists extends Monitor[LockEvent] {
   case class Locked(t: Isnt, x: Int) extends state {
@@ -406,6 +410,9 @@ class MonitorUsingExists extends Monitor[LockEvent] {
   }
 }
 ```
+
+The `ensure(b: Boolean): state` function returns the state `ok` if the Boolean condition
+`b` is true, otherwise it returns the state `error`.
 
 #### The Monitor using the map Function
 
