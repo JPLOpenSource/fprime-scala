@@ -400,3 +400,129 @@ class AcquireReleaseLimit extends Monitor[LockEvent] {
 The `invariant` function takes as argument a Boolean expression (call by name) and ensures that this expression is evaluated after each event processed by the monitor. If the expression ever becomes false, an error is issued.
 
 The example illustrates how the temporal logic can be combined with programming. This paradigm of combining programming and temporal logic/state machines can of course be carried much furher.
+
+## Multiple Monitors
+
+Monitors can be combined into a single monitor. For example, the following is possible:
+
+```scala
+class AcquireRelease extends Monitor[Event] {
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_,`x`) => error
+        case release(`t`,`x`) => ok
+      }
+  }
+}
+
+class ReleaseAcquired extends Monitor[Event] {
+  case class Locked(t:Int, x:Int) extends state {
+    watch {
+      case release(`t`,`x`) => ok
+    }
+  }
+
+  always {
+    case acquire(t,x) => Locked(t,x)
+    case release(t,x) if !Locked(t,x) => error
+  }
+}
+
+class Monitors extends Monitor[Event] {
+  monitor(new AcquireRelease, new ReleaseAcquired) // monitor sub-monitors
+}
+
+object Main {
+  def main(args: Array[String]) {
+    val m = new Monitors // now monitoring two sub-monitors
+    m.verify(acquire(1, 10))
+    m.verify(release(1, 10))
+    m.end()
+  }
+}
+```
+
+This allows to build a hierarchy of monitors, which might be useful for grouping.
+
+## How to React to Errors
+
+Error handing in monitors can be done in a number of ways.
+
+### Checing on Final Error Count
+
+Once monitoring is done (assuming `end()` is called, but even before), one can call
+the `getErrorCount` method on the monitor to determine how many errors occurred, and
+if any, perform a proper action:
+
+```scala
+object Main {
+  def main(args: Array[String]) {
+    val m = new Monitors // now monitoring two sub-monitors
+    m.verify(acquire(1, 10))
+    m.verify(release(1, 10))
+    m.end()
+    if (m.getErrorCount > 0) { /* action */ }
+  }
+}
+```
+
+### Writing Error Handling Code in Transitions
+
+One can of course write error handling code in the transitions themselves, as in:
+
+```scala
+class AcquireRelease extends Monitor[Event] {
+  def handleError() { /* action */ }
+
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_,`x`) => 
+          handleError() // handle the error
+          error // and return the error state
+        case release(`t`,`x`) => ok
+      }
+  }
+}
+```
+
+### Using Callback Function
+
+Finally, one can override the `callBack()` method defined in the `Monitor` class.
+This method will be automatically called upon detection of an error. It does not need to
+be called explicitly.
+
+```scala
+class AcquireRelease extends Monitor[Event] {
+  override def callBack() { /* action */ }
+
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_,`x`) => 
+          handleError() // handle the error
+          error // and return the error state
+        case release(`t`,`x`) => ok
+      }
+  }
+}
+
+```
+
+## Options
+
+A Daut monitor has three option variables that can be set:
+
+- PRINT : when set to true, causes each monitor step to be printed, including event and resulting set of states. Default is false.
+- PRINT_ERROR_BANNER : when set to true, when an error occurs, a very big ERROR BANNNER is printed (to make it visible amongst plenty of output). Default is false.
+- STOP_ON_ERROR: when set to true an error will case the monitor to stop. Default is false.
+
+These options can be set in two manners, either by assigning to these variables:
+
+```scala
+val m = MyMonitor()
+m.PRINT = true
+m.PRINT_ERROR_BANNER = false
+m.STOP_ON_ERROR = true
+```

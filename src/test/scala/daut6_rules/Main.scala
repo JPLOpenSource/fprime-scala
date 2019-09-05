@@ -1,7 +1,6 @@
 package daut6_rules
 
 import daut._
-import daut.Monitor
 
 trait TaskEvent
 case class start(task: Int) extends TaskEvent
@@ -17,7 +16,6 @@ case class stop(task: Int) extends TaskEvent
  */
 
 class TestMonitor extends Monitor[TaskEvent] {
-
   case class Start(task: Int) extends state {
     wnext {
       case start(`task`) => Stop(task)
@@ -41,8 +39,8 @@ object Main {
     m.verify(stop(0))
     m.verify(start(1))
     m.verify(stop(1))
-    m.verify(start(2))
-    m.verify(stop(2))
+    m.verify(start(3))
+    m.verify(stop(3))
     m.end()
   }
 }
