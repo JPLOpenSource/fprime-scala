@@ -22,6 +22,8 @@ The general idea is to create a monitor as a class sub-classing the `Monitor` cl
 This can schematically be illustrated as follows:
 
 ```scala
+import daut._
+
 class MyMonitor extends Monitor[SomeType] {
   ...
 }
@@ -683,3 +685,133 @@ m.PRINT = true
 m.PRINT_ERROR_BANNER = false
 m.STOP_ON_ERROR = true
 ```
+
+## Implementing New Temporal Operators
+
+Daut is extensible in the sense that one can define new temporal operators/patterns. We shall here mention two ways of doing this, namely repsectively as a (monitor) class or as a function. We shall illustrate the concepts on an example concerning a radio, which can be opened and closed, and over which messages can be sent, and received at the other end.
+
+#### The Events
+
+The event type covers opening and closing the radio, as well as sending messages over the radio, which are 
+then hopefully received at the other end:
+
+```scala
+trait RadioEvent
+case object Open extends RadioEvent
+case object Close extends RadioEvent
+case class Send(msg: String) extends RadioEvent
+case class Receive(msg: String) extends RadioEvent
+```
+
+#### The Property
+
+The properties we want to check is the following two:
+
+- _"An opened radio must eventually be closed."_
+- _"When the radio is open, all sent messages should eventually be received."_
+
+Each of these properties follows a pattern. The first is the _response_ pattern: when an event occurs, some other event must occur later. The second is a _scope_ pattern: in between two events (here `Open` and `Close`) some condition must hold.
+
+#### A Pattern Can be Programmed as a Monitor
+
+The first _response_ pattern can be programmed as a parameterized monitor class, which checks a particular property dependent on the parameters provided to the class. This is done in the following:
+
+```scala
+class Response[E](e1: E, e2: E) extends Monitor[E] {
+  always {
+    case `e1` => hot {
+      case `e2` => ok
+    }
+  }
+}
+```
+
+It can then be applied as follows: `new Response(Open, Close)` to create a monitor checking that an
+`Open` is always followed by a `Close` (before `end()` is called). We shall see this below.
+
+#### A Pattern can be Programmed as a Function
+
+The second _scope_ pattern is programmed as a function that takes two events and a transition function (partial function from events to sets of traces) as arguments:
+
+```scala
+class NewMonitor[E] extends Monitor[E] {
+  def between(e1: E, e2: E)(tr: Transitions): state = {
+    always {
+      case `e1` =>
+        unless {
+          case `e2` => ok
+        } watch (tr)
+    }
+  }
+}
+```
+
+The idea is that any monitor that uses this function will now have to **extend** `NewMonitor` 
+instead of `Monitor`, and then call this function, a we shall illustrate below.
+
+The function returns a state, which behaves as indicated: it is always the case, that if `e1` is observed then the transition `tr` will be applied (if matching) to every incoming event, unless and until `e2` occurs (not required to occur). The `unless` function has the signature:
+
+```scala
+def unless(ts1: Transitions) watch (ts2: Transitions): state
+```
+
+and checks `ts2` repeatedly unless `ts1` applies (which does not need to happen). There is a similar:
+
+```scala
+def until(ts1: Transitions) watch (ts2: Transitions): state
+```
+
+which requires `ts1` to eventually trigger.
+
+Note that whatever monitoring is initiated in `tr` betweeen `e1` and `e2` will continue if needed after 
+`e2`. Writing a function that stops `tr` after `e2` is a non-trivial programming exercise left to the reader.
+
+#### The Monitors
+
+We can now create a monitor for the second property by extending the `NewMonitor` class and
+call the function `between`, which creates a state, and as we have explained earlier, the first
+created state becomes an initial state (as a side effect).
+
+```scala
+class ReceiveWhenOpen extends NewMonitor[RadioEvent] {
+  between(Open,Close) {
+    case Send(m) => hot {
+      case Receive(`m`) => true
+    }
+  }
+}
+```
+
+We now create a monitor containing this monitor and an instance of the `Response` monitor as sub-monitors:
+
+```scala
+class AllMonitors extends Monitor[RadioEvent] {
+  monitor(
+    new Response(Open,Close),
+    new ReceiveWhenOpen
+  )
+}
+```
+
+#### The Main Program
+
+Finally, we can invoke `AllMonitors`:
+
+```scala
+object Main {
+  def main(args: Array[String]) {
+    val m = new AllMonitors
+    m.verify(Send("ignore this message"))
+    m.verify(Open)
+    m.verify(Send("hello"))
+    m.verify(Send("world"))
+    m.verify(Send("I just saw a UFO!")) // violating since not received
+    m.verify(Receive("hello"))
+    m.verify(Close)
+    m.verify(Receive("world"))
+    m.verify(Send("and ignore this one too"))
+    m.end()
+  }
+}
+```
+

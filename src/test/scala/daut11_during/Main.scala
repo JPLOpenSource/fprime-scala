@@ -8,10 +8,9 @@ case class enter(thread: Int) extends Event
 case class exit(thread:Int) extends Event
 case class abort(thread:Int) extends Event
 
-
 /**
- * A task acquiring a lock should eventually release it.
-
+ * A task acquiring a lock should eventually release it.
+ *
  * This monitor illustrates the during predicate and invariants.
  */
 
