@@ -54,14 +54,14 @@ case class acquire(t:Int, x:Int) extends LockEvent // thread t acquires lock x
 case class release(t:Int, x:Int) extends LockEvent // thread t releases lock x
 ```
 
-### The Property
+#### The Property
 
 We can then formulate our first property: 
 
 - _"A task acquiring a lock should eventually release it. At most one task
 can acquire a lock at a time"_. 
 
-### The Monitor
+#### The Monitor
 
 This property is stated as the following monitor:
 
@@ -89,7 +89,7 @@ event, where the `x` is the same as was previously acquired (caused by the quote
      
 event, where the thread `t` and the lock `t` are the same as in the original acquisition. In the first case the transition returns the `error` state, and in the second case the transition returns the `ok` state. An `ok` means that we are done monitoring that particular path in the monitor.
 
-### Applying the Monitor
+#### Applying the Monitor
 
 We can now apply the monitor, as for example in the following main program:
 
@@ -107,7 +107,7 @@ object Main {
 Note the call `m.end()` which terminates monitoring. A monitor does not need to be terminated by this call, and
 will not be if for example it concerns an ongoing online monitoring of an executing system. However, if this method is called, it will check that no monitor is in a `hot` state, as shown above. This is in effect how eventuallity properties are checked on finite traces.
 
-### The State Producing Functions
+#### The State Producing Functions
 
 The body `always { ... }` above was perhaps a little bit of a mystery. In reality it is a call of a function with the signature:
 
@@ -140,7 +140,7 @@ def next(ts: Transitions): state   // non-final, one of the transitions must fir
 def wnext(ts: Transitions): state  // one of the transtions must fire next, if there is a next event
 ```
 
-### From States to Sets of States and Other Magic
+#### From States to Sets of States and Other Magic
 
 You notice above that the state producing functions each takes a partial function of type `Transitions` as argument, that is, of type:
 
@@ -174,7 +174,7 @@ implicit def convUnit2StateSet(u: Unit): Set[state] = Set(ok)
 implicit def convBoolean2StateSet(b: Boolean): Set[state] = Set(if (b) ok else error)
 ```
 
-### How Did the Initial State Get Recorded?
+#### How Did the Initial State Get Recorded?
 
 You may wonder how the state procuced by the `always` function ends up being monitored. After all, it is just a call of a function that returns a state. It happens conveniently that the first state created in a monitor becomes the initial state of the monitor (a side effect).
                                                                                 
@@ -209,7 +209,7 @@ This "state machine" contains no loops. The next example introduces a looping st
 In this example, we shall illustrate a state machine with a loop, using functions to represent the individual
 states, which by the way in this case are parameterized with data, a feature not supported by text book state machines, including extended state machines.
 
-### The Events
+#### The Events
 
 We are monitoring a sequence of `start` and `stop` events, each carrying a task id as parameter:
 
@@ -219,14 +219,14 @@ case class start(task: Int) extends TaskEvent
 case class stop(task: Int) extends TaskEvent
 ```
 
-### The Property
+#### The Property
 
 The property we want to monitor is the following: 
 
 - _"Tasks should be executed (started and stopped) in increasing order according to task numbers, starting from task 0, with no other events in between, hence: 
 start(0),stop(0),start(1),stop(1),start(2),stop(2),... A started task should eventually be stopped"_.
 
-### The Monitor
+#### The Monitor
 
 This following monitor verifies this property, and illustrates the use of next and weak next states.
 
@@ -246,7 +246,7 @@ class StartStop extends Monitor[TaskEvent] {
 }
 ```
 
-### The Main Program
+#### The Main Program
 
 The following main program exercises the monitor.
 
@@ -270,7 +270,7 @@ object Main {
 
 Above we saw how state machines can be modeled using state-returning functions. There is an alternative way of modeling states, which becomes useful when we want to use techniques known from rule-based programming. In rule-based programming one can query whether a particular state is in the _state soup_, as a condition to taking a transition. This is particularly useful for modeling properties reasoning about the past (the past is stored as states). In order to do that, we need to make states objects (of case classes). This technique can be used as a general technique for modeling state machines, but is only strictly needed when quering states in this manner.
 
-### The Property
+#### The Property
 
 Let's go back to our lock acquisition and release scenario, and formulate the following property:
 
@@ -279,7 +279,7 @@ can acquire a lock at a time. A task cannot release a lock it has not acquired."
 
 It is the last requirement _"A task cannot release a lock it has not acquired"_, that is a past time property: if a task is released, it must have been acquired in the past, and not released since. 
 
-### The Monitor
+#### The Monitor
 
 The monitor can be formulated as follows:
 
@@ -318,7 +318,7 @@ being true only if the object is in the _state soup_, represented by the variabl
 implicit def convState2Boolean(s: state): Boolean = states contains s 
 ```
 
-### Two Kinds of State Producing Functions.
+#### Two Kinds of State Producing Functions.
 
 In the `Locked(t: Int, x: Int)` case class above, we saw a call of a `hot` function. Although it looks like
 the `hot` function we saw earlier, it is actually a different one, not returning a state, but updating the state
@@ -369,7 +369,7 @@ whereas this is not the case when using anonymous states (using the function app
 Daut supports monitoring of some forms of timing properties. We shall consider the lock
 acquisition and release scenario again, but slightly modified such that events carry a time stamp. We shall then formulate a property about these time stamps.
 
-### The Events
+#### The Events
 
 The events now carry an additional time stamp `ts` indicating when the lock was acquired, respectively released:
 
@@ -379,14 +379,14 @@ case class acquire(t:Int, x:Int, ts:Int) extends LockEvent
 case class release(t:Int, x:Int, ts:Int) extends LockEvent
 ```
 
-### The Property
+#### The Property
 
 The property now states that locks should be released in a timely manner:
 
 - _"Property ReleaseWithin: A task acquiring a lock should eventually release
 it within 500 milliseconds."_
 
-### The Monitor
+#### The Monitor
 
 The monitor can be formulated as a monitor class parameterized with the number of time
 units within which a lock must be released after it has been acquired:
@@ -427,7 +427,7 @@ Finally, it should be mentioned that one can call the function
 `check(b: Boolean): Unit` at any point. It will report an error in case the Boolean
 condition `b` is false, but otherwise will let the monitor progress as if no error had occurred.
 
-### The Main Program
+#### The Main Program
 
 Finally, we can instantiate the monitor:-
 
@@ -444,7 +444,7 @@ object Main {
 
 PS: note the call of `printSteps()` on the monitor (which returns the monitor). It has the same effect as adding `m.PRINT = true`.
 
-### Limitations of this Approach
+#### Limitations of this Approach
 
 The above described approach to the verification of timing properties is limited in the sense that it cannot detect a timing violation as soon as it occurs. For example, after an `acquire` event, if no `release` event occurs within the time window, the monitor will not know until either a proper `release` occurs, perhaps much later, or until the `end()` method is called and we find ourselves in the hot state. This can only be improved upon by e.g. introducing other more regularly occuring events containing time stamps and then include those in the specification. The TraceContract system has timers internal to the monitor, but Daut does currently not support this.
 
@@ -454,11 +454,11 @@ This example illustrates the use of Scala code as part of a specification, and t
 class invariants, using the lock acquisition and release scenario again. First we reformulate
 the property we want to monitor.
 
-### The Property
+#### The Property
 
 - _"A task acquiring a lock should eventually release it. At most one task can acquire a lock at a time. At most 4 locks should be acquired at any moment"_.
 
-### The Monitor
+#### The Monitor
 
 The monitor declares a monitor local integer variable `count`, keeping track of the number
 of un-released locks. A monitor class invariant expresses the upper limit on the number of
@@ -533,7 +533,7 @@ This allows to build a hierarchy of monitors, which might be useful for grouping
 
 Error handing in monitors can be done in a number of ways.
 
-### Checing on Final Error Count
+#### Checing on Final Error Count
 
 Once monitoring is done (assuming `end()` is called, but even before), one can call
 the `getErrorCount` method on the monitor to determine how many errors occurred, and
@@ -551,7 +551,7 @@ object Main {
 }
 ```
 
-### Writing Error Handling Code in Transitions
+#### Writing Error Handling Code in Transitions
 
 One can of course write error handling code in the transitions themselves, as in:
 
@@ -571,7 +571,7 @@ class AcquireRelease extends Monitor[Event] {
 }
 ```
 
-### Using Callback Function
+#### Using Callback Function
 
 Finally, one can override the `callBack()` method defined in the `Monitor` class.
 This method will be automatically called upon detection of an error. It does not need to
