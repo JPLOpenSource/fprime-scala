@@ -33,7 +33,7 @@ class StartStop extends Monitor[TaskEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val m = new StartStop printSteps()
+    val m = new StartStop
     m.PRINT = true
     m.verify(start(0))
     m.verify(stop(0))

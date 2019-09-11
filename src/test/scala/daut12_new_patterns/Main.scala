@@ -51,7 +51,7 @@ class AllMonitors extends Monitor[RadioEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val m = new AllMonitors printSteps()
+    val m = new AllMonitors
     m.verify(Send("ignore this message"))
     m.verify(Open)
     m.verify(Send("hello"))
