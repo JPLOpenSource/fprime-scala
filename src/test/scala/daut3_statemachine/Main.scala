@@ -33,8 +33,8 @@ class StartStop extends Monitor[TaskEvent] {
 
 object Main {
   def main(args: Array[String]) {
+    DautOptions.DEBUG = true
     val m = new StartStop
-    m.PRINT = true
     m.verify(start(0))
     m.verify(stop(0))
     m.verify(start(1))

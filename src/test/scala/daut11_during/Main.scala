@@ -33,9 +33,8 @@ class TestMonitor extends Monitor[Event] {
 
 object Main {
   def main(args: Array[String]) {
+    DautOptions.DEBUG = true
     val m = new TestMonitor
-    m.PRINT = true
-
     m.verify(enter(1))
     m.verify(enter(2))
     m.verify(exit(1))

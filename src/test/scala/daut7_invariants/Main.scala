@@ -28,8 +28,8 @@ class AcquireReleaseLimit extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
+    DautOptions.DEBUG = true
     val m = new AcquireReleaseLimit
-    m.PRINT = true
     m.verify(acquire(1, 10))
     m.verify(acquire(2, 20))
     m.verify(acquire(3, 30))

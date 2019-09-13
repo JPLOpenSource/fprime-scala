@@ -11,6 +11,8 @@ package fprime14_camera_dejavu
  * DejaVu monitoring logic.
  */
 
+/*
+
 import fprime._
 import hsm._
 import qtl._
@@ -243,4 +245,5 @@ object Main {
   }
 }
 
+ */
 

@@ -1,5 +1,7 @@
 package fprime14_camera_dejavu
 
+/*
+
 import qtl.{Formula, Monitor, V}
 
 // This monitor below is auto generated using package example15_dejavu
@@ -80,4 +82,6 @@ class PropertyMonitor extends Monitor {
   formulae ++= List(new Formula_fifo(this))
 }
 
-// --- monitor end ---
+// ---
+
+*/

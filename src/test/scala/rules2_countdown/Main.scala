@@ -10,7 +10,7 @@ class CountDown extends Rules {
     println(x)
   }
 
-  strategy(Random)
+  strategy(Random())
 }
 
 object Main {

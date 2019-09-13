@@ -1,16 +1,20 @@
 package rules4_test_hsm
 
 /**
- * The imaging system described in the paper:
+ * Rule-based testing of the imaging system described in the paper:
  * "Modeling and Monitoring of Hierarchical State Machines in Scala",
  * Klaus Havelund and Rajeev Joshi,
  * 9th International Workshop on Software Engineering for Resilient Systems (SERENE 2017),
  * September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer Science Volume 10479.
+ *
+ * The imaging system is programmed as an F' component, and the rule-based tester as
+ * another component.
  */
 
 import fprime._
 import hsm._
 import daut._
+import rules._
 
 import akka.actor.ReceiveTimeout
 import scala.language.postfixOps
@@ -62,10 +66,10 @@ class Imaging extends Component {
   val o_obs = new ObsOutput
 
   object MissedEvents {
-    private var missedEvents : List[Any] = Nil
+    private var missedEvents: List[Any] = Nil
 
-    def add(event : Any): Unit = {
-      missedEvents ++=  List(event)
+    def add(event: Any): Unit = {
+      missedEvents ++= List(event)
     }
 
     def submit(): Unit = {
@@ -73,9 +77,12 @@ class Imaging extends Component {
         case Nil =>
         case event :: rest =>
           missedEvents = rest
+          println(s"resubmiting $event, resulting in new queue: $this")
           selfTrigger(event)
       }
     }
+
+    override def toString: String = missedEvents.mkString("[",",","]")
   }
 
   object Machine extends HSM[Any] {
@@ -156,14 +163,51 @@ class Imaging extends Component {
   }
 
   override def when: PartialFunction[Any, Unit] = {
-    case input => if (!Machine(input)) MissedEvents.add(input)
+    case input =>
+      if (!Machine(input)) {
+        MissedEvents.add(input)
+        println(s"$input stored as missed: $MissedEvents")
+      }
   }
 }
 
-class Ground extends Component {
-  val i_int = new Input[Int]
+class Test extends Component {
+  val i_tck = new Input[Unit]
   val i_obs = new ObsInput
+  val i_cam = new Input[Imaging2Camera]
   val o_cmd = new CommandOutput
+  val o_cam = new Output[Camera2Imaging]
+
+  object TestRules extends Rules {
+    val MAX_IMAGES: Int = 1000
+    val MAX_SHUTDOWNS: Int = 1000
+    val MAX_READY: Int = 1000
+    var imageCount: Int = 0
+    var shutdownCount: Int = 0
+    var readyCount: Int = 0
+
+    rule("TakeImage") {
+      imageCount < MAX_IMAGES
+    } -> {
+      o_cmd.invoke((TakeImage(imageCount)))
+      imageCount += 1
+    }
+    rule("ShutDown") {
+      shutdownCount < MAX_SHUTDOWNS
+    } -> {
+      o_cmd.invoke(ShutDown)
+      shutdownCount += 1
+    }
+    rule("Ready") {
+      readyCount < MAX_READY
+    } -> {
+      o_cam.invoke(Ready)
+      readyCount += 1
+    }
+
+    //strategy(Random())
+    strategy(Pick())
+  }
 
   object SaveOrAbort extends Monitor[Observation] {
     always {
@@ -175,8 +219,9 @@ class Ground extends Component {
   }
 
   override def when: PartialFunction[Any, Unit] = {
-    case d: Int => o_cmd.invoke(TakeImage(d))
+    case _: Unit => TestRules.fire()
     case o: Observation => SaveOrAbort.verify(o)
+    case _ =>
   }
 }
 
@@ -185,26 +230,28 @@ class Ground extends Component {
 object Main {
   def main(args: Array[String]): Unit = {
     FPrimeOptions.DEBUG = true
-    HSMOptions.PRINT = true
-    HSMOptions.TRACE = true
+    HSMOptions.DEBUG = true
+    RulesOptions.DEBUG = true
+    DautOptions.DEBUG = false
 
     val imaging = new Imaging
-    val camera = new Camera
-    val ground = new Ground
+    val test = new Test
 
-    imaging.o_cam.connect(camera.i_img)
-    imaging.o_obs.connect(ground.i_obs)
-    camera.o_img.connect(imaging.i_cam)
-    camera.o_obs.connect(ground.i_obs)
-    ground.o_cmd.connect(imaging.i_cmd)
+    test.o_cmd.connect(imaging.i_cmd)
+    test.o_cam.connect(imaging.i_cam)
+    imaging.o_cam.connect(test.i_cam)
+    imaging.o_obs.connect(test.i_obs)
+
+    println("Begin!")
 
     Configuration.show("/Users/khavelun/Desktop/config.dot")
 
-    ground.i_int.invoke(1000)
-    ground.i_int.invoke(2000)
-    ground.i_int.invoke(3000)
+    repeat(1000) {
+      Thread.sleep(100)
+      println("=" * 80)
+      test.i_tck.invoke(())
+    }
+
+    println("End!")
   }
 }
-
-
-

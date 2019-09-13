@@ -66,7 +66,7 @@ class Strategy6 extends MyRules {
 }
 
 class Strategy7 extends MyRules {
-  strategy(Random)
+  strategy(Random())
 }
 
 class Strategy8 extends MyRules {

@@ -22,7 +22,7 @@ class Euclid(A: Int, B: Int) extends Rules {
   rule ("r2") { b < a} -> {a = a - b}
 
   override def after() {println(s"a = $a, b = $b")}
-  strategy(Random)
+  strategy(Random())
 }
 
 object Main {

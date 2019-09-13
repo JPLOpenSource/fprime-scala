@@ -1,5 +1,5 @@
 package fprime15_dejavu
-
+/*
 import dejavu.Verify
 
 object Main {
@@ -12,3 +12,4 @@ object Main {
     Verify.main(Array(spec1,log2, "3"))
   }
 }
+*/

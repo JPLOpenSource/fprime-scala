@@ -219,7 +219,7 @@ class Ground extends Component {
 object Main {
   def main(args: Array[String]): Unit = {
     FPrimeOptions.DEBUG = true
-    HSMOptions.PRINT = true
+    HSMOptions.DEBUG = true
     HSMOptions.TRACE = true
 
     val imaging = new Imaging

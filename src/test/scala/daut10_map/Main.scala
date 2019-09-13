@@ -1,7 +1,6 @@
 package daut10_map
 
 import daut._
-import daut.Monitor
 
 trait LockEvent
 case class acquire(thread: Int, lock: Int) extends LockEvent
@@ -101,8 +100,8 @@ class TestMonitor extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
+    DautOptions.DEBUG = true
     val m = new TestMonitor
-    m.PRINT = true
     // m.stopOnError()
     m.verify(acquire(2,  1))
     m.verify(acquire(2,  5))

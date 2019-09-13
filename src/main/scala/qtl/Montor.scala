@@ -2,6 +2,8 @@ package qtl
 
 /* Generic Monitoring Code common for all properties. */
 
+/*
+
 import net.sf.javabdd.{BDD, BDDFactory}
 import java.io._
 
@@ -966,3 +968,5 @@ abstract class Formula(val monitor: Monitor) {
     }
   }
 }
+
+*/

@@ -44,7 +44,7 @@ object Util {
    */
 
   def debug(msg : => String): Unit = {
-    if (FPrimeOptions.DEBUG) println(s"| $msg")
+    if (FPrimeOptions.DEBUG) println(s"[fpr] $msg")
   }
 
   /**
@@ -420,8 +420,8 @@ class Output[T](implicit componentName: String) {
   def invoke(a: T): Unit = {
     assert(!otherEnds.isEmpty, "Output port has not been connected to input port when sending $a")
     for (otherEnd <- otherEnds) {
+      debug(s"! $componentName -[$a]-> ${otherEnd.getComponentName}")
       otherEnd.invoke(a)
-      debug(s"$componentName -[$a]-> ${otherEnd.getComponentName}")
     }
   }
 }

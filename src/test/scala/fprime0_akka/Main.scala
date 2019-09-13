@@ -43,31 +43,37 @@ class Printer extends Actor with ActorLogging {
   }
 }
 
-object AkkaQuickstart extends App {
+object AkkaQuickstart {
   import Greeter._
 
-  println("running!")
+  def main(args: Array[String]): Unit = {
 
-  val system: ActorSystem = ActorSystem("helloAkka")
 
-  val printer: ActorRef =
-    system.actorOf(Printer.props, "printerActor")
-  val howdyGreeter: ActorRef =
-    system.actorOf(Greeter.props("Howdy", printer), "howdyGreeter")
-  val helloGreeter: ActorRef =
-    system.actorOf(Greeter.props("Hello", printer), "helloGreeter")
-  val goodDayGreeter: ActorRef =
-    system.actorOf(Greeter.props("Good day", printer), "goodDayGreeter")
+    println("running!")
 
-  howdyGreeter ! WhoToGreet("Akka")
-  howdyGreeter ! Greet
+    val system: ActorSystem = ActorSystem("helloAkka")
 
-  howdyGreeter ! WhoToGreet("Lightbend")
-  howdyGreeter ! Greet
+    val printer: ActorRef =
+      system.actorOf(Printer.props, "printerActor")
+    val howdyGreeter: ActorRef =
+      system.actorOf(Greeter.props("Howdy", printer), "howdyGreeter")
+    val helloGreeter: ActorRef =
+      system.actorOf(Greeter.props("Hello", printer), "helloGreeter")
+    val goodDayGreeter: ActorRef =
+      system.actorOf(Greeter.props("Good day", printer), "goodDayGreeter")
 
-  helloGreeter ! WhoToGreet("Scala")
-  helloGreeter ! Greet
+    howdyGreeter ! WhoToGreet("Akka")
+    howdyGreeter ! Greet
 
-  goodDayGreeter ! WhoToGreet("Play")
-  goodDayGreeter ! Greet
+    howdyGreeter ! WhoToGreet("Lightbend")
+    howdyGreeter ! Greet
+
+    helloGreeter ! WhoToGreet("Scala")
+    helloGreeter ! Greet
+
+    goodDayGreeter ! WhoToGreet("Play")
+    goodDayGreeter ! Greet
+
+
+  }
 }

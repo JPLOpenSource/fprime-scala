@@ -68,4 +68,17 @@
  * }}}
  */
 
-package object rules {}
+package object rules {
+  /**
+   * Repeats `max` times execution of `code`.
+   *
+   * @param max number of times `code` should be executed.
+   * @param code the code to be executed `max` times.
+   */
+
+  def repeat(max: Int)(code: => Unit): Unit = {
+    for (_ <- 0 to max) {
+      code
+    }
+  }
+}

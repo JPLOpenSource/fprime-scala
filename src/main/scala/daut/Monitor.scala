@@ -1,6 +1,47 @@
 package daut
 
 /**
+ * Daut options to be set by the user.
+ */
+
+object DautOptions {
+  /**
+   * When true debugging information is printed as monitors execute. Can be set by user.
+   * The default value is false.
+   */
+
+  var DEBUG: Boolean = false
+
+  /**
+   * When true will cause a big ERROR banner to be printed
+   * on standard out upon detection of a specification violation, making it easier
+   * to quickly see that an error occurred amongst other output.
+   * The default value is true.
+   */
+
+  var PRINT_ERROR_BANNER = true
+}
+
+/**
+ * Utilities.
+ */
+
+object Util {
+  /**
+   * Prints a message on standard out if the `DEBUG` flag is set.
+   * Used for debugging purposes.
+   *
+   * @param msg the message to be printed.
+   */
+
+  def debug(msg : => String): Unit = {
+    if (DautOptions.DEBUG) println(s"[dau] $msg")
+  }
+}
+
+import Util._
+
+/**
  * If the `STOP_ON_ERROR` flag is set to true, a `MonitorError` exception is thrown
  * if a monitor's specification is violated by the observed event stream.
  */
@@ -79,23 +120,6 @@ class Monitor[E] {
   private var errorCount = 0
 
   /**
-   * Option, which when set to true will cause debugging information to be printed during
-   * monitoring, such as for each processed event: the event and the resulting set of states.
-   * Default value is false.
-   */
-
-  var PRINT: Boolean = false
-
-  /**
-   * Option, which when set to true will cause a big ERROR banner to be printed
-   * on standard out upon detection of a specification violation, making it easier
-   * to quickly see that an error occurred amongst other output.
-   * Default value is true.
-   */
-
-  var PRINT_ERROR_BANNER = true
-
-  /**
    * Option, which when set to true will cause monitoring to stop the first time
    * a specification violation is encountered. Otherwise monitoring will continue.
    * Default value is false.
@@ -113,17 +137,6 @@ class Monitor[E] {
 
   def monitor(monitors: Monitor[E]*) {
     this.monitors ++= monitors
-  }
-
-  /**
-   * A call of this method will cause the events and monitor+sub-monitor states to be printed in each step.
-   *
-   * @return the monitor itself so that the method can be called dot-appended to a constructor call.
-   */
-
-  def printSteps(): Monitor[E] = {
-    PRINT = true
-    this
   }
 
   /**
@@ -390,7 +403,7 @@ class Monitor[E] {
    * }
    * }}}
    *
-   *  The invariant can also be written as follows, using the ==> method:
+   * The invariant can also be written as follows, using the ==> method:
    *
    * {{{
    *   invariant {
@@ -870,7 +883,7 @@ class Monitor[E] {
 
   def verify(event: E) {
     verifyBeforeEvent(event)
-    if (PRINT) printEvent(event)
+    debug("\n===[" + event + "]===\n")
     for (sourceState <- states) {
       sourceState(event) match {
         case None =>
@@ -889,7 +902,7 @@ class Monitor[E] {
     states ++= statesToAdd
     statesToRemove = emptyStateSet
     statesToAdd = emptyStateSet
-    if (PRINT) printStates()
+    if (DautOptions.DEBUG) printStates()
     invariants foreach { case (e, inv) => check(inv(), e) }
     for (monitor <- monitors) {
       monitor.verify(event)
@@ -903,11 +916,11 @@ class Monitor[E] {
    */
 
   def end() {
-    if (PRINT) println(s"ENDING TRACE EVALUATION FOR $monitorName")
+    debug(s"ending Daut trace evaluation for $monitorName")
     val hotStates = states filter (!_.isFinal)
     if (!hotStates.isEmpty) {
       println()
-      println(s"*** non final $monitorName states:")
+      println(s"*** non final Daut $monitorName states:")
       println()
       hotStates foreach println
       reportError()
@@ -954,16 +967,6 @@ class Monitor[E] {
   protected def callBack(): Unit = {}
 
   /**
-   * Prints an event on standard out.
-   *
-   * @param event the event to be printed.
-   */
-
-  private def printEvent(event: E) {
-    println("\n===[" + event + "]===\n")
-  }
-
-  /**
    * Returns the number of errors detected by the monitor, its sub-monitors, their sub-monitors.
    * etc.
    *
@@ -998,7 +1001,7 @@ class Monitor[E] {
 
   private def reportError() {
     errorCount += 1
-    if (PRINT_ERROR_BANNER) {
+    if (DautOptions.PRINT_ERROR_BANNER) {
       println(
         s"""
            |███████╗██████╗ ██████╗  ██████╗ ██████╗

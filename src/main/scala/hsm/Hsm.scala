@@ -18,8 +18,27 @@ object HSMOptions {
    * The default value is false.
    */
 
-  var PRINT = false
+  var DEBUG = false
 }
+
+/**
+ * Utilities.
+ */
+
+object Util {
+  /**
+   * Prints a message on standard out if the `DEBUG` flag is set.
+   * Used for debugging purposes.
+   *
+   * @param msg the message to be printed.
+   */
+
+  def debug(msg : => String): Unit = {
+    if (HSMOptions.DEBUG) println(s"[hsm] $msg")
+  }
+}
+
+import Util._
 
 /**
  * The static variables of HSMs.
@@ -55,7 +74,7 @@ object HSM {
    */
 
   def printTrace(): Unit = {
-    println("===== trace: =====")
+    println("===== hsm trace: =====")
     println()
     println(trace)
     println("------------------")
@@ -182,15 +201,11 @@ trait HSM[Event] {
    */
 
   private def recordTransition(exitStates: List[state], event: Event, enterStates: List[state]): Unit = {
-    if (HSMOptions.PRINT || HSMOptions.TRACE) {
+    if (HSMOptions.DEBUG || HSMOptions.TRACE) {
       val exitStateNames = exitStates.map(_.stateName).mkString(",")
       val enterStateNames = enterStates.map(_.stateName).mkString(",")
       val msg = s"$hsmName : [$exitStateNames] --  $event --> [$enterStateNames]"
-      if (HSMOptions.PRINT) {
-        println()
-        println(s"--- $msg")
-        println()
-      }
+      debug(msg)
       if (HSMOptions.TRACE) {
         HSM.addToTrace(msg)
       }
