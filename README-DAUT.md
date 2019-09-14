@@ -671,19 +671,20 @@ class AcquireRelease extends Monitor[Event] {
 
 ## Options
 
-A Daut monitor has three option variables that can be set:
+Daut offers three option variables that can be set:
 
-- PRINT : when set to true, causes each monitor step to be printed, including event and resulting set of states. Default is false.
-- PRINT_ERROR_BANNER : when set to true, when an error occurs, a very big ERROR BANNNER is printed (to make it visible amongst plenty of output). Default is false.
-- STOP_ON_ERROR: when set to true an error will case the monitor to stop. Default is false.
+- `DautOptions.DEBUG` (static variable): when set to true, causes each monitor step to be printed, including event and resulting set of states. Default is false.
+- `DautOptions.PRINT_ERROR_BANNER` (static variable): when set to true, when an error occurs, a very big ERROR BANNNER is printed (to make it visible amongst plenty of output). Default is true.
+- `Monitor.STOP_ON_ERROR`: when set to true an error will case the monitor to stop. Default is false. This option is local to each monitor.
 
-These options can be set in two manners, either by assigning to these variables:
+These options can be set as shown in the following example:
 
 ```scala
+DautOptions.DEBUG = true
+DautOptions.PRINT_ERROR_BANNER = false
 val m = MyMonitor()
-m.PRINT = true
-m.PRINT_ERROR_BANNER = false
 m.STOP_ON_ERROR = true
+...
 ```
 
 ## Implementing New Temporal Operators

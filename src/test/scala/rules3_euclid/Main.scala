@@ -18,16 +18,25 @@ class Euclid(A: Int, B: Int) extends Rules {
   var a : Int = A
   var b : Int = B
 
-  rule ("r1") { a < b} -> {b = b - a}
-  rule ("r2") { b < a} -> {a = a - b}
+  invariant { a > 0 && b > 0 }
 
-  override def after() {println(s"a = $a, b = $b")}
-  strategy(Random())
+  rule ("r1") (a < b) -> {b = b - a} post (b > 0)
+  rule ("r2") (b < a) -> {a = a - b} post (a > 0)
 }
 
-object Main {
+object Main1 {
+  def main(args: Array[String]): Unit = {
+    val rules = new Euclid(28,16)
+    rules.fire()
+    println(s"a = ${rules.a}, b = ${rules.b}")
+  }
+}
+
+object Main2 {
  def main(args: Array[String]): Unit = {
-   val rules = new Euclid(212,34)
+   val rules = new Euclid(28,16) {
+     override def afterRule() {println(s"a = $a, b = $b")}
+   }
    rules.fire()
  }
 }

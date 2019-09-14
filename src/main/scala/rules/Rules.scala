@@ -235,6 +235,16 @@ trait Rules {
   private var strategy: Option[Alg] = None
 
   /**
+   * This variable holds invariants that have been defined by the user with one of the
+   * `invariant` methods. Invariants are Boolean valued functions that are
+   * evaluated after each rule execution. An invariant can e.g. check the values of variables
+   * declared local to the rule class. The violation of an
+   * invariant is reported as an error.
+   */
+
+  private var invariants: List[(String, Unit => Boolean)] = Nil
+
+  /**
    * Used for computing random numbers.
    */
 
@@ -271,9 +281,9 @@ trait Rules {
    */
 
   private def execute(rule: Rule): Unit = {
-    before()
+    beforeRule()
     rule.exec()
-    after()
+    afterRule()
   }
 
   /**
@@ -295,10 +305,11 @@ trait Rules {
         }
       case AlgRepeatRandomBounded(max, rules) =>
         breakable {
-          for (_ <- 0 to max) {
+          for (i <- 0 until max) {
             pickRuleRandomly(rules) match {
               case None => break
-              case Some(rule) => execute(rule)
+              case Some(rule) =>
+                execute(rule)
             }
           }
         }
@@ -346,7 +357,7 @@ trait Rules {
           interpret(alg)
         }
       case AlgBounded(max, alg) =>
-        for (_ <- 0 to max) {
+        for (_ <- 0 until max) {
           interpret(alg)
         }
     }
@@ -365,14 +376,43 @@ trait Rules {
 
   /**
    * Executes the strategy (algorithm) declared with the `strategy(alg: Alg): Unit` function.
-   * If none has been declared, an error message is issued.
+   * If none has been declared, `Random()` is used, which means repeated random execution of
+   * enabled rules.
    */
 
   def fire(): Unit = {
-    strategy match {
-      case None => println("*** A strategy has not been provided!")
-      case Some(alg) => interpret(alg)
-    }
+    val algorithm : Alg  = strategy.getOrElse(Random())
+    interpret(algorithm)
+  }
+
+  /**
+   * Invariant method which takes an invariant Boolean valued expression (call by name)
+   * as argument and adds the corresponding lambda abstraction (argument of type `Unit`)
+   * to the list of invariants to check in the initial state and after each rule execution.
+   *
+   * @param inv the invariant expression to be checked in the initial state and
+   *            after each rule execution.
+   */
+
+  protected def invariant(inv: => Boolean): Unit = {
+    invariants ::= ("", ((x: Unit) => inv))
+    assert(inv, s"*** violation invariant")
+  }
+
+  /**
+   * Invariant method which takes an invariant Boolean valued expression (call by name)
+   * as argument and adds the corresponding lambda abstraction (argument of type `Unit`)
+   * to the list of invariants to check in the initial state and after each rule execution.
+   * The first argument is a message that will be printed in case the invariant is violated.
+   *
+   * @param msg   message to be printed in case of an invariant violation.
+   * @param inv the invariant expression to be checked in the initial state and
+   *            after each rule execution.
+   */
+
+  protected def invariant(msg: String)(inv: => Boolean): Unit = {
+    invariants ::= (msg, ((x: Unit) => inv))
+    assert(inv, s"*** violation of invariant: $msg")
   }
 
   /**
@@ -380,14 +420,14 @@ trait Rules {
    * the function has an empty body and is equivalent to an empty statement.
    */
 
-  protected def before() {}
+  protected def beforeRule() {}
 
   /**
    * Called after each rule execution. Can be overridden by user. By default
    * the function has an empty body and is equivalent to an empty statement.
    */
 
-  protected def after() {}
+  protected def afterRule() {}
 
   /**
    * "Syntax" for declaring a rule. A rule declaration has one of two forms.
@@ -565,4 +605,13 @@ trait Rules {
    */
 
   protected def Bounded(max: Int, alg: Alg): Alg = AlgBounded(max, alg)
+
+  /**
+   * Lifts a rule `r` to the algorithm: `Enabled(r)`.
+   *
+   * @param r rule to be lifted.
+   * @return resulting `Enabled(r)` algorithm.
+   */
+
+  implicit def rule2Alg(r: Rule): Alg = Enabled(r)
 }
