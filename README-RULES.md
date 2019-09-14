@@ -314,7 +314,7 @@ x = 4, y = 5, z = 3
 x = 4, y = 4, z = 3
 x = 4, y = 4, z = 2
 
-// Step 4: Three times randomly execute enabled rules amongst all the declared six rules
+// Step 4: Three times randomly execute enabled rules amongst all the declared six rules.
 
 x = 4, y = 5, z = 2
 x = 3, y = 5, z = 2
