@@ -1,9 +1,20 @@
 
 # Component Based Programming in Scala
 
-The contents of this repository is a Scala DSL of a component-based framework for software development consiting to three components, all of which can be used together.
+The contents of this repository is a collection of four Scala DSLs for composing, programming, monitoring, and testing component-based systems. The four DSLs are: F', pronounced F prime (for composing component based systems), HSM (for programming with hiearchical state machines), Daut (for monitoring with data automata), and Rules (for rule-based testing).
 
-## Contents of Repository
+The four DSLs can be used together. For example, a system can be built as an F' application with interacting components, and where some components are programmed as hierachical state machines. Selected components can be monitors, and all component can be tested using rules.
+
+The DSLs are effectively API's (libraries) in Scala, but are given DSL "look and feel". The DSLs are so-called _internal shallow DSLs_, internal because they are Scala APIs, and shallow because Scala's own language features form a fundamental part of the DSLs.
+
+Documentation of the DSLs is structured as follows.
+
+- For an example of combining F', HSM, and Daut, see example below.
+- For specific documentation on Daut, see [README-DAUT.md](README-DAUT.md).
+- For specific documentation on Rules, see [README-RULES.md](README-RULES.md).
+- Otherwise, see `doc/api` folder for API documentation for each of the four packages (F', HSM, Daut, and Rules).
+
+## The Four Scala DSLs
 
 ### F' (F Prime) 
 
@@ -28,7 +39,7 @@ A Scala DSL for writing Hiearchical State Machines (HSMs). The DSL is described 
 An HSM supports programming with states, superstates, entry and exit actions of states,
 and transitions between states. The concept corresponds to state charts.
 
-### Daut (Data automata)
+### Daut (Data automata) for Monitoring
 
 A Scala DSL for writing temporal event monitors. A version of the DSL is described in the paper (see doc/papers/daut folder):
 
@@ -40,15 +51,11 @@ A Scala DSL for writing temporal event monitors. A version of the DSL is describ
 
 The DSL supports writing event monitors that have either a temporal logic appearance, or using state machines. The temporal logic appearance is what makes this DSL different from HSMs.
 
-### Unification
+### Rules for Testing
 
-The three DSLs mentioned above can be used together. For example, a system can be built as an F' application with interacting components, and where a component can contain a hierachical state machine or a data automaton monitor.
-
-### Documentation
-
-- For an example of combining F', HSM, and Daut, see example below.
-- For specific documentation on Daut, see [README-DAUT.md](README-DAUT.md).
-- Otherwise, see `doc/api` folder for API documentation for each of the three packages (F', HSM, and Daut).
+A Scala DSL for writing rule-based programs in the style of
+[Guarded Commands](https://en.wikipedia.org/wiki/Guarded_Command_Language). A rule-based program is a set of rules, each consisting of a pre-condition and an action. Enabled (pre-condition is true) rules are repeatedly executed in one main loop. The Rules DSL 
+can be used for randomized testing of components.
 
 ## Example Combining F', HSM, and Daut
 
