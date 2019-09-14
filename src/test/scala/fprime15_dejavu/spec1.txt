@@ -1,5 +1,0 @@
-
-prop fifo :
- Forall d1 . Forall d2 .
-  (takeImage(d2) & P (requestImage(d2) & @ P requestImage(d1))) ->
-    @ P takeImage(d1)
