@@ -1,8 +1,8 @@
-# Testing am F' Component with Rules
+# Testing an F' Component with Rules
 
 I the following we will explain how the Rules DSL can be used for rule-based testing of an F' component. The entire code shown can be found in package [src/test/scala/rules4_test_hsm](src/test/scala/rules4_test_hsm). The F' component being tested is the `Imaging` state machine explained on the main page: [README.md](README.md). We shall go through the example step by step below.
 
-Rules-based component testing is the idea of writing a non-deterministic program, which randomly invokes messages on the component, with the purpose of trying scenarios that would not otherwise have been explored in a manual test. The Rules DSL is meant for writing such non-deterministic tests. The basic idea is to define a system consisiting of two components: the `Imaging` component that we want to test, and a `Test` component, which contains a rule-based program interacting with the `Imaging` component in a randomized manner.
+Rule-based component testing is the idea of writing a non-deterministic program, which randomly invokes messages on the component, with the purpose of trying scenarios that would not otherwise have been explored in a manual test. The Rules DSL is meant for writing such non-deterministic tests. The basic idea is to define a system consisiting of two components: the `Imaging` component that we want to test, and a `Test` component, which contains a rule-based program interacting with the `Imaging` component in a randomized manner.
 
 Note, that allthough the approach here is used for testing one component (unit testing) it can be used for testing a collection of components as well (integration testing).
 
