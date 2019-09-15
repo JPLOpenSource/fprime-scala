@@ -2,8 +2,10 @@
 
 Rules is an internal Scala DSL for rule-based programming in the style of [Guarded Command Language](https://en.wikipedia.org/wiki/Guarded_Command_Language). Rule programs may show non-deterministic behavior when in some program states more than one rule is enabled to execute, and the choise becomes random. Rule-based programs can therefore be useful for writing randomized tests. 
 
-The Rules concept for testing was introduced and advocated by 
-[Robert Bocchino](http://rob-bocchino.net/Professional/Home.html) at Jet Propulsion Laboratory, for testing F' programs written in C++. The same concept is here implemented in Scala for experimental purposes.
+The use of rule-based programming for testing component-based F' systems in C++ was introduced and advocated by [Robert Bocchino](http://rob-bocchino.net/Professional/Home.html) at Jet Propulsion Laboratory. The same concept, with variations, is here implemented in Scala for experimental purposes.
+
+The introduction below explains Rules as an stand-alone language. See
+[this page](README-RULES-TEST.md) for a description of how Rules can be used for testing a component based F' system.
 
 ## The Basics
 

@@ -17,7 +17,6 @@ import daut._
 import rules._
 
 import akka.actor.ReceiveTimeout
-import scala.language.postfixOps
 
 // Messages:
 
@@ -77,7 +76,7 @@ class Imaging extends Component {
         case Nil =>
         case event :: rest =>
           missedEvents = rest
-          println(s"resubmiting $event, resulting in new queue: $this")
+          // println(s"resubmiting $event, resulting in new queue: $this")
           selfTrigger(event)
       }
     }
