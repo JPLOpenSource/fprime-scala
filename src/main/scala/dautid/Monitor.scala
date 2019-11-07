@@ -1,4 +1,4 @@
-package daut
+package dautid
 
 /**
  * Daut options to be set by the user.
@@ -38,6 +38,8 @@ object Util {
     if (DautOptions.DEBUG) println(s"[dau] $msg")
   }
 
+  // TODO
+
   /**
    * Method for timing the execution of a block of code.
    *
@@ -58,7 +60,7 @@ object Util {
   }
 }
 
-import Util._
+import dautid.Util._
 
 /**
  * If the `STOP_ON_ERROR` flag is set to true, a `MonitorError` exception is thrown
@@ -75,6 +77,17 @@ case class MonitorError() extends RuntimeException
  */
 
 class Monitor[E] {
+  private var monitorAtTop: Boolean = true // TODO
+
+  // TODO:
+
+  def asSubMonitor(): Monitor[E] = {
+    monitorAtTop = false
+    this
+  }
+
+  def keyOf(event: E): Option[Int] = None // TODO
+
   /**
    * The name of the monitor, derived from its class name.
    */
@@ -95,7 +108,32 @@ class Monitor[E] {
    * the states in the set.
    */
 
-  private var states: Set[state] = Set()
+  private var states: (Set[state],Map[Int,Set[state]]) = (Set(),Map()) // TODO
+
+  // TODO
+
+  def lookupStates(key: Option[Int]): Set[state] = {
+    key match {
+      case None => states._1
+      case Some(index) =>
+        states._2.get(index) match {
+          case None => states._1
+          case Some(ss) => ss
+        }
+    }
+  }
+
+  // TODO
+
+  def updateStates(key: Option[Int], newStates: Set[state]): Unit = {
+    val (oldStates, oldMap) = states
+    key match {
+      case None =>
+        states = (newStates, oldMap)
+      case Some(index) =>
+        states = (oldStates, oldMap + (index -> newStates))
+    }
+  }
 
   /**
    * This variable holds invariants that have been defined by the user with one of the
@@ -155,7 +193,7 @@ class Monitor[E] {
    */
 
   def monitor(monitors: Monitor[E]*) {
-    this.monitors ++= monitors
+    this.monitors ++= monitors.map(_.asSubMonitor())
   }
 
   /**
@@ -230,15 +268,44 @@ class Monitor[E] {
    * A state of the monitor.
    */
 
+  // TODO:
+
+  protected trait fact extends state
+
+  protected trait astate extends state {
+
+    /**
+     * The standard `toString` method overridden.
+     *
+     * @return text representation of state.
+     */
+
+    // TODO:
+    override def toString: String = name
+  }
+
+  // TODO:
+
   protected trait state {
     thisState =>
+
+    // TODO
+
+    var name : String = ""
+
+    // TODO
+
+    def label(values: Any*) : state = {
+      name += values.map(_.toString).mkString("(",",",")")
+      this
+    }
 
     /**
      * The transitions out of this state, represented as an (initially empty) partial
      * function from events to sets of states.
      */
 
-    private[daut] var transitions: Transitions = noTransitions
+    private[dautid] var transitions: Transitions = noTransitions
 
     /**
      * This variable is true for final (acceptance) states: that is states where it is
@@ -246,7 +313,7 @@ class Monitor[E] {
      * acceptance states in standard automaton theory.
      */
 
-    private[daut] var isFinal: Boolean = true
+    private[dautid] var isFinal: Boolean = true
 
     /**
      * Updates the transition function to exactly the transition function provided.
@@ -256,8 +323,10 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    protected def watch(ts: Transitions) {
+    def watch(ts: Transitions) : state = { // TODO: removed protected
+      name = "watch"
       transitions = ts
+      this
     }
 
     /**
@@ -270,8 +339,10 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    protected def always(ts: Transitions) {
+    def always(ts: Transitions) : state = { // TODO: removed protected
+      name = "always"
       transitions = ts andThen (_ + this)
+      this
     }
 
     /**
@@ -283,9 +354,11 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    protected def hot(ts: Transitions) {
+    def hot(ts: Transitions) : state = { // TODO: removed protected
+      name = "hot"
       transitions = ts
       isFinal = false
+      this
     }
 
     /**
@@ -297,8 +370,10 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    protected def wnext(ts: Transitions) {
+    def wnext(ts: Transitions) : state = { // TODO: removed protected
+      name = "wnext"
       transitions = ts orElse { case _ => error }
+      this
     }
 
     /**
@@ -310,9 +385,11 @@ class Monitor[E] {
      * @param ts the transition function.
      */
 
-    protected def next(ts: Transitions) {
+    def next(ts: Transitions) : state = { // TODO: removed protected
+      name = "next"
       transitions = ts orElse { case _ => error }
       isFinal = false
+      this
     }
 
     /**
@@ -326,9 +403,11 @@ class Monitor[E] {
      * @param ts1 the transition function.
      */
 
-    protected def unless(ts1: Transitions) = new {
-      def watch(ts2: Transitions) {
+    def unless(ts1: Transitions) = new { // TODO: removed protected
+      def watch(ts2: Transitions) : state = {
+        name = "until"
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
+        thisState
       }
     }
 
@@ -344,10 +423,12 @@ class Monitor[E] {
      * @param ts1 the transition function.
      */
 
-    protected def until(ts1: Transitions) = new {
-      def watch(ts2: Transitions) {
+    def until(ts1: Transitions) = new { // TODO: removed protected
+      def watch(ts2: Transitions) : state = {
+        name = "until"
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
         isFinal = false
+        thisState
       }
     }
 
@@ -365,17 +446,9 @@ class Monitor[E] {
         Some(transitions(event)) else None
 
     if (first) {
-      states += this
+      states = (Set(this), Map()) // TODO
       first = false
     }
-
-    /**
-     * The standard `toString` method overridden.
-     *
-     * @return text representation of state.
-     */
-
-    override def toString: String = "some state" // needs improvement.
   }
 
   /**
@@ -451,7 +524,7 @@ class Monitor[E] {
      * This variable is true when we are within an interval.
      */
 
-    private[daut] var on: Boolean = false
+    private[dautid] var on: Boolean = false
 
     /**
      * This method allows us, given a during-state `dur`, to write a Booelean
@@ -514,7 +587,7 @@ class Monitor[E] {
    * @return a watch-state.
    */
 
-  protected def watch(ts: Transitions) = new state {
+  protected def watch(ts: Transitions) = new astate {
     watch(ts)
   }
 
@@ -529,7 +602,7 @@ class Monitor[E] {
    * @return a always-state.
    */
 
-  protected def always(ts: Transitions) = new state {
+  protected def always(ts: Transitions) = new astate {
     always(ts)
   }
 
@@ -543,7 +616,7 @@ class Monitor[E] {
    * @return a hot-state.
    */
 
-  protected def hot(ts: Transitions) = new state {
+  protected def hot(ts: Transitions) = new astate {
     hot(ts)
   }
 
@@ -557,7 +630,7 @@ class Monitor[E] {
    * @return a wnext-state.
    */
 
-  protected def wnext(ts: Transitions) = new state {
+  protected def wnext(ts: Transitions) = new astate {
     wnext(ts)
   }
 
@@ -571,7 +644,7 @@ class Monitor[E] {
    * @return a next-state.
    */
 
-  protected def next(ts: Transitions) = new state {
+  protected def next(ts: Transitions) = new astate {
     next(ts)
   }
 
@@ -588,7 +661,7 @@ class Monitor[E] {
    */
 
   protected def unless(ts1: Transitions) = new {
-    def watch(ts2: Transitions) = new state {
+    def watch(ts2: Transitions) = new astate {
       unless(ts1) watch (ts2)
     }
   }
@@ -607,7 +680,7 @@ class Monitor[E] {
    */
 
   protected def until(ts1: Transitions) = new {
-    def watch(ts2: Transitions) = new state {
+    def watch(ts2: Transitions) = new astate {
       until(ts1) watch (ts2)
     }
   }
@@ -622,8 +695,9 @@ class Monitor[E] {
    *         and `pred(s) == true`.
    */
 
+  // TODO: not sure what should be quantified over here
   protected def exists(pred: PartialFunction[state, Boolean]): Boolean = {
-    states exists (pred orElse { case _ => false })
+    states._1.union(states._2.values.flatten.toSet) exists (pred orElse { case _ => false })
   }
 
   /**
@@ -701,11 +775,12 @@ class Monitor[E] {
    * @return set of states produced from applying the partial function `fp` to active states.
    */
 
+  // TODO
   protected def map(pf: PartialFunction[state, Set[state]]) = new {
     def orelse(otherwise: => Set[state]): Set[state] = {
-      val matchingStates = states filter (pf.isDefinedAt(_))
+      val matchingStates = states._1.union(states._2.values.flatten.toSet) filter (pf.isDefinedAt(_))
       if (!matchingStates.isEmpty) {
-        (for (matchingState <- matchingStates) yield pf(matchingState)).flatten
+        (for (matchingState <- matchingStates) yield pf(matchingState)).flatten.toSet
       } else
         otherwise
     }
@@ -753,8 +828,9 @@ class Monitor[E] {
    * @param s state to be added as initial state.
    */
 
+  // TODO
   protected def initial(s: state) {
-    states += s
+    states = (Set(s), Map())
   }
 
   /**
@@ -769,8 +845,9 @@ class Monitor[E] {
    * @return true iff. the state `s` is amongst the current states.
    */
 
+    // TODO
   protected implicit def convState2Boolean(s: state): Boolean =
-    states contains s
+    states._1.union(states._2.values.flatten.toSet) contains s
 
   /**
    * Implicit function lifting the `Unit` value `()` to the set:
@@ -900,10 +977,13 @@ class Monitor[E] {
    * @param event the submitted event.
    */
 
+  // TODO
   def verify(event: E) {
     verifyBeforeEvent(event)
-    debug("\n===[" + event + "]===\n")
-    for (sourceState <- states) {
+    if (monitorAtTop) debug("\n===[" + event + "]===\n")
+    val key = keyOf(event)
+    var theStates = lookupStates(key)
+    for (sourceState <- theStates) {
       sourceState(event) match {
         case None =>
         case Some(targetStates) =>
@@ -917,15 +997,16 @@ class Monitor[E] {
           }
       }
     }
-    states --= statesToRemove
-    states ++= statesToAdd
+    theStates --= statesToRemove
+    theStates ++= statesToAdd
+    updateStates(key, theStates)
     statesToRemove = emptyStateSet
     statesToAdd = emptyStateSet
-    if (DautOptions.DEBUG) printStates()
     invariants foreach { case (e, inv) => check(inv(), e) }
     for (monitor <- monitors) {
       monitor.verify(event)
     }
+    if (monitorAtTop && DautOptions.DEBUG) printStates()
     verifyAfterEvent(event)
   }
 
@@ -934,9 +1015,11 @@ class Monitor[E] {
    * These represent obligations that have not been fulfilled.
    */
 
+  // TODO
   def end() {
     debug(s"ending Daut trace evaluation for $monitorName")
-    val hotStates = states filter (!_.isFinal)
+    val theEndStates = states._1.union(states._2.values.flatten.toSet)
+    val hotStates = theEndStates filter (!_.isFinal)
     if (!hotStates.isEmpty) {
       println()
       println(s"*** non final Daut $monitorName states:")
@@ -1002,12 +1085,16 @@ class Monitor[E] {
    * Prints the current states of the monitor, and its sub-monitors.
    */
 
+  // TODO
   private def printStates() {
     val topline = "--- " + monitorName + ("-" * 20)
     val bottomline = "-" * topline.length
     println(topline)
-    for (s <- states) {
-      println(s)
+    println("-- main states: ")
+    states._1 foreach println
+    for ((index, ss) <- states._2){
+      println(s"-- index=$index:")
+      ss foreach println
     }
     println(bottomline)
     println()
