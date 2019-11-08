@@ -5,7 +5,7 @@ import daut.Util.time
 
 /**
  * Property AcquireRelease: A task acquiring a lock should eventually release it. A task can acquire at most
- * one lock at a time.
+ * one lock at a time. Furthermore, the `CANCEL` event will cancel all lock acquisitions.
  */
 
 trait LockEvent
@@ -45,5 +45,3 @@ object Main {
     m.end()
   }
 }
-
-

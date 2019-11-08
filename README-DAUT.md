@@ -142,6 +142,9 @@ def next(ts: Transitions): state   // non-final, one of the transitions must fir
 def wnext(ts: Transitions): state  // one of the transtions must fire next, if there is a next event
 ```
 
+Note: these functions actually return an object of a subclass (named
+`anonymous`) of class `state`, but that is not important here.
+
 #### From States to Sets of States and Other Magic
 
 You notice above that the state producing functions each takes a partial function of type `Transitions` as argument, that is, of type:
@@ -287,7 +290,7 @@ The monitor can be formulated as follows:
 
 ```scala
 class AcquireRelease extends Monitor[LockEvent] {
-  case class Locked(t: Int, x: Int) extends state {
+  case class Locked(t: Int, x: Int) extends fact {
     hot {
       case acquire(_, `x`) => error
       case release(`t`, `x`) => ok
@@ -301,7 +304,7 @@ class AcquireRelease extends Monitor[LockEvent] {
 }
 ```
 
-The monitor declares a **case** class `Locked`. An instance `Locked(t, x)` of this class is a state (the `Locked` class extends the `state` class) and is meant to represent the _fact_ (rule-based terminology) that thread `t` has acquired the lock `x`. A state `Locked(t, x)` is created and added to the _state soup_ upon the observation of an
+The monitor declares a **case** class `Locked`. An instance `Locked(t, x)` of this class is a state (the `Locked` class extends the `fact` trait, which itself extends the `state` trait) and is meant to represent the _fact_ (rule-based terminology) that thread `t` has acquired the lock `x`. A state `Locked(t, x)` is created and added to the _state soup_ upon the observation of an
 `acquire(t, x)` event in the always active `always` state. Note how the state itself this time checks whether it gets double acquired by some other thread (underscore pattern means that we don't care about the thread),
 and if released, resulting in the `ok` state, goes away.
 
@@ -328,11 +331,11 @@ it is called from within. That is, the `state` class provides the following func
 but which just updates the state's transition function (return type is `Unit` and not `state`):
 
 ```scala
-def always(ts: Transitions): Unit // always check the transitions
-def watch(ts: Transitions): Unit  // watch until one of the transitions fire and move on
-def hot(ts: Transitions): Unit   // non-final, otherwise same meaning as watch
-def next(ts: Transitions): Unit   // non-final, one of the transitions must fire next
-def wnext(ts: Transitions): Unit  // one of the transtions must fire next, if there is a next event
+def always(ts: Transitions): state // always check the transitions
+def watch(ts: Transitions): state  // watch until one of the transitions fire and move on
+def hot(ts: Transitions): state   // non-final, otherwise same meaning as watch
+def next(ts: Transitions): state   // non-final, one of the transitions must fire next
+def wnext(ts: Transitions): state  // one of the transtions must fire next, if there is a next event
 ```
 
 A user does not need to think about this distinction between the two sets of functions,
@@ -345,13 +348,13 @@ In this example we illustrate, using the start-stop example, how case classes ca
 ```scala
 class TestMonitor extends Monitor[TaskEvent] {
 
-  case class Start(task: Int) extends state {
+  case class Start(task: Int) extends fact {
     wnext {
       case start(`task`) => Stop(task)
     }
   }
 
-  case class Stop(task: Int) extends state {
+  case class Stop(task: Int) extends fact {
     next {
       case stop(`task`) => Start(task + 1)
     }
@@ -362,7 +365,7 @@ class TestMonitor extends Monitor[TaskEvent] {
 ```
 
 Both solutions in this case work equally well from a monitoring point of view. 
-However, the use of case classes has one advantage: if we turn on printing mode,
+However, the use of case classes (facts) has one advantage: if we turn on printing mode,
 setting a monitor's `PRINT` flag to true (see below), then case class states will be printed nicely,
 whereas this is not the case when using anonymous states (using the function approach).
 
@@ -399,7 +402,7 @@ acquired. This state removes itself on a proper `release` event by the same thre
 
 ```scala
 class MonitorUsingExists extends Monitor[LockEvent] {
-  case class Locked(t: Isnt, x: Int) extends state {
+  case class Locked(t: Isnt, x: Int) extends fact {
     watch {
       case release(`t`, `x`) => ok
     }
@@ -420,7 +423,7 @@ The `ensure(b: Boolean): state` function returns the state `ok` if the Boolean c
 
 ```scala
 class MonitorUsingMap extends Monitor[LockEvent] {
-  case class Locked(t: Int, x: Int) extends state {
+  case class Locked(t: Int, x: Int) extends fact {
     watch {
       case release(`t`, `x`) => ok
     }
@@ -576,7 +579,7 @@ class AcquireRelease extends Monitor[Event] {
 }
 
 class ReleaseAcquired extends Monitor[Event] {
-  case class Locked(t:Int, x:Int) extends state {
+  case class Locked(t:Int, x:Int) extends fact {
     watch {
       case release(`t`,`x`) => ok
     }
@@ -603,6 +606,145 @@ object Main {
 ```
 
 This allows to build a hierarchy of monitors, which might be useful for grouping.
+
+## Using Indexing to Speed up Monitors
+
+Indexing is an approach to speed up monitoring by defining a function from events to keys, and using the keys as entries in a hashmap to obtain only those states that are relevent to the particular event. This can be useful if our state soup ends up containing many (thousands) of states. The larger the number of states in the state soup, the more important indexing becomes for obtaining an efficient monitor. The improvement in speed can be orders of magnitudes.
+
+Let us illustrate the indexing approach with a slight modification of our locking example.
+
+#### Events
+
+We shall use the same events as before, except that we add an additional `CANCEL` event which releases all locks (it has the same meaning as a sequence of `release` calls on all acquisitions):
+
+```scala
+trait LockEvent
+case class acquire(t: Int, x: Int) extends LockEvent
+case class release(t: Int, x: Int) extends LockEvent
+case object CANCEL extends LockEvent
+```
+
+#### The Property
+
+Our property is the same as in our first example: 
+
+- _"A task acquiring a lock should eventually release it. At most one task
+can acquire a lock at a time"_. 
+
+#### The Traditional Monitor Approach
+
+Let's do things a bit differenty and give names to the different
+monitor strategies. We first define our traditional generic monitor,
+calling it `SlowLockMonitor`, and the define our monitor as extending
+that (slightly modified to take `CANCEL` into account):
+
+```scala
+class SlowLockMonitor extends Monitor[LockEvent]
+
+class CorrectLock extends SlowLockMonitor {
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      }
+  }
+}
+```
+
+Let us apply this monitor as follows:
+
+```scala
+object Main {
+  def main(args: Array[String]) {
+    val m = new CorrectLock
+    m.verify(acquire(1, 100))
+    m.verify(acquire(2, 200))
+    m.verify(acquire(1, 200)) // error
+    m.CANCEL
+    m.end()
+  }
+}
+```
+
+The third event will violate the monitor since task 1 wants to acquire lock 200, which has already been acquired by task 2. Assume that we observed 100,000 lock acquisitions, then for each new lock acquisition we would at that point have to explore 100,000 states to see of there is a violation. We can optimize this and use indexing.
+
+#### Indexing
+
+Note that this property is __lock centric__: we can maintain a set of states for each lock: those states that concern only that lock. This is the idea in indexing. We can use the lock id as key in a mapping from  keys to sets of states. This is done by overriding the `keyOf` function in the `Monitor` class (something the user has to do explicitly). This funnction has the type:
+
+```scala
+def keyOf(event: LockEvent): Option[Int]
+```
+
+This function takes an event as argument and returns an optional integer index. It's default return value is `None`. The function can be overridden as follows for our example:
+
+```scala
+class FastLockMonitor extends Monitor[LockEvent] {
+  override def keyOf(event: LockEvent): Option[Int] = {
+    event match {
+      case acquire(_, x) => Some(x)
+      case release(_, x) => Some(x)
+      case CANCEL => None
+    }
+  }
+}
+
+class CorrectLock extends FastLockMonitor {
+  // as before:
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      }
+  }
+}
+```
+
+The `keyOf` function here extracts the lock `x` from the event and turns it into the key `Some(x)`. This now means that all events concerning a specific lock `x` are fed to only those states concerned with that lock.
+
+Note that `CANCEL` is mapped to `None`. This has as effect that this event is sent to all states, independent of their key. This is exaxtly what we want: all locks should be released.
+
+#### Be Careful with the Definition of `keyOf`
+
+One should be careful with the definition of the `keyOf` function (similarly to how one has to be careful when defining the functions `hashCode` and `equals`). Suppose for example that we instead had defined the `keyOf` function as follows, where the key is the __task id__, and not the lock id:
+
+```scala
+class BadLockMonitor extends Monitor[LockEvent] {
+  override def keyOf(event: LockEvent): Option[Int] = {
+    event match {
+      case acquire(t, _) => Some(t)
+      case release(t, _) => Some(t)
+      case CANCEL => None
+    }
+  }
+}
+
+class CorrectLock extends BadLockMonitor {
+  // as before:
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      }
+  }
+}
+```
+
+In this case, our monitor will not detect the violation in the sequence:
+
+```scala
+    m.verify(acquire(2, 200))
+    m.verify(acquire(1, 200)) // error
+```
+
+since the first event is sent to the state set denoted by 2 and the second event is sent to the state set denoted by 1. Those sets are different, and hence no violation is detected.
+
+#### Other Forms of Keys
+
+A key can be any integer. For example if an argument to an event is a string, the key can be the hash code of the string. Sometimes some function of all the arguments to an event can be used as a key. In some cases one cannot define a key function without breaking the monitor: all events must always be sent to all states.
 
 ## How to React to Errors
 
@@ -686,6 +828,22 @@ val m = MyMonitor()
 m.STOP_ON_ERROR = true
 ...
 ```
+
+#### Labeling of Anonymous States for Debugging Purposes
+
+When debugging a monitor with the `DautOptions.DEBUG` flag set to true, states will be printed on standard out. For anonymous states we will only get printed what kind of state it is (`always`, `hot`, ...). We can added information to be printed with the `label` function, for example as follows:
+
+```scala
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      } label(t, x)
+  }
+```
+
+This will cause `hot(1,2)` to be printed instead of just `hot` (for values `t`=1 and `x`=2).
 
 ## Implementing New Temporal Operators
 
