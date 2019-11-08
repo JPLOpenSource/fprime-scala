@@ -1,7 +1,7 @@
 package dautid4_temporal
 
-import dautid._
-import dautid.Util.time
+import daut._
+import daut.Util.time
 
 /**
  * Property OneLockGlobally: If a thread takes a lock, then no thread can take a lock

@@ -1,7 +1,7 @@
 package dautid2_temporal
 
-import dautid._
-import dautid.Util.time
+import daut._
+import daut.Util.time
 
 /**
  * Property OneThread: When a thread takes a lock no other thread (including itself)

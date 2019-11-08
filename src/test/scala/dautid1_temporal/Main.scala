@@ -1,7 +1,7 @@
 package dautid1_temporal
 
-import dautid._
-import dautid.Util.time
+import daut._
+import daut.Util.time
 
 /**
  * Property AcquireRelease: A task acquiring a lock should eventually release it. A task can acquire at most

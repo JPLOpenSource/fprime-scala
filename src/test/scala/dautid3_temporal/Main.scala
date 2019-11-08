@@ -1,7 +1,7 @@
 package dautid3_temporal
 
-import dautid._
-import dautid.Util.time
+import daut._
+import daut.Util.time
 
 /**
  * Property LocksNotReentrant: If a thread takes a lock it cannot take that lock
