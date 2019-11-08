@@ -4,7 +4,7 @@ import dautid._
 import dautid.Util.time
 
 /**
- * Property OneLockGlobally: If a thread take a lock, then no thread can take a lock
+ * Property OneLockGlobally: If a thread takes a lock, then no thread can take a lock
  * until the lock has been released.
  */
 
@@ -24,8 +24,8 @@ class OneLockGlobally extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val INDEX = 1000000
-    DautOptions.DEBUG = false
+    val INDEX = 3
+    DautOptions.DEBUG = true
     val m = new OneLockGlobally
     time (s"analyzing $INDEX acquisitions") {
       for (index <- 1 to INDEX) {

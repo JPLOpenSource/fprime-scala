@@ -34,16 +34,14 @@ object Util {
    * @param msg the message to be printed.
    */
 
-  def debug(msg : => String): Unit = {
+  def debug(msg: => String): Unit = {
     if (DautOptions.DEBUG) println(s"[dau] $msg")
   }
-
-  // TODO
 
   /**
    * Method for timing the execution of a block of code.
    *
-   * @param text this text is printed as part of the timing information.
+   * @param text  this text is printed as part of the timing information.
    * @param block the code to be executed.
    * @tparam R the result type of the block to be executed.
    * @return the result of ececution the block.
@@ -77,16 +75,24 @@ case class MonitorError() extends RuntimeException
  */
 
 class Monitor[E] {
-  private var monitorAtTop: Boolean = true // TODO
+  /**
+   * True for the topmost monitor in a hierarchy of monitors (created by calls of the
+   * `monitor` method). Used for controlling printing during debugging.
+   */
 
-  // TODO:
+  private var monitorAtTop: Boolean = true
 
-  def asSubMonitor(): Monitor[E] = {
-    monitorAtTop = false
-    this
-  }
+  /**
+   * Computes the key for an event. Keys are used for optimizing monitoring.
+   * The method has a default definition returning `None` for all events. It
+   * can be overridden by the user. Care should be taken since it interferes
+   * with how properties are monitored.
+   *
+   * @param event the event.
+   * @return the key computed for the event.
+   */
 
-  def keyOf(event: E): Option[Int] = None // TODO
+  protected def keyOf(event: E): Option[Int] = None
 
   /**
    * The name of the monitor, derived from its class name.
@@ -103,36 +109,35 @@ class Monitor[E] {
   private var monitors: List[Monitor[E]] = List()
 
   /**
-   * A monitor is at any point in time in zero, one, or more states, represented as a set of states. All
+   * A monitor is at any point in time in zero, one, or more states, conceptually represented as a set of states. All
    * states have to lead to success, hence there is an implicitly understood conjunction between
-   * the states in the set.
+   * the states in the set. The implementation is, however, a map from keys to sets of states, to facilitate
+   * optimization. The key `None` represents the initial default set of states.
    */
 
-  private var states: (Set[state],Map[Int,Set[state]]) = (Set(),Map()) // TODO
+  private var states: Map[Option[Int], Set[state]] = Map(None -> Set())
 
-  // TODO
+  /**
+   * Looks up a key in the key in the `states` variable. If `states` is not
+   * defined for the key, the default state set denoted by the key `None` is returned.
+   *
+   * @param key the key to look up.
+   * @return the set of states denoted by the key, or the set denoted by `None` if
+   *         the key is not defined.
+   */
 
-  def lookupStates(key: Option[Int]): Set[state] = {
-    key match {
-      case None => states._1
-      case Some(index) =>
-        states._2.get(index) match {
-          case None => states._1
-          case Some(ss) => ss
-        }
-    }
-  }
+  private def lookupStates(key: Option[Int]): Set[state] =
+    states.getOrElse(key, states(None))
 
-  // TODO
+  /**
+   * Updates the set of states denoted by `key`.
+   *
+   * @param key the key to be updated.
+   * @param newStates the set of states it is mapped to.
+   */
 
-  def updateStates(key: Option[Int], newStates: Set[state]): Unit = {
-    val (oldStates, oldMap) = states
-    key match {
-      case None =>
-        states = (newStates, oldMap)
-      case Some(index) =>
-        states = (oldStates, oldMap + (index -> newStates))
-    }
+  private def updateStates(key: Option[Int], newStates: Set[state]): Unit = {
+    states += (key -> newStates)
   }
 
   /**
@@ -144,22 +149,6 @@ class Monitor[E] {
    */
 
   private var invariants: List[(String, Unit => Boolean)] = Nil
-
-  /**
-   * For each submitted event this set contains all states that are to be removed
-   * from the set `states` of active states. A state needs to be removed
-   * when leaving the state due to a fired transition.
-   */
-
-  private var statesToRemove: Set[state] = Set()
-
-  /**
-   * For each submitted event this set contains all states that are to be added
-   * to the set `states` of active states. A state needs to be added
-   * when entering the state due to a fired transition.
-   */
-
-  private var statesToAdd: Set[state] = Set()
 
   /**
    * A monitor's body consists of a sequence of state declarations. The very first state
@@ -193,7 +182,10 @@ class Monitor[E] {
    */
 
   def monitor(monitors: Monitor[E]*) {
-    this.monitors ++= monitors.map(_.asSubMonitor())
+    for (monitor <- monitors) {
+      monitor.monitorAtTop = false
+    }
+    this.monitors ++= monitors
   }
 
   /**
@@ -268,37 +260,14 @@ class Monitor[E] {
    * A state of the monitor.
    */
 
-  // TODO:
-
-  protected trait fact extends state
-
-  protected trait astate extends state {
-
-    /**
-     * The standard `toString` method overridden.
-     *
-     * @return text representation of state.
-     */
-
-    // TODO:
-    override def toString: String = name
-  }
-
-  // TODO:
-
   protected trait state {
     thisState =>
 
-    // TODO
+    /**
+     * String used to print state when not a case class. Used for anonymous states.
+     */
 
-    var name : String = ""
-
-    // TODO
-
-    def label(values: Any*) : state = {
-      name += values.map(_.toString).mkString("(",",",")")
-      this
-    }
+    protected var name: String = ""
 
     /**
      * The transitions out of this state, represented as an (initially empty) partial
@@ -321,9 +290,10 @@ class Monitor[E] {
      * is submitted that makes a transition fire. The state is final.
      *
      * @param ts the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def watch(ts: Transitions) : state = { // TODO: removed protected
+    def watch(ts: Transitions): state = {
       name = "watch"
       transitions = ts
       this
@@ -337,9 +307,10 @@ class Monitor[E] {
      * self loop, no matter what transition fires. The state is final.
      *
      * @param ts the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def always(ts: Transitions) : state = { // TODO: removed protected
+    def always(ts: Transitions): state = {
       name = "always"
       transitions = ts andThen (_ + this)
       this
@@ -352,9 +323,10 @@ class Monitor[E] {
      * that it is an error to be in this state on a call of the `end()` method.
      *
      * @param ts the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def hot(ts: Transitions) : state = { // TODO: removed protected
+    def hot(ts: Transitions): state = {
       name = "hot"
       transitions = ts
       isFinal = false
@@ -368,9 +340,10 @@ class Monitor[E] {
      * The state is therefore final.
      *
      * @param ts the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def wnext(ts: Transitions) : state = { // TODO: removed protected
+    def wnext(ts: Transitions): state = {
       name = "wnext"
       transitions = ts orElse { case _ => error }
       this
@@ -383,9 +356,10 @@ class Monitor[E] {
      * The state is therefore non-final.
      *
      * @param ts the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def next(ts: Transitions) : state = { // TODO: removed protected
+    def next(ts: Transitions): state = {
       name = "next"
       transitions = ts orElse { case _ => error }
       isFinal = false
@@ -401,10 +375,11 @@ class Monitor[E] {
      * The transition function `ts1` does not need to ever fire, which makes the state final.
      *
      * @param ts1 the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def unless(ts1: Transitions) = new { // TODO: removed protected
-      def watch(ts2: Transitions) : state = {
+    def unless(ts1: Transitions) = new {
+      def watch(ts2: Transitions): state = {
         name = "until"
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
         thisState
@@ -421,10 +396,11 @@ class Monitor[E] {
      * called, which makes the state non-final.
      *
      * @param ts1 the transition function.
+     * @return the state itself, allowing for further chained method calls.
      */
 
-    def until(ts1: Transitions) = new { // TODO: removed protected
-      def watch(ts2: Transitions) : state = {
+    def until(ts1: Transitions) = new {
+      def watch(ts2: Transitions): state = {
         name = "until"
         transitions = ts1 orElse (ts2 andThen (_ + thisState))
         isFinal = false
@@ -446,9 +422,69 @@ class Monitor[E] {
         Some(transitions(event)) else None
 
     if (first) {
-      states = (Set(this), Map()) // TODO
+      states = Map(None -> Set(this))
       first = false
     }
+  }
+
+  /**
+   * A subtrait of the `state` trait. Named states introduced by the user as case classes are called
+   * facts and must extend this trait, as in:
+   *
+   * {{{
+   *   case class MyData(x:Int) extends fact
+   * }}}
+   *
+   * The `toString` method works as for case classes.
+   */
+
+  protected trait fact extends state
+
+  /**
+   * An anonymous state can be labelled with data with a call of the `label`
+   * method. The label becomes part of the result of calling the `toString`
+   * method.
+   */
+
+  protected trait anonymous extends state {
+
+    /**
+     * Given an anonymous state, this method adds the arguments provided as a text
+     * string in parentheses to the name of the anonymous state. This is returned by
+     * the `toString` method. It is used for debugging specifications and their
+     * execution.
+     *
+     * E.g. given the state:
+     *
+     * {{{
+     *  always {
+     *     case acquire(t, x) =>
+     *       hot {
+     *         case acquire(`t`,_) => error
+     *         case release(`t`,`x`) => ok
+     *       } label(t,x)
+     *   }
+     * }}}
+     *
+     * The outer always state prints as: `always` whereas the inner hot state
+     * prints as `hot(1,3)` for data `t=1` and `x=3`.
+     *
+     * @param values the values to be incuded in the label.
+     * @return the state itself, but updated with the label.
+     */
+
+    def label(values: Any*): state = {
+      name += values.map(_.toString).mkString("(", ",", ")")
+      this
+    }
+
+    /**
+     * The standard `toString` method overridden.
+     *
+     * @return text representation of state.
+     */
+
+    override def toString: String = name
   }
 
   /**
@@ -584,10 +620,10 @@ class Monitor[E] {
    * is submitted that makes a transition fire. The state is final.
    *
    * @param ts the transition function.
-   * @return a watch-state.
+   * @return an anonymous watch-state.
    */
 
-  protected def watch(ts: Transitions) = new astate {
+  protected def watch(ts: Transitions) = new anonymous {
     watch(ts)
   }
 
@@ -599,10 +635,10 @@ class Monitor[E] {
    * self loop, no matter what transition fires. The state is final.
    *
    * @param ts the transition function.
-   * @return a always-state.
+   * @return an anonymous always-state.
    */
 
-  protected def always(ts: Transitions) = new astate {
+  protected def always(ts: Transitions) = new anonymous {
     always(ts)
   }
 
@@ -613,10 +649,10 @@ class Monitor[E] {
    * that it is an error to be in this state on a call of the `end()` method.
    *
    * @param ts the transition function.
-   * @return a hot-state.
+   * @return an anonymous hot-state.
    */
 
-  protected def hot(ts: Transitions) = new astate {
+  protected def hot(ts: Transitions) = new anonymous {
     hot(ts)
   }
 
@@ -627,10 +663,10 @@ class Monitor[E] {
    * The state is therefore final.
    *
    * @param ts the transition function.
-   * @return a wnext-state.
+   * @return an anonymous wnext-state.
    */
 
-  protected def wnext(ts: Transitions) = new astate {
+  protected def wnext(ts: Transitions) = new anonymous {
     wnext(ts)
   }
 
@@ -641,10 +677,10 @@ class Monitor[E] {
    * The state is therefore non-final.
    *
    * @param ts the transition function.
-   * @return a next-state.
+   * @return an anonymous next-state.
    */
 
-  protected def next(ts: Transitions) = new astate {
+  protected def next(ts: Transitions) = new anonymous {
     next(ts)
   }
 
@@ -657,11 +693,11 @@ class Monitor[E] {
    * The transition function `ts1` does not need to ever fire, which makes the state final.
    *
    * @param ts1 the transition function.
-   * @return an unless-state.
+   * @return an anonymous unless-state.
    */
 
   protected def unless(ts1: Transitions) = new {
-    def watch(ts2: Transitions) = new astate {
+    def watch(ts2: Transitions) = new anonymous {
       unless(ts1) watch (ts2)
     }
   }
@@ -676,11 +712,11 @@ class Monitor[E] {
    * called, which makes the state non-final.
    *
    * @param ts1 the transition function.
-   * @return an until-state.
+   * @return an anonymous until-state.
    */
 
   protected def until(ts1: Transitions) = new {
-    def watch(ts2: Transitions) = new astate {
+    def watch(ts2: Transitions) = new anonymous {
       until(ts1) watch (ts2)
     }
   }
@@ -695,9 +731,9 @@ class Monitor[E] {
    *         and `pred(s) == true`.
    */
 
-  // TODO: not sure what should be quantified over here
   protected def exists(pred: PartialFunction[state, Boolean]): Boolean = {
-    states._1.union(states._2.values.flatten.toSet) exists (pred orElse { case _ => false })
+    val alwaysFalse : PartialFunction[state, Boolean] = { case _ => false }
+    states.values.flatten.toSet exists (pred orElse alwaysFalse)
   }
 
   /**
@@ -775,12 +811,11 @@ class Monitor[E] {
    * @return set of states produced from applying the partial function `fp` to active states.
    */
 
-  // TODO
   protected def map(pf: PartialFunction[state, Set[state]]) = new {
     def orelse(otherwise: => Set[state]): Set[state] = {
-      val matchingStates = states._1.union(states._2.values.flatten.toSet) filter (pf.isDefinedAt(_))
+      val matchingStates = states.values.flatten.toSet filter (pf.isDefinedAt(_))
       if (!matchingStates.isEmpty) {
-        (for (matchingState <- matchingStates) yield pf(matchingState)).flatten.toSet
+        (for (matchingState <- matchingStates) yield pf(matchingState)).flatten
       } else
         otherwise
     }
@@ -828,9 +863,8 @@ class Monitor[E] {
    * @param s state to be added as initial state.
    */
 
-  // TODO
   protected def initial(s: state) {
-    states = (Set(s), Map())
+    states = Map(None -> Set(s))
   }
 
   /**
@@ -845,9 +879,8 @@ class Monitor[E] {
    * @return true iff. the state `s` is amongst the current states.
    */
 
-    // TODO
   protected implicit def convState2Boolean(s: state): Boolean =
-    states._1.union(states._2.values.flatten.toSet) contains s
+    states.values.flatten.toSet contains s
 
   /**
    * Implicit function lifting the `Unit` value `()` to the set:
@@ -974,14 +1007,44 @@ class Monitor[E] {
    * of states. The result is the union of these sets of states. The method evaluates
    * the invariants as part of the verification.
    *
+   * The method uses indexing to optimize the monitoring: each event is mapped to
+   * a key, which is used to fast-access the set of states relevant for the event.
+   *
    * @param event the submitted event.
    */
 
-  // TODO
-  def verify(event: E) {
+  def verify(event: E): Unit = {
     verifyBeforeEvent(event)
     if (monitorAtTop) debug("\n===[" + event + "]===\n")
     val key = keyOf(event)
+    key match {
+      case None =>
+        for (key_ <- states.keySet) {
+          applyEventToKey(key_, event)
+        }
+      case Some(_) =>
+        applyEventToKey(key, event)
+    }
+    invariants foreach { case (e, inv) => check(inv(), e) }
+    for (monitor <- monitors) {
+      monitor.verify(event)
+    }
+    if (monitorAtTop && DautOptions.DEBUG) printStates()
+    verifyAfterEvent(event)
+  }
+
+  /**
+   * Applies an event to the states denoted by a specific key, and only the states for
+   * that key. If no states is defined for that key, the set of states denoted by
+   * the key `None` are used. This method performs the main verification task.
+   *
+   * @param key the key the states of which are to be updated.
+   * @param event the event.
+   */
+
+  private def applyEventToKey(key: Option[Int], event : E ): Unit = {
+    var statesToRemove: Set[state] = emptyStateSet
+    var statesToAdd: Set[state] = emptyStateSet
     var theStates = lookupStates(key)
     for (sourceState <- theStates) {
       sourceState(event) match {
@@ -1000,14 +1063,6 @@ class Monitor[E] {
     theStates --= statesToRemove
     theStates ++= statesToAdd
     updateStates(key, theStates)
-    statesToRemove = emptyStateSet
-    statesToAdd = emptyStateSet
-    invariants foreach { case (e, inv) => check(inv(), e) }
-    for (monitor <- monitors) {
-      monitor.verify(event)
-    }
-    if (monitorAtTop && DautOptions.DEBUG) printStates()
-    verifyAfterEvent(event)
   }
 
   /**
@@ -1015,10 +1070,9 @@ class Monitor[E] {
    * These represent obligations that have not been fulfilled.
    */
 
-  // TODO
   def end() {
     debug(s"ending Daut trace evaluation for $monitorName")
-    val theEndStates = states._1.union(states._2.values.flatten.toSet)
+    val theEndStates = states.values.flatten.toSet
     val hotStates = theEndStates filter (!_.isFinal)
     if (!hotStates.isEmpty) {
       println()
@@ -1085,18 +1139,19 @@ class Monitor[E] {
    * Prints the current states of the monitor, and its sub-monitors.
    */
 
-  // TODO
   private def printStates() {
-    val topline = "--- " + monitorName + ("-" * 20)
-    val bottomline = "-" * topline.length
-    println(topline)
-    println("-- main states: ")
-    states._1 foreach println
-    for ((index, ss) <- states._2){
-      println(s"-- index=$index:")
-      ss foreach println
+    println(s"--- $monitorName:")
+    println("[main] ")
+    for (s <- states(None)) {
+      println(s"  $s")
     }
-    println(bottomline)
+    println
+    for ((Some(index), ss) <- states) {
+      println(s"[index=$index]")
+      for (s <- ss) {
+        println(s"  $s")
+      }
+    }
     println()
     for (m <- monitors) m.printStates()
   }

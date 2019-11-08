@@ -31,8 +31,8 @@ class OneThread extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val INDEX = 10000000
-    DautOptions.DEBUG = false
+    val INDEX = 3
+    DautOptions.DEBUG = true
     val m = new OneThread
     time (s"analyzing $INDEX acquisitions") {
       for (index <- 1 to INDEX) {

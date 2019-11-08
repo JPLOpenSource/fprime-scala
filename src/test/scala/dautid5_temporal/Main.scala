@@ -4,13 +4,21 @@ import dautid._
 import dautid.Util.time
 
 /**
+ * Property AcquireRelease: A task acquiring a lock should eventually release it. A task can acquire at most
+ * one lock at a time.
+ *
+ * Property OneThread: When a thread takes a lock no other thread (including itself)
+ * can take the lock.
+ *
  * Property LocksNotReentrant: If a thread takes a lock it cannot take that lock
  * again before it has been released.
  */
 
 trait LockEvent
-case class acquire(t:Int, x:Int) extends LockEvent
-case class release(t:Int, x:Int) extends LockEvent
+
+case class acquire(t: Int, x: Int) extends LockEvent
+
+case class release(t: Int, x: Int) extends LockEvent
 
 class AcquireRelease extends Monitor[LockEvent] {
   override def keyOf(event: LockEvent): Option[Int] = {
@@ -23,9 +31,9 @@ class AcquireRelease extends Monitor[LockEvent] {
   always {
     case acquire(t, x) =>
       hot {
-        case acquire(`t`,_) => error
-        case release(`t`,`x`) => ok
-      } label(t,x)
+        case acquire(`t`, _) => error
+        case release(`t`, `x`) => ok
+      } label(t, x)
   }
 }
 
@@ -40,9 +48,9 @@ class OneThread extends Monitor[LockEvent] {
   always {
     case acquire(t, x) =>
       watch {
-        case acquire(_,`x`) => error
-        case release(`t`,`x`) => ok
-      } label(t,x)
+        case acquire(_, `x`) => error
+        case release(`t`, `x`) => ok
+      } label(t, x)
   }
 }
 
@@ -57,9 +65,9 @@ class LocksNotReentrant extends Monitor[LockEvent] {
   always {
     case acquire(t, x) =>
       watch {
-        case acquire(`t`,`x`) => error
-        case release(`t`,`x`) => ok
-      } label(t,x)
+        case acquire(`t`, `x`) => error
+        case release(`t`, `x`) => ok
+      } label(t, x)
   }
 }
 
@@ -76,7 +84,7 @@ object Main {
     val INDEX = 3
     DautOptions.DEBUG = true
     val m = new AllMonitors
-    time (s"analyzing $INDEX acquisitions") {
+    time(s"analyzing $INDEX acquisitions") {
       for (index <- 1 to INDEX) {
         m.verify(acquire(index, index))
       }

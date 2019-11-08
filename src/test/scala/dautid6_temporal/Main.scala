@@ -1,4 +1,4 @@
-package dautid1_temporal
+package dautid6_temporal
 
 import dautid._
 import dautid.Util.time
@@ -11,12 +11,14 @@ import dautid.Util.time
 trait LockEvent
 case class acquire(t:Int, x:Int) extends LockEvent
 case class release(t:Int, x:Int) extends LockEvent
+case object CANCEL extends LockEvent
 
 class AcquireRelease extends Monitor[LockEvent] {
   override def keyOf(event: LockEvent): Option[Int] = {
     event match {
       case acquire(t, _) => Some(t)
       case release(t, _) => Some(t)
+      case CANCEL => None
     }
   }
 
@@ -24,7 +26,7 @@ class AcquireRelease extends Monitor[LockEvent] {
     case acquire(t, x) =>
       hot {
         case acquire(`t`,_) => error
-        case release(`t`,`x`) => ok
+        case CANCEL | release(`t`,`x`) => ok
       } label(t,x)
   }
 }
@@ -38,11 +40,10 @@ object Main {
       for (index <- 1 to INDEX) {
         m.verify(acquire(index, index))
       }
-      for (index <- 1 to INDEX) {
-        m.verify(release(index, index))
-      }
+      m.verify(CANCEL)
     }
     m.end()
   }
 }
+
 
