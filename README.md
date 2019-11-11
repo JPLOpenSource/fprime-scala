@@ -1,9 +1,9 @@
 
 # Component Based Programming in Scala
 
-The contents of this repository is a collection of four Scala DSLs for composing, programming, monitoring, and testing component-based systems. The four DSLs are: F', pronounced F prime (for composing component based systems), HSM (for programming with hiearchical state machines), Daut (for monitoring with data automata), and Rules (for rule-based testing).
+The contents of this repository is a collection of four Scala DSLs for composing, programming, monitoring, and testing component-based systems. The four DSLs are: F', pronounced F prime (for composing component based systems), HSM (for programming with hierarchical state machines), Daut (for monitoring with data automata), and Rules (for rule-based testing).
 
-The four DSLs can be used together. For example, a system can be built as an F' application with interacting components, and where some components are programmed as hierachical state machines. Selected components can be monitors, and all component can be tested using rules.
+The four DSLs can be used together. For example, a system can be built as an F' application with interacting components, and where some components are programmed as hierarchical state machines. Selected components can be monitors, and all component can be tested using rules.
 
 The DSLs are effectively API's (libraries) in Scala, but are given DSL "look and feel". The DSLs are so-called _internal shallow DSLs_, internal because they are Scala APIs, and shallow because Scala's own language features form a fundamental part of the DSLs.
 
@@ -26,9 +26,9 @@ A small subset of the framework developed in C++ and described in the following 
 
 F' supports programming a system as a collection of parallel executing components (tasks, threads). Each component's interface consists of a collection of typed input ports and a collection of typed output ports. Each output port of one component is connected to an input port of another component with a connection. Communication over ports can be asyncrhonous (buffered) as well as syncrhonous (as method calls).
 
-### HSM (Hiearchical State Machines)
+### HSM (Hierarchical State Machines)
 
-A Scala DSL for writing Hiearchical State Machines (HSMs). The DSL is described in the paper
+A Scala DSL for writing Hierarchical State Machines (HSMs). The DSL is described in the paper
 (see doc/papers/hsm folder):
 
 * **Modeling and Monitoring of Hierarchical State Machines in Scala**, 
@@ -68,7 +68,7 @@ which can be found in [doc/papers/fprime/serene-2017.pdf](doc/papers/hsm/serene-
     September 4-5, 2017, Geneva, Switzerland. Lecture Notes in Computer 
     Science Volume 10479.
 
-The example is that of an imaging application on board a spacecraft, consisiting of two components (`Imaging` and `Camera`) and a `Ground` component. The `Imaging` component is given commands from ground to orchestrate the taking of an image with the shutter being open for a certain duration. The `Imaging` component communicates with the `Camera`. Furthermore, events, reporting what is happening, are sent to ground. The `Imaging` component is programmed as a hiearchical state machine and the ground, also a component, is programmed as a data automaton monitor. Each component has input ports (white) and output ports (blue). Output ports are connected to input ports.
+The example is that of an imaging application on board a spacecraft, consisiting of two components (`Imaging` and `Camera`) and a `Ground` component. The `Imaging` component is given commands from ground to orchestrate the taking of an image with the shutter being open for a certain duration. The `Imaging` component communicates with the `Camera`. Furthermore, events, reporting what is happening, are sent to ground. The `Imaging` component is programmed as a hierarchical state machine and the ground, also a component, is programmed as a data automaton monitor. Each component has input ports (white) and output ports (blue). Output ports are connected to input ports.
 
 ![Component topology](components.png)
 
@@ -168,7 +168,7 @@ class Imaging extends Component {
   }
 
   /**
-   * The hiearchical state machine.
+   * The hierarchical state machine.
    */
 
   object Machine extends HSM[Any] {
