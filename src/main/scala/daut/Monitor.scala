@@ -487,6 +487,17 @@ class Monitor[E] {
     override def toString: String = name
   }
 
+  // TODO:
+
+  /**
+   * Special state indicating that we stay in the current state. This is normally
+   * achieved by none of the transitions being able to fire. However, there can be
+   * situations where we want to provide a transition explicitly, to indicate that
+   * we stay in the current state.
+   */
+
+  protected case object stay extends state
+
   /**
    * Special state indicating successful termination.
    */
@@ -1055,6 +1066,7 @@ class Monitor[E] {
             targetState match {
               case `error` => reportError()
               case `ok` =>
+              case `stay` => statesToAdd += sourceState // TODO
               case _ => statesToAdd += targetState
             }
           }
