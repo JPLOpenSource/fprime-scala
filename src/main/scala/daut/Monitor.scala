@@ -163,16 +163,6 @@ class Monitor[E] {
    * Number of violation of the specification encountered.
    */
 
-  // TODO:
-
-  /**
-   * Variable holding the initial state of a monitor. Used to remove that state
-   * from the state soup of a particular index when indexing is used (`keyOf` has been
-   * overridden by the user). It is needed to in particular remove `always` states.
-   */
-
-  private var initialState : state = null
-
   private var errorCount = 0
 
   /**
