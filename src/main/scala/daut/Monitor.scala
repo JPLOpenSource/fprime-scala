@@ -75,6 +75,123 @@ case class MonitorError() extends RuntimeException
  */
 
 class Monitor[E] {
+
+  /**
+   * This class represents all the active states in a monitor (excluding those of its sub-monitors).
+   */
+
+  private class States {
+    /**
+     * A monitor is at any point in time in zero, one, or more states, conceptually represented as a set of states. All
+     * states have to lead to success, hence there is an implicitly understood conjunction between
+     * the states in the set. The implementation, however, consists of a main set of states,
+     * and a map from indexes to sets of states, to facilitate
+     * optimization. A key  is an optional index, where `None` represents the initial default set of states.
+     */
+
+    private var mainStates: Set[state] = Set()
+    private var indexedStates : Map[Any,Set[state]] = Map()
+
+    /**
+     * Returns all states contained in the main set and in the indexed sets.
+     *
+     * @return all states.
+     */
+
+    def getAllStates: Set[state] = mainStates.union(indexedStates.values.flatten.toSet)
+
+    /**
+     * Returns the main non-indexed set of states.
+     *
+     * @return the main non-indexed set of states.
+     */
+
+    def getMainStates: Set[state] = mainStates
+
+    /**
+     * Returns the set of indexes of indexed state sets.
+     *
+     * @return the set of indexes of indexed state sets.
+     */
+
+    def getIndexes: Set[Any] = indexedStates.keySet
+
+    /**
+     * Get the set indexed by `index`.
+     *
+     * @param index the index used to look up the state set. It is assumed that there is an entry for
+     *              this index.
+     * @return the state set denoted by the index.
+     */
+
+    def getIndexedSet(index: Any): Set[state] = indexedStates(index)
+
+    /**
+     * Updates the main set of states to contain the state `s`.
+     *
+     * @param s the state to add to the main set of states.
+     */
+
+    def initial(s : state): Unit = {
+      mainStates = Set(s)
+    }
+
+    /**
+     * Applies an event to the states of the monitor. If the key of the event is `None`
+     * it is applied to the main set of states as well as to each indexed set. Otherwise
+     * the event is applied to the indexed set. If a such does not exist, the main set is used
+     * as a starting point, and stored in that index when evaluated.
+     *
+     * @param event the event to evaluate.
+     */
+
+    def applyEvent(event: E): Unit = {
+      val key = keyOf(event)
+      key match {
+        case None =>
+          mainStates = applyEventToStateSet(event)(mainStates)
+          for ((index,ss) <- indexedStates) {
+            indexedStates += (index -> applyEventToStateSet(event)(ss))
+          }
+        case Some(index) =>
+          val ss = indexedStates.getOrElse(index, mainStates)
+          indexedStates += (index -> applyEventToStateSet(event)(ss))
+      }
+    }
+
+    /**
+     * Applies an event to a set of states and returns the updated set.
+     * This method performs the main verification task.
+     *
+     * @param event the event.
+     * @param states the set of states to apply the event to.
+     */
+
+    private def applyEventToStateSet(event : E)(states: Set[state]): Set[state] = {
+      var statesToRemove: Set[state] = emptyStateSet
+      var statesToAdd: Set[state] = emptyStateSet
+      var theStates = states
+      for (sourceState <- theStates) {
+        sourceState(event) match {
+          case None =>
+          case Some(targetStates) =>
+            statesToRemove += sourceState
+            for (targetState <- targetStates) {
+              targetState match {
+                case `error` => reportError()
+                case `ok` =>
+                case `stay` => statesToAdd += sourceState
+                case _ => statesToAdd += targetState
+              }
+            }
+        }
+      }
+      theStates --= statesToRemove
+      theStates ++= statesToAdd
+      theStates
+    }
+  }
+
   /**
    * True for the topmost monitor in a hierarchy of monitors (created by calls of the
    * `monitor` method). Used for controlling printing during debugging.
@@ -92,7 +209,7 @@ class Monitor[E] {
    * @return the key computed for the event.
    */
 
-  protected def keyOf(event: E): Index = None
+  protected def keyOf(event: E): Option[Any] = None
 
   /**
    * The name of the monitor, derived from its class name.
@@ -109,36 +226,10 @@ class Monitor[E] {
   private var monitors: List[Monitor[E]] = List()
 
   /**
-   * A monitor is at any point in time in zero, one, or more states, conceptually represented as a set of states. All
-   * states have to lead to success, hence there is an implicitly understood conjunction between
-   * the states in the set. The implementation is, however, a map from keys to sets of states, to facilitate
-   * optimization. The key `None` represents the initial default set of states.
+   * The active states of the monitor, excluding those of its sub-monitors.
    */
 
-  private var states: Map[Index, Set[state]] = Map(None -> Set())
-
-  /**
-   * Looks up a key in the key in the `states` variable. If `states` is not
-   * defined for the key, the default state set denoted by the key `None` is returned.
-   *
-   * @param key the key to look up.
-   * @return the set of states denoted by the key, or the set denoted by `None` if
-   *         the key is not defined.
-   */
-
-  private def lookupStates(key: Index): Set[state] =
-    states.getOrElse(key, states(None))
-
-  /**
-   * Updates the set of states denoted by `key`.
-   *
-   * @param key the key to be updated.
-   * @param newStates the set of states it is mapped to.
-   */
-
-  private def updateStates(key: Index, newStates: Set[state]): Unit = {
-    states += (key -> newStates)
-  }
+  private var states = new States()
 
   /**
    * This variable holds invariants that have been defined by the user with one of the
@@ -742,7 +833,7 @@ class Monitor[E] {
 
   protected def exists(pred: PartialFunction[state, Boolean]): Boolean = {
     val alwaysFalse : PartialFunction[state, Boolean] = { case _ => false }
-    states.values.flatten.toSet exists (pred orElse alwaysFalse)
+    states.getAllStates exists (pred orElse alwaysFalse)
   }
 
   /**
@@ -822,7 +913,7 @@ class Monitor[E] {
 
   protected def map(pf: PartialFunction[state, Set[state]]) = new {
     def orelse(otherwise: => Set[state]): Set[state] = {
-      val matchingStates = states.values.flatten.toSet filter (pf.isDefinedAt(_))
+      val matchingStates = states.getAllStates filter (pf.isDefinedAt(_))
       if (!matchingStates.isEmpty) {
         (for (matchingState <- matchingStates) yield pf(matchingState)).flatten
       } else
@@ -873,7 +964,7 @@ class Monitor[E] {
    */
 
   protected def initial(s: state) {
-    states = Map(None -> Set(s))
+    states.initial(s)
   }
 
   /**
@@ -889,7 +980,7 @@ class Monitor[E] {
    */
 
   protected implicit def convState2Boolean(s: state): Boolean =
-    states.values.flatten.toSet contains s
+    states.getAllStates contains s
 
   /**
    * Implicit function lifting the `Unit` value `()` to the set:
@@ -1012,9 +1103,9 @@ class Monitor[E] {
 
   /**
    * Submits an event to the monitor for verification against the specification.
-   * The event is "submitted" to each current state, each resulting in a new set
-   * of states. The result is the union of these sets of states. The method evaluates
-   * the invariants as part of the verification.
+   * The event is "submitted" to each relevant current state set (taking indexing into account),
+   * each such application resulting in a new set of states.
+   * The method evaluates the invariants as part of the verification.
    *
    * The method uses indexing to optimize the monitoring: each event is mapped to
    * a key, which is used to fast-access the set of states relevant for the event.
@@ -1025,15 +1116,7 @@ class Monitor[E] {
   def verify(event: E): Unit = {
     verifyBeforeEvent(event)
     if (monitorAtTop) debug("\n===[" + event + "]===\n")
-    val key = keyOf(event)
-    key match {
-      case None =>
-        for (key_ <- states.keySet) {
-          applyEventToKey(key_, event)
-        }
-      case Some(_) =>
-        applyEventToKey(key, event)
-    }
+    states.applyEvent(event)
     invariants foreach { case (e, inv) => check(inv(), e) }
     for (monitor <- monitors) {
       monitor.verify(event)
@@ -1043,50 +1126,17 @@ class Monitor[E] {
   }
 
   /**
-   * Applies an event to the states denoted by a specific key, and only the states for
-   * that key. If no states is defined for that key, the set of states denoted by
-   * the key `None` are used. This method performs the main verification task.
-   *
-   * @param key the key the states of which are to be updated.
-   * @param event the event.
-   */
-
-  private def applyEventToKey(key: Index, event : E ): Unit = {
-    var statesToRemove: Set[state] = emptyStateSet
-    var statesToAdd: Set[state] = emptyStateSet
-    var theStates = lookupStates(key)
-    for (sourceState <- theStates) {
-      sourceState(event) match {
-        case None =>
-        case Some(targetStates) =>
-          statesToRemove += sourceState
-          for (targetState <- targetStates) {
-            targetState match {
-              case `error` => reportError()
-              case `ok` =>
-              case `stay` => statesToAdd += sourceState
-              case _ => statesToAdd += targetState
-            }
-          }
-      }
-    }
-    theStates --= statesToRemove
-    theStates ++= statesToAdd
-    updateStates(key, theStates)
-  }
-
-  /**
    * Ends the monitoring, reporting on all remaining current non-final states.
    * These represent obligations that have not been fulfilled.
    */
 
   def end() {
     debug(s"Ending Daut trace evaluation for $monitorName")
-    val theEndStates = states.values.flatten.toSet
+    val theEndStates = states.getAllStates
     val hotStates = theEndStates filter (!_.isFinal)
     if (!hotStates.isEmpty) {
       println()
-      println(s"*** non final Daut $monitorName states:")
+      println(s"*** Non final Daut $monitorName states:")
       println()
       hotStates foreach println
       reportError()
@@ -1152,13 +1202,13 @@ class Monitor[E] {
   private def printStates() {
     println(s"--- $monitorName:")
     println("[main] ")
-    for (s <- states(None)) {
+    for (s <- states.getMainStates) {
       println(s"  $s")
     }
     println
-    for ((Some(index), ss) <- states) {
+    for (index <- states.getIndexes) {
       println(s"[index=$index]")
-      for (s <- ss) {
+      for (s <- states.getIndexedSet(index)) {
         println(s"  $s")
       }
     }

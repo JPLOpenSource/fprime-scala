@@ -13,7 +13,7 @@ case class acquire(t:Int, x:Int) extends LockEvent
 case class release(t:Int, x:Int) extends LockEvent
 
 class AcquireRelease extends Monitor[LockEvent] {
-  override def keyOf(event: LockEvent): Index = {
+  override def keyOf(event: LockEvent): Option[Int] = {
     event match {
       case acquire(t, _) => Some(t)
       case release(t, _) => Some(t)
