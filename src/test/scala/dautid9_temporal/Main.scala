@@ -15,6 +15,27 @@ case class acquire(t: Int, x: Int) extends LockEvent
 
 case class release(t: Int, x: Int) extends LockEvent
 
+class TestMonitor extends Monitor[LockEvent] {
+  override def keyOf(event: LockEvent): Option[Int] = {
+    event match {
+      case acquire(_, x) => Some(x)
+      case release(_, x) => Some(x)
+    }
+  }
+
+  def start(): state = {
+    watch {
+      case acquire(t,x) => watch {
+        case acquire(`t`, `x`) => stay
+        case acquire(_, `x`) => error
+        case release(`t`, `x`) => ok
+      } label(t,x)
+    }
+  }
+
+  start()
+}
+
 class AcquireRelease extends Monitor[LockEvent] {
   override def keyOf(event: LockEvent): Option[Int] = {
     event match {
@@ -36,7 +57,7 @@ class AcquireRelease extends Monitor[LockEvent] {
 object Main {
   def main(args: Array[String]) {
     DautOptions.DEBUG = true
-    val m = new AcquireRelease
+    val m = new TestMonitor
     m.verify(acquire(1, 100))
     m.verify(acquire(1, 100))
     m.verify(acquire(2, 200))

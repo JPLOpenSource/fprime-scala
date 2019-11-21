@@ -145,6 +145,8 @@ def wnext(ts: Transitions): state  // one of the transtions must fire next, if t
 Note: these functions actually return an object of a subclass (named
 `anonymous`) of class `state`, but that is not important here.
 
+An additional state `stay` as a result of a transition indicates that we stay in the current state.
+
 #### From States to Sets of States and Other Magic
 
 You notice above that the state producing functions each takes a partial function of type `Transitions` as argument, that is, of type:
@@ -811,40 +813,6 @@ class AcquireRelease extends Monitor[Event] {
 
 ```
 
-## Options
-
-Daut offers three option variables that can be set:
-
-- `DautOptions.DEBUG` (static variable): when set to true, causes each monitor step to be printed, including event and resulting set of states. Default is false.
-- `DautOptions.PRINT_ERROR_BANNER` (static variable): when set to true, when an error occurs, a very big ERROR BANNNER is printed (to make it visible amongst plenty of output). Default is true.
-- `Monitor.STOP_ON_ERROR`: when set to true an error will case the monitor to stop. Default is false. This option is local to each monitor.
-
-These options can be set as shown in the following example:
-
-```scala
-DautOptions.DEBUG = true
-DautOptions.PRINT_ERROR_BANNER = false
-val m = MyMonitor()
-m.STOP_ON_ERROR = true
-...
-```
-
-#### Labeling of Anonymous States for Debugging Purposes
-
-When debugging a monitor with the `DautOptions.DEBUG` flag set to true, states will be printed on standard out. For anonymous states we will only get printed what kind of state it is (`always`, `hot`, ...). We can added information to be printed with the `label` function, for example as follows:
-
-```scala
-  always {
-    case acquire(t, x) =>
-      hot {
-        case acquire(_, `x`) => error
-        case CANCEL | release(`t`, `x`) => ok
-      } label(t, x)
-  }
-```
-
-This will cause `hot(1,2)` to be printed instead of just `hot` (for values `t`=1 and `x`=2).
-
 ## Implementing New Temporal Operators
 
 Daut is extensible in the sense that one can define new temporal operators/patterns. We shall here mention two ways of doing this, namely repsectively as a (monitor) class or as a function. We shall illustrate the concepts on an example concerning a radio, which can be opened and closed, and over which messages can be sent, and received at the other end.
@@ -974,3 +942,203 @@ object Main {
 }
 ```
 
+## Options
+
+Daut offers three option variables that can be set:
+
+- `DautOptions.DEBUG` (static variable): when set to true, causes each monitor step to be printed, including event and resulting set of states. Default is false.
+- `DautOptions.PRINT_ERROR_BANNER` (static variable): when set to true, when an error occurs, a very big ERROR BANNNER is printed (to make it visible amongst plenty of output). Default is true.
+- `Monitor.STOP_ON_ERROR`: when set to true an error will case the monitor to stop. Default is false. This option is local to each monitor.
+
+These options can be set as shown in the following example:
+
+```scala
+DautOptions.DEBUG = true
+DautOptions.PRINT_ERROR_BANNER = false
+val m = MyMonitor()
+m.STOP_ON_ERROR = true
+...
+```
+
+#### Labeling of Anonymous States for Debugging Purposes
+
+When debugging a monitor with the `DautOptions.DEBUG` flag set to true, states will be printed on standard out. For anonymous states we will only get printed what kind of state it is (`always`, `hot`, ...). We can added information to be printed with the `label` function, for example as follows:
+
+```scala
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      } label(t, x)
+  }
+```
+
+This will cause `hot(1,2)` to be printed instead of just `hot` (for values `t`=1 and `x`=2).
+
+#### Example of using debugging mode
+
+##### The slow monitor not using indexing
+
+Consider the example introduced in the section `Using Indexing to Speed up Monitors` above. We shall run this example in debug mode and explain the resulting output. We first debug the slow monitor:
+
+```scala
+class CorrectLock extends SlowLockMonitor {
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      } label(t, x)
+  }
+}
+```
+
+Note that we have added the `label(t,x)` to the `hot` state. This will cause the debug output to contain terms such as `hot(1,100)`. Next, in the main program, we set the `DEBUG` flag to true:
+
+```
+object Main {
+  def main(args: Array[String]) {
+    val m = new CorrectLock
+    DautOptions.DEBUG = true
+    m.verify(acquire(1, 100))
+    m.verify(acquire(2, 200))
+    m.verify(acquire(1, 200)) // error
+    m.verify(CANCEL)
+    m.end()
+  }
+}
+```
+
+When we run this program we get the following output:
+
+```
+===[acquire(1,100)]===
+
+--- CorrectLock:
+[main] 
+  hot(1,100)
+  always
+
+===[acquire(2,200)]===
+
+--- CorrectLock:
+[main] 
+  hot(1,100)
+  hot(2,200)
+  always
+
+===[acquire(1,200)]===
+
+███████╗██████╗ ██████╗  ██████╗ ██████╗
+██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗
+█████╗  ██████╔╝██████╔╝██║   ██║██████╔╝
+██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██╗
+███████╗██║  ██║██║  ██║╚██████╔╝██║  ██║
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+
+CorrectLock error # 1
+        
+--- CorrectLock:
+[main] 
+  hot(1,100)
+  hot(1,200)
+  always
+  
+===[CANCEL]===
+
+--- CorrectLock:
+[main] 
+  always
+
+
+Ending Daut trace evaluation for CorrectLock
+
+```
+
+For each event we get a line indicating what event, e.g `===[acquire(1,100)]===`.
+Next, for each monitor, here we have one: `CorrectLock`, we see what states are maintained in the `main` state set. For example after the events
+`acquire(1,100)` and `acquire(2,200)` we have the set:
+
+```
+[main] 
+  hot(1,100)
+  hot(2,200)
+  always
+```
+
+consisting of two `hot` states, and the initial `always` state. As we can see, all the states are in the same set. After the `CANCEL` event we see that this set returns to only contain the `always` state.
+
+##### The fast monitor using indexing
+
+If we now instead run the example with the fast indexed monitor:
+
+```scala
+class CorrectLock extends FastLockMonitor {
+  ...
+}
+```
+
+we get the following output:
+
+```
+===[acquire(1,100)]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot(1,100)
+  always
+
+===[acquire(2,200)]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot(1,100)
+  always
+[index=200]
+  hot(2,200)
+  always
+
+===[acquire(1,200)]===
+
+███████╗██████╗ ██████╗  ██████╗ ██████╗
+██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗
+█████╗  ██████╔╝██████╔╝██║   ██║██████╔╝
+██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██╗
+███████╗██║  ██║██║  ██║╚██████╔╝██║  ██║
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+
+CorrectLock error # 1
+        
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot(1,100)
+  always
+[index=200]
+  hot(1,200)
+  always
+
+===[CANCEL]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  always
+[index=200]
+  always
+
+Ending Daut trace evaluation for CorrectLock
+```
+
+Note how the different `hot` states are now distributed in different buckets in the indexed hash map. Note also how the `always` state is copied to these buckets and is always active.

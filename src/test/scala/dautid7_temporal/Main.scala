@@ -21,8 +21,8 @@ class SlowLockMonitor extends Monitor[LockEvent]
 class FastLockMonitor extends Monitor[LockEvent] {
   override def keyOf(event: LockEvent): Option[Int] = {
     event match {
-      case acquire(_, l) => Some(l)
-      case release(_, l) => Some(l)
+      case acquire(_, x) => Some(x)
+      case release(_, x) => Some(x)
       case CANCEL => None
     }
   }
@@ -38,7 +38,7 @@ class BadLockMonitor extends Monitor[LockEvent] {
   }
 }
 
-class CorrectLock extends SlowLockMonitor {
+class CorrectLock extends FastLockMonitor {
   always {
     case acquire(t, x) =>
       hot {

@@ -163,6 +163,16 @@ class Monitor[E] {
    * Number of violation of the specification encountered.
    */
 
+  // TODO:
+
+  /**
+   * Variable holding the initial state of a monitor. Used to remove that state
+   * from the state soup of a particular index when indexing is used (`keyOf` has been
+   * overridden by the user). It is needed to in particular remove `always` states.
+   */
+
+  private var initialState : state = null
+
   private var errorCount = 0
 
   /**
@@ -422,7 +432,7 @@ class Monitor[E] {
         Some(transitions(event)) else None
 
     if (first) {
-      states = Map(None -> Set(this))
+      initial(this)
       first = false
     }
   }
@@ -486,8 +496,6 @@ class Monitor[E] {
 
     override def toString: String = name
   }
-
-  // TODO:
 
   /**
    * Special state indicating that we stay in the current state. This is normally
@@ -1066,7 +1074,7 @@ class Monitor[E] {
             targetState match {
               case `error` => reportError()
               case `ok` =>
-              case `stay` => statesToAdd += sourceState // TODO
+              case `stay` => statesToAdd += sourceState
               case _ => statesToAdd += targetState
             }
           }
@@ -1083,7 +1091,7 @@ class Monitor[E] {
    */
 
   def end() {
-    debug(s"ending Daut trace evaluation for $monitorName")
+    debug(s"Ending Daut trace evaluation for $monitorName")
     val theEndStates = states.values.flatten.toSet
     val hotStates = theEndStates filter (!_.isFinal)
     if (!hotStates.isEmpty) {
