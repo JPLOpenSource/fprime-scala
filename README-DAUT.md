@@ -676,10 +676,10 @@ The third event will violate the monitor since task 1 wants to acquire lock 200,
 Note that this property is __lock centric__: we can maintain a set of states for each lock: those states that concern only that lock. This is the idea in indexing. We can use the lock id as key in a mapping from  keys to sets of states. This is done by overriding the `keyOf` function in the `Monitor` class (something the user has to do explicitly). This function has the type:
 
 ```scala
-def keyOf(event: LockEvent): Option[Int]
+def keyOf(event: LockEvent): Option[Any]
 ```
 
-This function takes an event as argument and returns an optional integer index. It's default return value is `None`. The function can be overridden as follows for our example:
+This function takes an event as argument and returns an optional index of type `Any` (any index can be used). It's default return value is `None`. The function can be overridden as follows for our example:
 
 ```scala
 class FastLockMonitor extends Monitor[LockEvent] {

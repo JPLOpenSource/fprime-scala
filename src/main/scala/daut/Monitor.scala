@@ -92,7 +92,7 @@ class Monitor[E] {
    * @return the key computed for the event.
    */
 
-  protected def keyOf(event: E): Option[Int] = None
+  protected def keyOf(event: E): Index = None
 
   /**
    * The name of the monitor, derived from its class name.
@@ -115,7 +115,7 @@ class Monitor[E] {
    * optimization. The key `None` represents the initial default set of states.
    */
 
-  private var states: Map[Option[Int], Set[state]] = Map(None -> Set())
+  private var states: Map[Index, Set[state]] = Map(None -> Set())
 
   /**
    * Looks up a key in the key in the `states` variable. If `states` is not
@@ -126,7 +126,7 @@ class Monitor[E] {
    *         the key is not defined.
    */
 
-  private def lookupStates(key: Option[Int]): Set[state] =
+  private def lookupStates(key: Index): Set[state] =
     states.getOrElse(key, states(None))
 
   /**
@@ -136,7 +136,7 @@ class Monitor[E] {
    * @param newStates the set of states it is mapped to.
    */
 
-  private def updateStates(key: Option[Int], newStates: Set[state]): Unit = {
+  private def updateStates(key: Index, newStates: Set[state]): Unit = {
     states += (key -> newStates)
   }
 
@@ -1051,7 +1051,7 @@ class Monitor[E] {
    * @param event the event.
    */
 
-  private def applyEventToKey(key: Option[Int], event : E ): Unit = {
+  private def applyEventToKey(key: Index, event : E ): Unit = {
     var statesToRemove: Set[state] = emptyStateSet
     var statesToAdd: Set[state] = emptyStateSet
     var theStates = lookupStates(key)

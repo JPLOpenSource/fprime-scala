@@ -42,4 +42,10 @@
  * }}}
  */
 
-package object daut {}
+package object daut {
+  /**
+   * Type of indexes when using indexing approach.
+   */
+
+  type Index = Option[Any]
+}

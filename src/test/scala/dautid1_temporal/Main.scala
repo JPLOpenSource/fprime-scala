@@ -13,7 +13,7 @@ case class acquire(t:Int, x:Int) extends LockEvent
 case class release(t:Int, x:Int) extends LockEvent
 
 class AcquireRelease extends Monitor[LockEvent] {
-  override def keyOf(event: LockEvent): Option[Int] = {
+  override def keyOf(event: LockEvent): Index = {
     event match {
       case acquire(t, _) => Some(t)
       case release(t, _) => Some(t)
@@ -31,8 +31,8 @@ class AcquireRelease extends Monitor[LockEvent] {
 
 object Main {
   def main(args: Array[String]) {
-    val INDEX = 3
-    DautOptions.DEBUG = true
+    val INDEX = 1000000
+    DautOptions.DEBUG = false
     val m = new AcquireRelease
     time (s"analyzing $INDEX acquisitions") {
       for (index <- 1 to INDEX) {
