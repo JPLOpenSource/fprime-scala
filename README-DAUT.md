@@ -1142,3 +1142,81 @@ Ending Daut trace evaluation for CorrectLock
 ```
 
 Note how the different `hot` states are now distributed in different buckets in the indexed hash map. Note also how the `always` state is copied to these buckets and is always active.
+
+##### Not using labels
+
+Suppose we do not label the anonymous `hot` state, as in the following where the label has been commented out:
+
+```scala
+class CorrectLock extends FastLockMonitor {
+  always {
+    case acquire(t, x) =>
+      hot {
+        case acquire(_, `x`) => error
+        case CANCEL | release(`t`, `x`) => ok
+      } // label(t, x)
+  }
+}
+```
+
+Then the output will be less informative, and will only tell us what kind of states (`always`, `hot`, ...) are in the state soups, without any values, as follows:
+
+```
+===[acquire(1,100)]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot
+  always
+
+===[acquire(2,200)]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot
+  always
+[index=200]
+  hot
+  always
+
+===[acquire(1,200)]===
+
+███████╗██████╗ ██████╗  ██████╗ ██████╗
+██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗
+█████╗  ██████╔╝██████╔╝██║   ██║██████╔╝
+██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██╗
+███████╗██║  ██║██║  ██║╚██████╔╝██║  ██║
+╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
+
+CorrectLock error # 1
+        
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  hot
+  always
+[index=200]
+  hot
+  always
+
+===[CANCEL]===
+
+--- CorrectLock:
+[main] 
+  always
+
+[index=100]
+  always
+[index=200]
+  always
+
+Ending Daut trace evaluation for CorrectLock
+```

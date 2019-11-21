@@ -44,7 +44,7 @@ class CorrectLock extends FastLockMonitor {
       hot {
         case acquire(_, `x`) => error
         case CANCEL | release(`t`, `x`) => ok
-      } label(t, x)
+      } // label(t, x)
   }
 }
 
