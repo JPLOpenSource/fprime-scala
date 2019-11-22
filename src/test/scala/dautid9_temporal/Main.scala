@@ -4,71 +4,63 @@ import daut._
 import daut.Util.time
 
 /**
- * Property AcquireRelease: A task acquiring a lock should eventually release it.
- * A task can only be acquired by one task at a time, but a task can acquire the
- * same lock numerous times before releasing it.
+ * Property CorrectElevator:
+ * 1. An elevator has to have been requested to go to a floor before it can
+ *    go to that floor and reach that floor.
+ * 2. Once requested to go to a floor, the elevator can be repeatedly requested to
+ *    go to that floor, go to that floor, and reach that floor, but not other floors.
+ * 3. A RESET resets the system to its initial state for all elevators.
+ *
+ * Property 1 is essentially a past time temporal property that without indexing would
+ * have to be expressed using facts (as in rule-based programming). With indexing we
+ * can utilize the same technique as done in slicing based systems such as MOP.
  */
 
-trait LockEvent
+trait ElevatorEvent
+case class request(elevator: Int, floor: Int) extends ElevatorEvent
+case class going(elevator: Int, floor: Int) extends ElevatorEvent
+case class reached(elevator: Int, floor: Int) extends ElevatorEvent
+case object RESET extends ElevatorEvent
 
-case class acquire(t: Int, x: Int) extends LockEvent
-
-case class release(t: Int, x: Int) extends LockEvent
-
-class TestMonitor extends Monitor[LockEvent] {
-  override def keyOf(event: LockEvent): Option[Int] = {
+class ElevatorMonitor extends Monitor[ElevatorEvent] {
+  override def keyOf(event: ElevatorEvent): Option[Int] = {
     event match {
-      case acquire(_, x) => Some(x)
-      case release(_, x) => Some(x)
+      case request(e, f) => Some(e)
+      case going(e, f) => Some(e)
+      case reached(e, f) => Some(e)
+      case RESET => None // goes to all states
     }
   }
-
-  def start(): state = {
-    watch {
-      case acquire(t,x) => watch {
-        case acquire(`t`, `x`) => stay
-        case acquire(_, `x`) => error
-        case release(`t`, `x`) => ok
-      } label(t,x)
-    }
-  }
-
-  start()
 }
 
-class AcquireRelease extends Monitor[LockEvent] {
-  override def keyOf(event: LockEvent): Option[Int] = {
-    event match {
-      case acquire(_, x) => Some(x)
-      case release(_, x) => Some(x)
-    }
+class CorrectElevator extends ElevatorMonitor {
+  def property(): state = watch {
+    case request(e, f) => watch {
+      case request(`e`, `f`) | going(`e`, `f`) => stay
+      case reached(`e`, `f`) | RESET => property()
+      case _ => error
+    } label(e, f)
+    case RESET => stay
+    case _ => error
   }
 
-  always {
-    case acquire(t, x) =>
-      hot {
-        case acquire(`t`, `x`) => stay
-        case acquire(_, `x`) => error
-        case release(`t`, `x`) => ok
-      } label(t, x)
-  }
+  property()
 }
 
 object Main {
   def main(args: Array[String]) {
+    val m = new CorrectElevator
     DautOptions.DEBUG = true
-    val m = new TestMonitor
-    m.verify(acquire(1, 100))
-    m.verify(acquire(1, 100))
-    m.verify(acquire(2, 200))
-    m.verify(acquire(2, 200))
-    m.verify(release(1, 100))
-    m.verify(acquire(1, 200))
+    m(request(1, 100))
+    m(request(2, 200))
+    m(going(1, 100))
+    m(going(2, 200))
+    m(RESET)
+    m(reached(1, 100))
+    m(reached(2, 200))
     m.end()
   }
 }
-
-
 
 
 

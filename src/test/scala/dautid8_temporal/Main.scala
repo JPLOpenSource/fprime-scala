@@ -11,7 +11,6 @@ case class going(floor: Int) extends ElevatorEvent
 
 case class reached(floor: Int) extends ElevatorEvent
 
-
 class UpMonitor extends Monitor[ElevatorEvent] {
   var thisFloor : Option[Int] = None
   override def keyOf(event: ElevatorEvent): Option[Int] = {
@@ -45,7 +44,6 @@ object Main {
     m.verify(request(100))
     m.verify(going(100))
     m.verify(going(100))
-    // m.verify(going(200)) // error
     m.verify(request(200))
     m.end()
   }
