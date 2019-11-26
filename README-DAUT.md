@@ -679,7 +679,8 @@ Note that this property is __lock centric__: we can maintain a set of states for
 def keyOf(event: LockEvent): Option[Any]
 ```
 
-This function takes an event as argument and returns an optional index of type `Any` (any index can be used). It's default return value is `None`. The function can be overridden as follows for our example:
+This function takes an event as argument and returns an optional index of type `Any` (any index can be used). It's default return value is `None`. The function can be overridden as follows for our example (note why it may be a good idea to separate out the definition
+of `keyOf` from the actual monitor: we achive modularity and potential reuse of the `keyOf` function for other monitors):
 
 ```scala
 class FastLockMonitor extends Monitor[LockEvent] {
@@ -771,7 +772,7 @@ class AcquireRelease extends Monitor[LockEvent] {
       case acquire(t, x) => hot {
         case acquire(_, `x`) => error
         case release(`t`, `x`) => start()
-      } label(t, x)
+      } 
       case release(_, _) => error
     }
 
