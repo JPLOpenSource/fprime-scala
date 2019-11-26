@@ -1,4 +1,4 @@
-# Monitoring with Data Automata (Daut)
+# Monitoring Data Automata with Daut
 
 Daut (Data automata) is an internal Scala DSL for writing event stream monitors. It
 supports a simple but yet interesting combination of state machines, temporal logic, 
@@ -611,7 +611,7 @@ This allows to build a hierarchy of monitors, which might be useful for grouping
 
 ## Using Indexing to Speed up Monitors
 
-Indexing is an approach to speed up monitoring by defining a function from events to keys, and using the keys as entries in a hashmap to obtain only those states that are relevent to the particular event. This can be useful if our state soup ends up containing many (thousands) of states. The larger the number of states in the state soup, the more important indexing becomes for obtaining an efficient monitor. The improvement in speed can be orders of magnitudes.
+Indexing is an approach to speed up monitoring by defining a function from events to keys, and using the keys as entries in a hashmap to obtain only those states that are relevent to the particular event. This can be useful if our state soup ends up containing many (thousands) of states. The larger the number of states in the state soup, the more important indexing becomes for obtaining an efficient monitor. The improvement in speed can be several orders of magnitudes.
 
 Let us illustrate the indexing approach with a slight modification of our locking example.
 
@@ -744,9 +744,52 @@ In this case, our monitor will not detect the violation in the sequence:
 
 since the first event is sent to the state set denoted by 2 and the second event is sent to the state set denoted by 1. Those sets are different, and hence no violation is detected.
 
-#### Other Forms of Keys
+#### Using Indexing to Check Past Time Properties
 
-A key can be any integer. For example if an argument to an event is a string, the key can be the hash code of the string. Sometimes some function of all the arguments to an event can be used as a key. In some cases one cannot define a key function without breaking the monitor: all events must always be sent to all states.
+An interesting application of indexing, beyond just optimization, is the formulation of
+past time properties, e.g.: _"if some event P happens now then some other event Q should have happened in the past"_. Recall that we previously used a fact (objects of case classes, specifically the fact `Locked(t,x)`), to model the fact that thread `t` has acquired lock `x`.
+We can instead use the indexing feature that all events concerning e.g. a lock are sent to the same state set, and we can therefore require that a `release` is not allowed for a lock before it has been acquired. Let's see how this looks like.
+
+The property we formulated earlier was the following:
+
+- _"A task acquiring a lock should eventually release it. At most one task
+can acquire a lock at a time. A task cannot release a lock it has not acquired."_.
+
+It is the last requirement _"A task cannot release a lock it has not acquired"_, that is a past time property: if a task is released, it must have been acquired in the past, and not released since. We shall leave out the `CANCEL` event from this example. The monitor for this property, using indexing, can be formulated as follows.
+
+```scala
+class AcquireRelease extends Monitor[LockEvent] {
+  override def keyOf(event: LockEvent): Option[Int] = {
+    event match {
+      case acquire(_, x) => Some(x)
+      case release(_, x) => Some(x)
+    }
+  }
+
+  def start(): state =
+    watch {
+      case acquire(t, x) => hot {
+        case acquire(_, `x`) => error
+        case release(`t`, `x`) => start()
+      } label(t, x)
+      case release(_, _) => error
+    }
+
+  start()
+}
+```
+
+The `keyOf` function extracts the lock id for each event, hence all events for one particular lock are sent to the same state set. The monitor itself is a state machine with one named state `start`, and an anonymous hot state, from which there is a transition back to the `start` state when a lock is released. Note the transition:
+
+```scala
+case release(_, _) => error
+```
+
+as part of the `start` state, which will trigger an error in case a `release` event arrives before an `acquire` event for a lock.
+
+This is fundamentally how slicing-based systems such as 
+[MOP](http://fsl.cs.illinois.edu/index.php/JavaMOP4) 
+model past time properties.
 
 ## How to React to Errors
 

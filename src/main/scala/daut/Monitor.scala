@@ -1138,8 +1138,10 @@ class Monitor[E] {
       println()
       println(s"*** Non final Daut $monitorName states:")
       println()
-      hotStates foreach println
-      reportError()
+      for (hotState <- hotStates) {
+        println(hotState)
+        reportError()
+      }
     }
     for (monitor <- monitors) {
       monitor.end()

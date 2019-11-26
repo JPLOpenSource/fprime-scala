@@ -7,7 +7,7 @@ import daut.Monitor
  * Property AcquireRelease: A task acquiring a lock should eventually release it. At most one task
  * can acquire a lock at a time.
  *
- * property ReleaseAcquired: A task cannot release a lock it has not acquire.
+ * property ReleaseAcquired: A task cannot release a lock it has not acquired.
  * */
 
 trait Event
