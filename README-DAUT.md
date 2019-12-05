@@ -848,8 +848,7 @@ class AcquireRelease extends Monitor[Event] {
     case acquire(t, x) =>
       hot {
         case acquire(_,`x`) => 
-          handleError() // handle the error
-          error // and return the error state
+          error // call callBack() and return the error state
         case release(`t`,`x`) => ok
       }
   }
